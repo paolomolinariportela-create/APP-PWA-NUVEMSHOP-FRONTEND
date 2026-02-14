@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import "../styles/AdminPanel.css";
 
-// Interface dos dados de Configuração
+// Interface dos dados
 interface AppConfig {
   app_name: string;
   theme_color: string;
@@ -10,20 +10,25 @@ interface AppConfig {
   whatsapp_number: string;
 }
 
-// Interface dos dados de Vendas (Novo)
+// Interface das Estatísticas Reais
 interface Stats {
   total: number;
   quantidade: number;
 }
 
 export default function AdminPanel() {
-  const [searchParams] = useSearchParams();
-  const storeId = searchParams.get("store_id");
+  const [searchParams, setSearchParams] = useSearchParams();
   
+  // 1. SEGURANÇA: Pegamos o Token da URL (não mais o store_id direto)
+  const tokenFromUrl = searchParams.get("token");
+
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   
-  // Estado da Configuração
+  // Estado do Token (O Crachá de Acesso)
+  const [token, setToken] = useState<string | null>(localStorage.getItem("app_token"));
+  
+  // Dados da Loja
   const [config, setConfig] = useState<AppConfig>({
     app_name: "Minha Loja",
     theme_color: "#000000",
@@ -31,55 +36,75 @@ export default function AdminPanel() {
     whatsapp_number: ""
   });
 
-  // Novos Estados: Estatísticas e URL
+  // Dados Reais (Vendas e Link)
   const [stats, setStats] = useState<Stats>({ total: 0, quantidade: 0 });
   const [storeUrl, setStoreUrl] = useState("");
 
-  // URL do Backend (pega do .env ou usa localhost)
+  // URL do Backend
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-  // Carregar dados ao abrir
+  // --- EFEITO 1: GERENCIAR LOGIN (JWT) ---
   useEffect(() => {
-    if (!storeId) return;
+    if (tokenFromUrl) {
+      // Se chegou um token novo na URL, salvamos e limpamos a URL para ficar seguro
+      localStorage.setItem("app_token", tokenFromUrl);
+      setToken(tokenFromUrl);
+      setSearchParams({}); // Limpa a URL visualmente
+    }
+  }, [tokenFromUrl, setSearchParams]);
+
+  // --- EFEITO 2: CARREGAR DADOS DA API ---
+  useEffect(() => {
+    // Só carrega se tivermos o crachá (Token)
+    if (!token) return;
+
     setLoading(true);
 
-    // 1. Busca Configurações Visuais
-    fetch(`${API_URL}/admin/config/${storeId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setConfig({
-          app_name: data.app_name || "Minha Loja",
-          theme_color: data.theme_color || "#000000",
-          logo_url: data.logo_url || "",
-          whatsapp_number: data.whatsapp_number || ""
+    // Função para fazer chamadas seguras (Enviando o Crachá)
+    const authFetch = (endpoint: string) => 
+        fetch(`${API_URL}${endpoint}`, { 
+            headers: { "Authorization": `Bearer ${token}` } 
         });
-      })
-      .catch((err) => console.error("Erro ao carregar config:", err));
 
-    // 2. Busca Estatísticas de Venda (Receita)
-    fetch(`${API_URL}/stats/total-vendas/${storeId}`)
-      .then((res) => res.json())
-      .then((data) => setStats(data))
-      .catch((err) => console.error("Erro ao carregar stats:", err));
+    // Carregamos tudo em paralelo
+    Promise.all([
+        authFetch("/admin/config").then(r => r.json()),
+        authFetch("/stats/total-vendas").then(r => r.json()),
+        authFetch("/admin/store-info").then(r => r.json())
+    ]).then(([dataConfig, dataStats, dataUrl]) => {
+        // Atualiza os estados com dados reais
+        setConfig({
+             app_name: dataConfig.app_name || "Minha Loja",
+             theme_color: dataConfig.theme_color || "#000000",
+             logo_url: dataConfig.logo_url || "",
+             whatsapp_number: dataConfig.whatsapp_number || ""
+        });
+        setStats(dataStats);
+        setStoreUrl(dataUrl.url);
+    })
+    .catch(err => {
+        console.error("Erro de Autenticação:", err);
+        // Se o token for inválido (Erro 401), avisamos o usuário
+        alert("Sessão expirada ou inválida. Por favor, reinstale o aplicativo.");
+        localStorage.removeItem("app_token");
+        setToken(null);
+    })
+    .finally(() => setLoading(false));
 
-    // 3. Busca URL da Loja para o Link
-    fetch(`${API_URL}/admin/store-info/${storeId}`)
-      .then((res) => res.json())
-      .then((data) => setStoreUrl(data.url))
-      .catch((err) => console.error("Erro ao carregar url:", err))
-      .finally(() => setLoading(false));
+  }, [token, API_URL]);
 
-  }, [storeId, API_URL]);
-
-  // Salvar dados
+  // --- FUNÇÃO DE SALVAR (BLINDADA) ---
   const handleSave = async () => {
-    if (!storeId) return alert("Loja não identificada!");
+    if (!token) return alert("Erro de segurança: Token não encontrado.");
     setSaving(true);
     try {
       await fetch(`${API_URL}/admin/config`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ store_id: storeId, ...config }),
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}` // <--- Aqui vai a chave de segurança
+        },
+        body: JSON.stringify(config), // Não precisamos mandar store_id, o token já diz quem é!
       });
       alert("✨ Configurações salvas com sucesso!");
     } catch (error) {
@@ -90,51 +115,45 @@ export default function AdminPanel() {
     }
   };
 
-  // Função para copiar o link
+  // Funções Auxiliares de Marketing
   const copyLink = () => {
     const link = `${storeUrl}/pages/app`;
     navigator.clipboard.writeText(link);
-    alert("Link copiado! Coloque na bio do Instagram.");
+    alert("Link copiado! Coloque na Bio do Instagram.");
   };
 
-  if (!storeId) return <div className="error-screen">🚫 ID da loja não fornecido na URL.</div>;
+  // URL para gerar o QR Code (Google API)
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(storeUrl + "/pages/app")}&color=${config.theme_color.replace("#", "")}`;
+
+  // Se não tiver token, bloqueia a tela
+  if (!token) return <div className="error-screen">🔒 Acesso Negado. Abra este app pelo painel da Nuvemshop.</div>;
 
   return (
     <div className="dashboard-container">
       {/* --- HEADER --- */}
       <header className="dashboard-header">
         <div className="header-content">
-          <h1>App Builder <span className="badge">PRO</span></h1>
+          <h1>App Builder <span className="badge">SECURE</span></h1>
           <div className="user-info">
-            <span className="store-id">Loja: {storeId}</span>
-            <div className="avatar">L</div>
+            <span className="store-id">Painel Seguro</span>
+            <div className="avatar">🔒</div>
           </div>
         </div>
       </header>
 
       <main className="dashboard-content">
         
-        {/* --- MÉTRICAS (STATS - ATUALIZADO COM VENDAS REAIS) --- */}
+        {/* --- MÉTRICAS (AGORA COM DADOS REAIS) --- */}
         <section className="stats-grid">
-          
-          {/* Card de Receita (O mais importante) */}
+          {/* Card 1: Receita Real */}
           <div className="stat-card" style={{ borderLeft: '4px solid #10B981' }}>
             <div className="stat-icon green">💰</div>
             <div className="stat-info">
               <h3>Receita Pelo App</h3>
               <p>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.total)}</p>
               <span className="stat-growth">
-                {stats.quantidade === 0 ? "Nenhuma venda ainda" : `🔥 ${stats.quantidade} vendas realizadas`}
+                 {stats.quantidade > 0 ? `🔥 ${stats.quantidade} vendas` : "Nenhuma venda ainda"}
               </span>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-icon blue">👀</div>
-            <div className="stat-info">
-              <h3>Visualizações</h3>
-              <p>--</p>
-              <span className="stat-growth">Dados em tempo real</span>
             </div>
           </div>
 
@@ -143,7 +162,16 @@ export default function AdminPanel() {
             <div className="stat-info">
               <h3>Instalações</h3>
               <p>--</p>
-              <span className="stat-growth">Disponível em breve</span>
+              <span className="stat-growth">Dados em tempo real</span>
+            </div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-icon blue">🚀</div>
+            <div className="stat-info">
+              <h3>Status</h3>
+              <p>Ativo</p>
+              <span className="stat-growth">App Seguro</span>
             </div>
           </div>
         </section>
@@ -152,20 +180,19 @@ export default function AdminPanel() {
           {/* --- COLUNA ESQUERDA: CONFIGURAÇÃO --- */}
           <div className="config-section">
             
-            {/* NOVO CARD: Link de Download Oficial */}
+            {/* NOVO CARD: Link Oficial (Vital para o lojista) */}
             <div className="card config-card" style={{ borderColor: '#8B5CF6' }}>
                 <div className="card-header">
                     <h2 style={{ color: '#7C3AED' }}>🔗 Link de Download</h2>
-                    <p>Página oficial criada automaticamente na sua loja.</p>
+                    <p>Divulgue este link no Instagram e WhatsApp.</p>
                 </div>
                 <div className="form-group">
-                    <label>Link para divulgar (Instagram/WhatsApp)</label>
                     <div style={{ display: 'flex', gap: '10px' }}>
                         <input 
                             type="text" 
                             readOnly 
                             value={storeUrl ? `${storeUrl}/pages/app` : "Carregando..."} 
-                            style={{ backgroundColor: '#f9f9f9', color: '#555' }}
+                            style={{ backgroundColor: '#f9f9f9', color: '#555', flex: 1 }}
                         />
                         <button 
                             onClick={copyLink}
@@ -179,7 +206,19 @@ export default function AdminPanel() {
                     </div>
                 </div>
             </div>
-            
+
+            {/* CARD: QR Code */}
+            <div className="card config-card" style={{ flexDirection: 'row', alignItems: 'center', gap: '20px' }}>
+                <img src={qrCodeUrl} alt="QR Code" style={{width: '80px', height: '80px', borderRadius: '8px', border: '1px solid #eee'}} />
+                <div>
+                    <h3 style={{fontSize: '16px', margin: '0 0 5px 0'}}>QR Code de Balcão</h3>
+                    <a href={qrCodeUrl} download="qrcode.png" target="_blank" rel="noreferrer" style={{color: config.theme_color, textDecoration: 'none', fontWeight: 'bold', fontSize: '14px'}}>
+                        ⬇️ Baixar Imagem
+                    </a>
+                </div>
+            </div>
+
+            {/* CARD: Identidade Visual (Seu código original) */}
             <div className="card config-card">
               <div className="card-header">
                 <h2>🎨 Identidade Visual</h2>
@@ -227,11 +266,11 @@ export default function AdminPanel() {
 
             <div className="card config-card">
               <div className="card-header">
-                <h2>🚀 Conversão</h2>
-                <p>Ferramentas para vender mais.</p>
+                <h2>📞 Suporte</h2>
+                <p>Botão de WhatsApp no App.</p>
               </div>
               <div className="form-group">
-                <label>WhatsApp para Suporte</label>
+                <label>WhatsApp</label>
                 <input 
                   type="text" 
                   value={config.whatsapp_number}
@@ -250,7 +289,7 @@ export default function AdminPanel() {
             </button>
           </div>
 
-          {/* --- COLUNA DIREITA: PREVIEW --- */}
+          {/* --- COLUNA DIREITA: PREVIEW (Intacto) --- */}
           <div className="preview-section">
             <div className="sticky-wrapper">
               <h3>Preview ao Vivo</h3>
@@ -287,7 +326,7 @@ export default function AdminPanel() {
                     </div>
                   </div>
 
-                  {/* Bottom Navigation (A nossa mágica) */}
+                  {/* Bottom Navigation */}
                   <div className="bottom-nav">
                     <div className="nav-item" style={{ color: config.theme_color }}>
                       <span>🏠</span>
