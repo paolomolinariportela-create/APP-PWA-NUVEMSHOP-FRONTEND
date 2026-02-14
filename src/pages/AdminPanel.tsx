@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import "../styles/AdminPanel.css";
 
-// Interface dos Dados Completos (Dashboard)
+// Interface dos Dados Completos (Dashboard) - ATUALIZADA COM NOVOS CAMPOS
 interface DashboardStats {
   receita: number;
   vendas: number;
@@ -11,6 +11,11 @@ interface DashboardStats {
   taxa_conversao: { app: number; site: number };
   economia_ads: number;
   top_produtos: Array<{ nome: string; vendas: number }>;
+  // Novos Campos
+  visualizacoes: { pageviews: number; tempo_medio: string; top_paginas: string[] };
+  funil: { visitas: number; carrinho: number; checkout: number };
+  recorrencia: { clientes_2x: number; taxa_recompra: number };
+  ticket_medio: { app: number; site: number };
 }
 
 // Interface da Configuração
@@ -54,7 +59,12 @@ export default function AdminPanel() {
     carrinhos_abandonados: { valor: 0, qtd: 0 },
     taxa_conversao: { app: 0, site: 0 },
     economia_ads: 0,
-    top_produtos: []
+    top_produtos: [],
+    // Inicialização dos Novos Cards
+    visualizacoes: { pageviews: 0, tempo_medio: "--", top_paginas: [] },
+    funil: { visitas: 0, carrinho: 0, checkout: 0 },
+    recorrencia: { clientes_2x: 0, taxa_recompra: 0 },
+    ticket_medio: { app: 0, site: 0 }
   });
 
   // --- EFEITO 1: GERENCIAR LOGIN (JWT) ---
@@ -164,7 +174,24 @@ export default function AdminPanel() {
                 </div>
             </div>
 
-            {/* 2. INSTALAÇÕES */}
+            {/* 2. TICKET MÉDIO (NOVO 🆕) */}
+            <div className="stat-card">
+                <div className="stat-icon" style={{background: '#F0F9FF', color: '#0369A1'}}>💳</div>
+                <div className="stat-info">
+                    <h3>Ticket Médio</h3>
+                    <div style={{marginTop: '10px'}}>
+                        <div style={{display:'flex', justifyContent:'space-between', marginBottom:'5px'}}>
+                            <span style={{color:'#10B981', fontWeight:'bold'}}>App: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.ticket_medio.app)}</span>
+                            <span style={{fontSize:'10px', background:'#DCFCE7', color:'#15803D', padding:'2px 6px', borderRadius:'4px'}}>+30%</span>
+                        </div>
+                        <div style={{fontSize:'12px', color:'#666'}}>
+                            Site: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.ticket_medio.site)}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* 3. INSTALAÇÕES */}
             <div className="stat-card">
                 <div className="stat-icon purple">📱</div>
                 <div className="stat-info">
@@ -174,7 +201,58 @@ export default function AdminPanel() {
                 </div>
             </div>
 
-            {/* 3. CARRINHOS ABANDONADOS (Dinheiro na mesa) */}
+            {/* 4. RECORRÊNCIA (NOVO 🆕) */}
+            <div className="stat-card">
+                <div className="stat-icon blue">🔁</div>
+                <div className="stat-info">
+                    <h3>Clientes Recorrentes</h3>
+                    <p>{stats.recorrencia.clientes_2x}</p>
+                    <span className="stat-growth">Compraram 2x ou mais</span>
+                    <div style={{fontSize: '11px', color: '#666', marginTop: '4px'}}>Taxa de Recompra: <strong>{stats.recorrencia.taxa_recompra}%</strong></div>
+                </div>
+            </div>
+
+            {/* 5. VISUALIZAÇÕES (NOVO 🆕) */}
+            <div className="stat-card">
+                <div className="stat-icon" style={{background:'#FFF7ED', color:'#C2410C'}}>👀</div>
+                <div className="stat-info">
+                    <h3>Engajamento</h3>
+                    <p>{stats.visualizacoes.pageviews.toLocaleString()}</p>
+                    <span className="stat-growth">Pageviews este mês</span>
+                    <div style={{marginTop: '8px', fontSize: '11px', color: '#555'}}>
+                        ⏱️ Tempo médio: <strong>{stats.visualizacoes.tempo_medio}</strong>
+                    </div>
+                </div>
+            </div>
+
+            {/* 6. FUNIL BÁSICO (NOVO 🆕) */}
+            <div className="stat-card" style={{gridRow: 'span 2'}}>
+                <div className="stat-info" style={{width: '100%'}}>
+                    <h3>Funil de Vendas 📉</h3>
+                    <div style={{marginTop: '15px'}}>
+                        {/* Etapa 1 */}
+                        <div className="conversion-bar">
+                            <div className="bar-label"><span>1. Visitas</span> <strong>{stats.funil.visitas}</strong></div>
+                            <div className="bar-track"><div className="bar-fill" style={{width: '100%', background: '#9CA3AF'}}></div></div>
+                        </div>
+                        {/* Etapa 2 */}
+                        <div className="conversion-bar">
+                            <div className="bar-label"><span>2. Carrinho</span> <strong>{stats.funil.carrinho}</strong></div>
+                            <div className="bar-track"><div className="bar-fill" style={{width: '32%', background: '#60A5FA'}}></div></div>
+                        </div>
+                        {/* Etapa 3 */}
+                        <div className="conversion-bar">
+                            <div className="bar-label"><span>3. Checkout</span> <strong>{stats.funil.checkout}</strong></div>
+                            <div className="bar-track"><div className="bar-fill" style={{width: '11%', background: '#10B981'}}></div></div>
+                        </div>
+                        <small style={{display:'block', marginTop:'10px', color:'#666', fontSize:'10px'}}>
+                            32% de conversão para carrinho
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            {/* 7. CARRINHOS ABANDONADOS */}
             <div className="stat-card" style={{borderLeft: '4px solid #ef4444'}}>
                 <div className="stat-icon red">💸</div>
                 <div className="stat-info">
@@ -186,16 +264,14 @@ export default function AdminPanel() {
                 </div>
             </div>
 
-            {/* 4. TAXA DE CONVERSÃO (Comparativo) */}
+            {/* 8. TAXA DE CONVERSÃO */}
             <div className="stat-card">
                 <div className="stat-info" style={{width: '100%'}}>
                     <h3>Taxa de Conversão 🏆</h3>
-                    
                     <div className="conversion-bar">
                         <div className="bar-label"><span>App PWA</span> <strong>{stats.taxa_conversao.app}%</strong></div>
                         <div className="bar-track"><div className="bar-fill" style={{width: `${stats.taxa_conversao.app * 20}%`, background: '#10B981'}}></div></div>
                     </div>
-                    
                     <div className="conversion-bar">
                         <div className="bar-label"><span>Site Mobile</span> <strong>{stats.taxa_conversao.site}%</strong></div>
                         <div className="bar-track"><div className="bar-fill" style={{width: `${stats.taxa_conversao.site * 20}%`, background: '#9ca3af'}}></div></div>
@@ -203,7 +279,7 @@ export default function AdminPanel() {
                 </div>
             </div>
 
-             {/* 5. ECONOMIA DE ADS */}
+             {/* 9. ECONOMIA DE ADS */}
              <div className="stat-card">
                 <div className="stat-icon blue">📉</div>
                 <div className="stat-info">
@@ -218,7 +294,7 @@ export default function AdminPanel() {
           {/* --- COLUNA ESQUERDA: CONFIGURAÇÃO --- */}
           <div className="config-section">
             
-            {/* NOVO CARD: Link Oficial (Vital para o lojista) */}
+            {/* CARD: Link Oficial */}
             <div className="config-card" style={{ background: '#f5f3ff', border: '1px solid #ddd6fe' }}>
                 <div className="card-header">
                     <h2 style={{ color: '#7C3AED' }}>🔗 Link de Download</h2>
@@ -256,7 +332,7 @@ export default function AdminPanel() {
                 </div>
             </div>
 
-            {/* CARD: Identidade Visual (Intacto) */}
+            {/* CARD: Identidade Visual */}
             <div className="config-card">
               <div className="card-header">
                 <h2>🎨 Identidade Visual</h2>
@@ -302,6 +378,7 @@ export default function AdminPanel() {
               </div>
             </div>
 
+            {/* CARD: Suporte */}
             <div className="config-card">
               <div className="card-header">
                 <h2>📞 Suporte</h2>
@@ -327,7 +404,7 @@ export default function AdminPanel() {
             </button>
           </div>
 
-          {/* --- COLUNA DIREITA: PREVIEW (Intacto) --- */}
+          {/* --- COLUNA DIREITA: PREVIEW --- */}
           <div className="preview-section">
             <div className="sticky-wrapper">
               <h3 style={{textAlign: 'center', marginBottom: '10px'}}>Preview ao Vivo</h3>
