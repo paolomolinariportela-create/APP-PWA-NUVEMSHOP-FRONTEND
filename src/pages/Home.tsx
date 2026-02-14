@@ -1,11 +1,19 @@
 import React from 'react';
 
 export default function Home() {
-  // Pega a URL da API do ambiente
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+  // --- CORREÇÃO DE SEGURANÇA E URL ---
+  // 1. Pega a URL do .env ou usa localhost como padrão
+  let API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+  // 2. O Railway as vezes entrega a URL sem o "https://". 
+  // Se não tiver, nós colocamos na força. Isso resolve o erro de tela branca/405.
+  if (API_URL && !API_URL.startsWith("http")) {
+      API_URL = `https://${API_URL}`;
+  }
+  // ------------------------------------
 
   const handleLogin = () => {
-    // Redireciona para o Backend iniciar o processo de Login/Instalação
+    // Redireciona para o Backend (agora com a URL correta)
     window.location.href = `${API_URL}/install`;
   };
 
@@ -30,7 +38,7 @@ export default function Home() {
   );
 }
 
-// Estilos CSS simples direto no arquivo (para facilitar)
+// Estilos CSS simples direto no arquivo (Mantidos iguais ao seu original)
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
     height: '100vh',
