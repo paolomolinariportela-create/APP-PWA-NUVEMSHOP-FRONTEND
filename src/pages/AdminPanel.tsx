@@ -2,12 +2,18 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import "../styles/AdminPanel.css";
 
-// Interface dos dados
+// Interface dos dados de Configuração
 interface AppConfig {
   app_name: string;
   theme_color: string;
   logo_url: string;
   whatsapp_number: string;
+}
+
+// Interface dos dados de Vendas (Novo)
+interface Stats {
+  total: number;
+  quantidade: number;
 }
 
 export default function AdminPanel() {
@@ -25,6 +31,10 @@ export default function AdminPanel() {
     whatsapp_number: ""
   });
 
+  // Novos Estados: Estatísticas e URL
+  const [stats, setStats] = useState<Stats>({ total: 0, quantidade: 0 });
+  const [storeUrl, setStoreUrl] = useState("");
+
   // URL do Backend (pega do .env ou usa localhost)
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -32,6 +42,8 @@ export default function AdminPanel() {
   useEffect(() => {
     if (!storeId) return;
     setLoading(true);
+
+    // 1. Busca Configurações Visuais
     fetch(`${API_URL}/admin/config/${storeId}`)
       .then((res) => res.json())
       .then((data) => {
@@ -42,8 +54,21 @@ export default function AdminPanel() {
           whatsapp_number: data.whatsapp_number || ""
         });
       })
-      .catch((err) => console.error("Erro ao carregar:", err))
+      .catch((err) => console.error("Erro ao carregar config:", err));
+
+    // 2. Busca Estatísticas de Venda (Receita)
+    fetch(`${API_URL}/stats/total-vendas/${storeId}`)
+      .then((res) => res.json())
+      .then((data) => setStats(data))
+      .catch((err) => console.error("Erro ao carregar stats:", err));
+
+    // 3. Busca URL da Loja para o Link
+    fetch(`${API_URL}/admin/store-info/${storeId}`)
+      .then((res) => res.json())
+      .then((data) => setStoreUrl(data.url))
+      .catch((err) => console.error("Erro ao carregar url:", err))
       .finally(() => setLoading(false));
+
   }, [storeId, API_URL]);
 
   // Salvar dados
@@ -56,7 +81,6 @@ export default function AdminPanel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ store_id: storeId, ...config }),
       });
-      // Feedback visual simples (pode ser melhorado com um Toast)
       alert("✨ Configurações salvas com sucesso!");
     } catch (error) {
       console.error(error);
@@ -64,6 +88,13 @@ export default function AdminPanel() {
     } finally {
       setSaving(false);
     }
+  };
+
+  // Função para copiar o link
+  const copyLink = () => {
+    const link = `${storeUrl}/pages/app`;
+    navigator.clipboard.writeText(link);
+    alert("Link copiado! Coloque na bio do Instagram.");
   };
 
   if (!storeId) return <div className="error-screen">🚫 ID da loja não fornecido na URL.</div>;
@@ -83,30 +114,36 @@ export default function AdminPanel() {
 
       <main className="dashboard-content">
         
-        {/* --- MÉTRICAS (STATS) --- */}
+        {/* --- MÉTRICAS (STATS - ATUALIZADO COM VENDAS REAIS) --- */}
         <section className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-icon purple">📱</div>
+          
+          {/* Card de Receita (O mais importante) */}
+          <div className="stat-card" style={{ borderLeft: '4px solid #10B981' }}>
+            <div className="stat-icon green">💰</div>
             <div className="stat-info">
-              <h3>Instalações</h3>
-              <p>124</p>
-              <span className="stat-growth">+12% essa semana</span>
+              <h3>Receita Pelo App</h3>
+              <p>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.total)}</p>
+              <span className="stat-growth">
+                {stats.quantidade === 0 ? "Nenhuma venda ainda" : `🔥 ${stats.quantidade} vendas realizadas`}
+              </span>
             </div>
           </div>
+
           <div className="stat-card">
             <div className="stat-icon blue">👀</div>
             <div className="stat-info">
               <h3>Visualizações</h3>
-              <p>1.8k</p>
-              <span className="stat-growth">Últimos 30 dias</span>
+              <p>--</p>
+              <span className="stat-growth">Dados em tempo real</span>
             </div>
           </div>
+
           <div className="stat-card">
-            <div className="stat-icon green">💬</div>
+            <div className="stat-icon purple">📱</div>
             <div className="stat-info">
-              <h3>Cliques WhatsApp</h3>
-              <p>45</p>
-              <span className="stat-growth">Alta conversão</span>
+              <h3>Instalações</h3>
+              <p>--</p>
+              <span className="stat-growth">Disponível em breve</span>
             </div>
           </div>
         </section>
@@ -114,6 +151,34 @@ export default function AdminPanel() {
         <div className="editor-grid">
           {/* --- COLUNA ESQUERDA: CONFIGURAÇÃO --- */}
           <div className="config-section">
+            
+            {/* NOVO CARD: Link de Download Oficial */}
+            <div className="card config-card" style={{ borderColor: '#8B5CF6' }}>
+                <div className="card-header">
+                    <h2 style={{ color: '#7C3AED' }}>🔗 Link de Download</h2>
+                    <p>Página oficial criada automaticamente na sua loja.</p>
+                </div>
+                <div className="form-group">
+                    <label>Link para divulgar (Instagram/WhatsApp)</label>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <input 
+                            type="text" 
+                            readOnly 
+                            value={storeUrl ? `${storeUrl}/pages/app` : "Carregando..."} 
+                            style={{ backgroundColor: '#f9f9f9', color: '#555' }}
+                        />
+                        <button 
+                            onClick={copyLink}
+                            style={{ 
+                                background: '#8B5CF6', color: 'white', border: 'none', 
+                                borderRadius: '8px', cursor: 'pointer', padding: '0 20px', fontWeight: 'bold' 
+                            }}
+                        >
+                            Copiar
+                        </button>
+                    </div>
+                </div>
+            </div>
             
             <div className="card config-card">
               <div className="card-header">
