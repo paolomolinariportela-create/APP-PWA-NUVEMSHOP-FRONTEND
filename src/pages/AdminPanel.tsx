@@ -2,7 +2,18 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import "../styles/AdminPanel.css";
 
-// Interface dos dados
+// Interface dos Dados Completos (Dashboard)
+interface DashboardStats {
+  receita: number;
+  vendas: number;
+  instalacoes: number;
+  carrinhos_abandonados: { valor: number; qtd: number };
+  taxa_conversao: { app: number; site: number };
+  economia_ads: number;
+  top_produtos: Array<{ nome: string; vendas: number }>;
+}
+
+// Interface da Configuração
 interface AppConfig {
   app_name: string;
   theme_color: string;
@@ -10,16 +21,10 @@ interface AppConfig {
   whatsapp_number: string;
 }
 
-// Interface das Estatísticas Reais
-interface Stats {
-  total: number;
-  quantidade: number;
-}
-
 export default function AdminPanel() {
   const [searchParams, setSearchParams] = useSearchParams();
   
-  // 1. SEGURANÇA: Pegamos o Token da URL (não mais o store_id direto)
+  // 1. SEGURANÇA: Pegamos o Token da URL
   const tokenFromUrl = searchParams.get("token");
 
   const [loading, setLoading] = useState(false);
@@ -28,7 +33,12 @@ export default function AdminPanel() {
   // Estado do Token (O Crachá de Acesso)
   const [token, setToken] = useState<string | null>(localStorage.getItem("app_token"));
   
-  // Dados da Loja
+  // URL do Backend
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+  // --- ESTADOS DE DADOS ---
+  const [storeUrl, setStoreUrl] = useState("");
+  
   const [config, setConfig] = useState<AppConfig>({
     app_name: "Minha Loja",
     theme_color: "#000000",
@@ -36,17 +46,20 @@ export default function AdminPanel() {
     whatsapp_number: ""
   });
 
-  // Dados Reais (Vendas e Link)
-  const [stats, setStats] = useState<Stats>({ total: 0, quantidade: 0 });
-  const [storeUrl, setStoreUrl] = useState("");
-
-  // URL do Backend
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+  // Novos dados do Dashboard (Inicializados com zeros)
+  const [stats, setStats] = useState<DashboardStats>({
+    receita: 0, 
+    vendas: 0, 
+    instalacoes: 0,
+    carrinhos_abandonados: { valor: 0, qtd: 0 },
+    taxa_conversao: { app: 0, site: 0 },
+    economia_ads: 0,
+    top_produtos: []
+  });
 
   // --- EFEITO 1: GERENCIAR LOGIN (JWT) ---
   useEffect(() => {
     if (tokenFromUrl) {
-      // Se chegou um token novo na URL, salvamos e limpamos a URL para ficar seguro
       localStorage.setItem("app_token", tokenFromUrl);
       setToken(tokenFromUrl);
       setSearchParams({}); // Limpa a URL visualmente
@@ -55,45 +68,41 @@ export default function AdminPanel() {
 
   // --- EFEITO 2: CARREGAR DADOS DA API ---
   useEffect(() => {
-    // Só carrega se tivermos o crachá (Token)
     if (!token) return;
-
     setLoading(true);
 
-    // Função para fazer chamadas seguras (Enviando o Crachá)
     const authFetch = (endpoint: string) => 
-        fetch(`${API_URL}${endpoint}`, { 
-            headers: { "Authorization": `Bearer ${token}` } 
-        });
+        fetch(`${API_URL}${endpoint}`, { headers: { "Authorization": `Bearer ${token}` } });
 
-    // Carregamos tudo em paralelo
     Promise.all([
         authFetch("/admin/config").then(r => r.json()),
-        authFetch("/stats/total-vendas").then(r => r.json()),
+        authFetch("/stats/dashboard").then(r => r.json()), // <--- ROTA NOVA DOS CARDS
         authFetch("/admin/store-info").then(r => r.json())
     ]).then(([dataConfig, dataStats, dataUrl]) => {
-        // Atualiza os estados com dados reais
+        
         setConfig({
              app_name: dataConfig.app_name || "Minha Loja",
              theme_color: dataConfig.theme_color || "#000000",
              logo_url: dataConfig.logo_url || "",
              whatsapp_number: dataConfig.whatsapp_number || ""
         });
-        setStats(dataStats);
+        
+        setStats(dataStats); // Carrega os cards novos
         setStoreUrl(dataUrl.url);
     })
     .catch(err => {
         console.error("Erro de Autenticação:", err);
-        // Se o token for inválido (Erro 401), avisamos o usuário
-        alert("Sessão expirada ou inválida. Por favor, reinstale o aplicativo.");
-        localStorage.removeItem("app_token");
-        setToken(null);
+        if(err.status === 401) {
+             alert("Sessão expirada. Reinstale o aplicativo.");
+             localStorage.removeItem("app_token");
+             setToken(null);
+        }
     })
     .finally(() => setLoading(false));
 
   }, [token, API_URL]);
 
-  // --- FUNÇÃO DE SALVAR (BLINDADA) ---
+  // --- FUNÇÃO DE SALVAR ---
   const handleSave = async () => {
     if (!token) return alert("Erro de segurança: Token não encontrado.");
     setSaving(true);
@@ -102,9 +111,9 @@ export default function AdminPanel() {
         method: "POST",
         headers: { 
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}` // <--- Aqui vai a chave de segurança
+            "Authorization": `Bearer ${token}` 
         },
-        body: JSON.stringify(config), // Não precisamos mandar store_id, o token já diz quem é!
+        body: JSON.stringify(config),
       });
       alert("✨ Configurações salvas com sucesso!");
     } catch (error) {
@@ -115,14 +124,13 @@ export default function AdminPanel() {
     }
   };
 
-  // Funções Auxiliares de Marketing
+  // Funções Auxiliares
   const copyLink = () => {
     const link = `${storeUrl}/pages/app`;
     navigator.clipboard.writeText(link);
-    alert("Link copiado! Coloque na Bio do Instagram.");
+    alert("Link copiado! Divulgue no Instagram.");
   };
 
-  // URL para gerar o QR Code (Google API)
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(storeUrl + "/pages/app")}&color=${config.theme_color.replace("#", "")}`;
 
   // Se não tiver token, bloqueia a tela
@@ -133,7 +141,7 @@ export default function AdminPanel() {
       {/* --- HEADER --- */}
       <header className="dashboard-header">
         <div className="header-content">
-          <h1>App Builder <span className="badge">SECURE</span></h1>
+          <h1>App Builder <span className="badge">PRO</span></h1>
           <div className="user-info">
             <span className="store-id">Painel Seguro</span>
             <div className="avatar">🔒</div>
@@ -143,45 +151,75 @@ export default function AdminPanel() {
 
       <main className="dashboard-content">
         
-        {/* --- MÉTRICAS (AGORA COM DADOS REAIS) --- */}
+        {/* --- NOVA GRID DE CARDS ESTRATÉGICOS --- */}
         <section className="stats-grid">
-          {/* Card 1: Receita Real */}
-          <div className="stat-card" style={{ borderLeft: '4px solid #10B981' }}>
-            <div className="stat-icon green">💰</div>
-            <div className="stat-info">
-              <h3>Receita Pelo App</h3>
-              <p>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.total)}</p>
-              <span className="stat-growth">
-                 {stats.quantidade > 0 ? `🔥 ${stats.quantidade} vendas` : "Nenhuma venda ainda"}
-              </span>
+            
+            {/* 1. RECEITA (O mais importante) */}
+            <div className="stat-card" style={{borderLeft: '4px solid #10B981'}}>
+                <div className="stat-icon green">💰</div>
+                <div className="stat-info">
+                    <h3>Receita App</h3>
+                    <p>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.receita)}</p>
+                    <span className="stat-growth">🔥 {stats.vendas} pedidos realizados</span>
+                </div>
             </div>
-          </div>
 
-          <div className="stat-card">
-            <div className="stat-icon purple">📱</div>
-            <div className="stat-info">
-              <h3>Instalações</h3>
-              <p>--</p>
-              <span className="stat-growth">Dados em tempo real</span>
+            {/* 2. INSTALAÇÕES */}
+            <div className="stat-card">
+                <div className="stat-icon purple">📱</div>
+                <div className="stat-info">
+                    <h3>Instalações Ativas</h3>
+                    <p>{stats.instalacoes}</p>
+                    <span className="stat-growth">Base de clientes fiéis</span>
+                </div>
             </div>
-          </div>
 
-          <div className="stat-card">
-            <div className="stat-icon blue">🚀</div>
-            <div className="stat-info">
-              <h3>Status</h3>
-              <p>Ativo</p>
-              <span className="stat-growth">App Seguro</span>
+            {/* 3. CARRINHOS ABANDONADOS (Dinheiro na mesa) */}
+            <div className="stat-card" style={{borderLeft: '4px solid #ef4444'}}>
+                <div className="stat-icon red">💸</div>
+                <div className="stat-info">
+                    <h3>Carrinhos Abandonados</h3>
+                    <p>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.carrinhos_abandonados.valor)}</p>
+                    <button style={{marginTop: '5px', background: '#dc2626', color: 'white', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '11px', cursor: 'pointer', fontWeight: 'bold'}}>
+                        🔔 RECUPERAR AGORA
+                    </button>
+                </div>
             </div>
-          </div>
+
+            {/* 4. TAXA DE CONVERSÃO (Comparativo) */}
+            <div className="stat-card">
+                <div className="stat-info" style={{width: '100%'}}>
+                    <h3>Taxa de Conversão 🏆</h3>
+                    
+                    <div className="conversion-bar">
+                        <div className="bar-label"><span>App PWA</span> <strong>{stats.taxa_conversao.app}%</strong></div>
+                        <div className="bar-track"><div className="bar-fill" style={{width: `${stats.taxa_conversao.app * 20}%`, background: '#10B981'}}></div></div>
+                    </div>
+                    
+                    <div className="conversion-bar">
+                        <div className="bar-label"><span>Site Mobile</span> <strong>{stats.taxa_conversao.site}%</strong></div>
+                        <div className="bar-track"><div className="bar-fill" style={{width: `${stats.taxa_conversao.site * 20}%`, background: '#9ca3af'}}></div></div>
+                    </div>
+                </div>
+            </div>
+
+             {/* 5. ECONOMIA DE ADS */}
+             <div className="stat-card">
+                <div className="stat-icon blue">📉</div>
+                <div className="stat-info">
+                    <h3>Economia em Ads</h3>
+                    <p>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.economia_ads)}</p>
+                    <span className="stat-growth">Tráfego grátis via Push</span>
+                </div>
+            </div>
         </section>
 
-        <div className="editor-grid">
+        <div className="editor-grid" style={{marginTop: '30px'}}>
           {/* --- COLUNA ESQUERDA: CONFIGURAÇÃO --- */}
           <div className="config-section">
             
             {/* NOVO CARD: Link Oficial (Vital para o lojista) */}
-            <div className="card config-card" style={{ borderColor: '#8B5CF6' }}>
+            <div className="config-card" style={{ background: '#f5f3ff', border: '1px solid #ddd6fe' }}>
                 <div className="card-header">
                     <h2 style={{ color: '#7C3AED' }}>🔗 Link de Download</h2>
                     <p>Divulgue este link no Instagram e WhatsApp.</p>
@@ -192,7 +230,7 @@ export default function AdminPanel() {
                             type="text" 
                             readOnly 
                             value={storeUrl ? `${storeUrl}/pages/app` : "Carregando..."} 
-                            style={{ backgroundColor: '#f9f9f9', color: '#555', flex: 1 }}
+                            style={{ backgroundColor: 'white', color: '#555', flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid #ccc' }}
                         />
                         <button 
                             onClick={copyLink}
@@ -208,7 +246,7 @@ export default function AdminPanel() {
             </div>
 
             {/* CARD: QR Code */}
-            <div className="card config-card" style={{ flexDirection: 'row', alignItems: 'center', gap: '20px' }}>
+            <div className="config-card" style={{ flexDirection: 'row', alignItems: 'center', gap: '20px', display: 'flex' }}>
                 <img src={qrCodeUrl} alt="QR Code" style={{width: '80px', height: '80px', borderRadius: '8px', border: '1px solid #eee'}} />
                 <div>
                     <h3 style={{fontSize: '16px', margin: '0 0 5px 0'}}>QR Code de Balcão</h3>
@@ -218,8 +256,8 @@ export default function AdminPanel() {
                 </div>
             </div>
 
-            {/* CARD: Identidade Visual (Seu código original) */}
-            <div className="card config-card">
+            {/* CARD: Identidade Visual (Intacto) */}
+            <div className="config-card">
               <div className="card-header">
                 <h2>🎨 Identidade Visual</h2>
                 <p>Personalize como seu App aparece para o cliente.</p>
@@ -264,7 +302,7 @@ export default function AdminPanel() {
               </div>
             </div>
 
-            <div className="card config-card">
+            <div className="config-card">
               <div className="card-header">
                 <h2>📞 Suporte</h2>
                 <p>Botão de WhatsApp no App.</p>
@@ -292,8 +330,8 @@ export default function AdminPanel() {
           {/* --- COLUNA DIREITA: PREVIEW (Intacto) --- */}
           <div className="preview-section">
             <div className="sticky-wrapper">
-              <h3>Preview ao Vivo</h3>
-              <p>Como seu cliente vê o App</p>
+              <h3 style={{textAlign: 'center', marginBottom: '10px'}}>Preview ao Vivo</h3>
+              <p style={{textAlign: 'center', marginBottom: '20px', fontSize: '12px', color: '#666'}}>Como seu cliente vê o App</p>
               
               <div className="phone-mockup">
                 <div className="phone-notch"></div>
