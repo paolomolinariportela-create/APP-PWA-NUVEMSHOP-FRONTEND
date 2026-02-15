@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import "../styles/AdminPanel.css";
 
-// Importando os Componentes Modulares
 import TabDashboard from "../components/TabDashboard";
 import TabConfig from "../components/TabConfig";
 import TabCampaigns from "../components/TabCampaigns";
 
+// Interfaces mantidas...
 interface DashboardStats {
   receita: number;
   vendas: number;
@@ -28,6 +28,9 @@ interface AppConfig {
   whatsapp_number: string;
   fab_enabled?: boolean;
   fab_text?: string;
+  fab_position?: string;
+  fab_icon?: string;
+  fab_delay?: number;
 }
 
 interface PushCampaign {
@@ -55,7 +58,10 @@ export default function AdminPanel() {
     logo_url: "",
     whatsapp_number: "",
     fab_enabled: false,
-    fab_text: "Baixar App"
+    fab_text: "Baixar App",
+    fab_position: "right",
+    fab_icon: "📲",
+    fab_delay: 0
   });
 
   const [pushForm, setPushForm] = useState<PushCampaign>({ title: "", message: "", url: "/" });
@@ -71,7 +77,6 @@ export default function AdminPanel() {
     ticket_medio: { app: 0, site: 0 }
   });
 
-  // Autenticação
   useEffect(() => {
     if (tokenFromUrl) {
       localStorage.setItem("app_token", tokenFromUrl);
@@ -80,7 +85,6 @@ export default function AdminPanel() {
     }
   }, [tokenFromUrl, setSearchParams]);
 
-  // Fetch de Dados
   useEffect(() => {
     if (!token) return;
     setLoading(true);
@@ -90,7 +94,7 @@ export default function AdminPanel() {
 
     Promise.all([
         authFetch("/admin/config").then(r => r.json()),
-        authFetch("/stats/dashboard").then(r => r.json()),
+        authFetch("/analytics/dashboard").then(r => r.json()), // <--- ROTA NOVA
         authFetch("/admin/store-info").then(r => r.json())
     ]).then(([dataConfig, dataStats, dataUrl]) => {
         setConfig({
@@ -99,7 +103,10 @@ export default function AdminPanel() {
              logo_url: dataConfig.logo_url || "",
              whatsapp_number: dataConfig.whatsapp_number || "",
              fab_enabled: dataConfig.fab_enabled || false,
-             fab_text: dataConfig.fab_text || "Baixar App"
+             fab_text: dataConfig.fab_text || "Baixar App",
+             fab_position: dataConfig.fab_position || "right",
+             fab_icon: dataConfig.fab_icon || "📲",
+             fab_delay: dataConfig.fab_delay || 0
         });
         setStats(dataStats);
         setStoreUrl(dataUrl.url);
@@ -109,8 +116,7 @@ export default function AdminPanel() {
         if(err.status === 401) { localStorage.removeItem("app_token"); setToken(null); }
     })
     .finally(() => setLoading(false));
-
-  }, [token, API_URL]); // <--- O ERRO ESTAVA AQUI (FALTAVA FECHAR ESTE BLOCO)
+  }, [token, API_URL]);
 
   const handleSave = async () => {
     if (!token) return;
@@ -121,37 +127,36 @@ export default function AdminPanel() {
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
         body: JSON.stringify(config),
       });
-      alert("✨ Configurações salvas!");
+      alert("✨ Salvo!");
     } catch (error) { alert("Erro ao salvar."); } finally { setSaving(false); }
   };
 
   const handleSendPush = async () => {
       if (!token) return;
-      if (!pushForm.title || !pushForm.message) { alert("Preencha título e mensagem!"); return; }
-      if(!confirm("Tem certeza que deseja enviar esta notificação?")) return;
+      if (!pushForm.title || !pushForm.message) { alert("Preencha tudo!"); return; }
+      if(!confirm("Enviar notificação?")) return;
+      
       setSendingPush(true);
       try {
-          const res = await fetch(`${API_URL}/stats/admin/send-push`, {
+          const res = await fetch(`${API_URL}/push/send`, { // <--- ROTA NOVA
               method: "POST",
               headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
               body: JSON.stringify(pushForm)
           });
           const data = await res.json();
           if(data.status === "success") {
-              alert(`✅ Enviado para ${data.sent} clientes.`);
+              alert(`✅ Enviado para ${data.sent} pessoas.`);
               setPushForm({ title: "", message: "", url: "/" });
-              // Força atualização da aba (opcional, pode ser via state lift)
           } else {
-              alert(`⚠️ Atenção: ${data.message || "Erro"}`);
+              alert(`⚠️ Erro: ${data.message}`);
           }
-      } catch (e) { alert("Erro ao enviar push."); } finally { setSendingPush(false); }
+      } catch (e) { alert("Erro de conexão."); } finally { setSendingPush(false); }
   };
 
-  if (!token) return <div className="error-screen">🔒 Acesso Negado.</div>;
+  if (!token) return <div className="error-screen">🔒 Login necessário.</div>;
 
   return (
     <div className="dashboard-container">
-      {/* HEADER */}
       <header className="dashboard-header">
         <div className="header-left">
           <div className="logo-area"><h1>App Builder</h1><span className="badge-pro">PRO</span></div>
@@ -167,18 +172,10 @@ export default function AdminPanel() {
       </header>
 
       <main className="dashboard-content">
-        
         {activeTab === 'dashboard' && <TabDashboard stats={stats} />}
-
+        
         {activeTab === 'config' && (
-            <TabConfig 
-                config={config} 
-                setConfig={setConfig} 
-                handleSave={handleSave} 
-                saving={saving} 
-                loading={loading}
-                storeUrl={storeUrl}
-            />
+            <TabConfig config={config} setConfig={setConfig} handleSave={handleSave} saving={saving} loading={loading} storeUrl={storeUrl} />
         )}
 
         {activeTab === 'campanhas' && (
@@ -194,12 +191,10 @@ export default function AdminPanel() {
         )}
 
         {activeTab === 'planos' && (
-            <div className="plans-container animate-fade-in" style={{textAlign:'center', padding:'40px'}}>
-                <h2>Planos Disponíveis</h2>
-                <p>Em breve...</p>
+            <div className="plans-container" style={{textAlign:'center', padding:'40px'}}>
+                <h2>Planos</h2><p>Em breve...</p>
             </div>
         )}
-
       </main>
     </div>
   );
