@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import "../styles/AdminPanel.css";
+import PhonePreview from '../pages/PhonePreview';
 
 // Interface dos Dados Completos
 interface DashboardStats {
