@@ -17,17 +17,16 @@ interface DashboardStats {
   ticket_medio: { app: number; site: number };
 }
 
-// Interface da Configuração (ATUALIZADA COM FAB)
+// Interface da Configuração
 interface AppConfig {
   app_name: string;
   theme_color: string;
   logo_url: string;
   whatsapp_number: string;
-  fab_enabled?: boolean; // Novo campo opcional
-  fab_text?: string;     // Novo campo opcional
+  fab_enabled?: boolean;
+  fab_text?: string;
 }
 
-// --- COMPONENTE PRINCIPAL (EXPORT DEFAULT CORRIGIDO) ---
 export default function AdminPanel() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tokenFromUrl = searchParams.get("token");
@@ -38,10 +37,8 @@ export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState("dashboard");
 
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
-
   const [storeUrl, setStoreUrl] = useState("");
   
-  // Estado Inicial da Configuração
   const [config, setConfig] = useState<AppConfig>({
     app_name: "Minha Loja",
     theme_color: "#000000",
@@ -82,7 +79,6 @@ export default function AdminPanel() {
         authFetch("/stats/dashboard").then(r => r.json()),
         authFetch("/admin/store-info").then(r => r.json())
     ]).then(([dataConfig, dataStats, dataUrl]) => {
-        // Atualiza config com fallback seguro
         setConfig({
              app_name: dataConfig.app_name || "Minha Loja",
              theme_color: dataConfig.theme_color || "#000000",
@@ -124,10 +120,7 @@ export default function AdminPanel() {
     <div className="dashboard-container">
       <header className="dashboard-header">
         <div className="header-left">
-          <div className="logo-area">
-            <h1>App Builder</h1>
-            <span className="badge-pro">PRO</span>
-          </div>
+          <div className="logo-area"><h1>App Builder</h1><span className="badge-pro">PRO</span></div>
           <nav className="header-nav">
             <button className={activeTab === 'dashboard' ? 'nav-link active' : 'nav-link'} onClick={() => setActiveTab('dashboard')}>📊 Dashboard</button>
             <button className={activeTab === 'config' ? 'nav-link active' : 'nav-link'} onClick={() => setActiveTab('config')}>⚙️ Configurações</button>
@@ -135,10 +128,7 @@ export default function AdminPanel() {
             <button className="nav-link" onClick={() => window.open(storeUrl, '_blank')}>🛍️ Ver Loja</button>
           </nav>
         </div>
-        <div className="header-right">
-            <div className="status-indicator"><span className="dot"></span><span>Online</span></div>
-            <div className="user-avatar">🔒</div>
-        </div>
+        <div className="header-right"><div className="status-indicator"><span className="dot"></span><span>Online</span></div><div className="user-avatar">🔒</div></div>
       </header>
 
       <main className="dashboard-content">
@@ -158,35 +148,13 @@ export default function AdminPanel() {
                     <div className="stat-icon" style={{background: '#F0F9FF', color: '#0369A1'}}>💳</div>
                     <div className="stat-info">
                         <h3>Ticket Médio</h3>
-                        <div style={{marginTop: '10px', display:'flex', justifyContent:'space-between'}}>
-                             <span style={{color:'#10B981', fontWeight:'bold'}}>App: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.ticket_medio.app)}</span>
-                        </div>
+                        <div style={{marginTop: '10px'}}><span style={{color:'#10B981', fontWeight:'bold'}}>App: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.ticket_medio.app)}</span></div>
                     </div>
                 </div>
-                <div className="stat-card">
-                    <div className="stat-icon purple">📱</div>
-                    <div className="stat-info">
-                        <h3>Instalações</h3>
-                        <p>{stats.instalacoes}</p>
-                        <span className="stat-growth">Base ativa</span>
-                    </div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-icon blue">🔁</div>
-                    <div className="stat-info">
-                        <h3>Recorrência</h3>
-                        <p>{stats.recorrencia.clientes_2x}</p>
-                        <div style={{fontSize: '11px', color: '#666'}}>Recompra: <strong>{stats.recorrencia.taxa_recompra}%</strong></div>
-                    </div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-icon" style={{background:'#FFF7ED', color:'#C2410C'}}>👀</div>
-                    <div className="stat-info">
-                        <h3>Engajamento</h3>
-                        <p>{stats.visualizacoes.pageviews.toLocaleString()}</p>
-                        <span className="stat-growth">Pageviews</span>
-                    </div>
-                </div>
+                <div className="stat-card"><div className="stat-icon purple">📱</div><div className="stat-info"><h3>Instalações</h3><p>{stats.instalacoes}</p><span className="stat-growth">Base ativa</span></div></div>
+                <div className="stat-card"><div className="stat-icon blue">🔁</div><div className="stat-info"><h3>Recorrência</h3><p>{stats.recorrencia.clientes_2x}</p><div style={{fontSize: '11px', color: '#666'}}>Taxa: <strong>{stats.recorrencia.taxa_recompra}%</strong></div></div></div>
+                <div className="stat-card"><div className="stat-icon" style={{background:'#FFF7ED', color:'#C2410C'}}>👀</div><div className="stat-info"><h3>Engajamento</h3><p>{stats.visualizacoes.pageviews.toLocaleString()}</p><span className="stat-growth">Pageviews</span></div></div>
+                
                 <div className="stat-card" style={{gridRow: 'span 2'}}>
                     <div className="stat-info" style={{width: '100%'}}>
                         <h3>Funil de Vendas 📉</h3>
@@ -198,35 +166,10 @@ export default function AdminPanel() {
                         </div>
                     </div>
                 </div>
+                
                 <div className="stat-card" style={{borderLeft: '4px solid #ef4444'}}>
                     <div className="stat-icon red">💸</div>
-                    <div className="stat-info">
-                        <h3>Carrinhos Abandonados</h3>
-                        <p>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.carrinhos_abandonados.valor)}</p>
-                        <button style={{marginTop: '5px', background: '#dc2626', color: 'white', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '11px', cursor: 'pointer', fontWeight: 'bold'}}>RECUPERAR</button>
-                    </div>
-                </div>
-                 <div className="stat-card">
-                    <div className="stat-info" style={{width: '100%'}}>
-                        <h3>Taxa de Conversão 🏆</h3>
-                        <div className="conversion-bar"><div className="bar-label"><span>App PWA</span> <strong>{stats.taxa_conversao.app}%</strong></div><div className="bar-track"><div className="bar-fill" style={{width: `${Math.min(stats.taxa_conversao.app * 20, 100)}%`, background: '#10B981'}}></div></div></div>
-                    </div>
+                    <div className="stat-info"><h3>Carrinhos Abandonados</h3><p>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.carrinhos_abandonados.valor)}</p><button style={{marginTop: '5px', background: '#dc2626', color: 'white', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '11px', cursor: 'pointer', fontWeight: 'bold'}}>RECUPERAR</button></div>
                 </div>
             </section>
         )}
-
-        {/* ABA CONFIGURAÇÕES */}
-        {activeTab === 'config' && (
-            <div className="editor-grid animate-fade-in" style={{marginTop: '20px'}}>
-                <div className="config-section">
-                    <h2 style={{marginBottom:'20px'}}>Personalizar Aplicativo</h2>
-                    
-                    {/* Link Download */}
-                    <div className="config-card" style={{ background: '#f5f3ff', border: '1px solid #ddd6fe' }}>
-                        <div className="card-header"><h3 style={{ color: '#7C3AED', margin:0 }}>🔗 Link de Download</h3><p style={{margin:'5px 0'}}>Divulgue este link no Instagram.</p></div>
-                        <div className="form-group"><div style={{ display: 'flex', gap: '10px' }}><input type="text" readOnly value={storeUrl ? `${storeUrl}/pages/app` : "Carregando..."} style={{ backgroundColor: 'white', color: '#555', flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid #ccc' }} /><button onClick={copyLink} style={{ background: '#8B5CF6', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', padding: '0 20px', fontWeight: 'bold' }}>Copiar</button></div></div>
-                    </div>
-
-                    {/* QR Code */}
-                    <div className="config-card" style={{ flexDirection: 'row', alignItems: 'center', gap: '20px', display: 'flex' }}>
-                        <img src={qrCodeUrl}
