@@ -17,15 +17,21 @@ interface DashboardStats {
   ticket_medio: { app: number; site: number };
 }
 
-// Interface da Configuração (ATUALIZADA)
+// Interface da Configuração
 interface AppConfig {
   app_name: string;
   theme_color: string;
   logo_url: string;
   whatsapp_number: string;
-  // Novos campos para o Botão Flutuante
   fab_enabled?: boolean;
   fab_text?: string;
+}
+
+// Interface da Campanha Push (NOVO)
+interface PushCampaign {
+    title: string;
+    message: string;
+    url: string;
 }
 
 export default function AdminPanel() {
@@ -34,8 +40,9 @@ export default function AdminPanel() {
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [sendingPush, setSendingPush] = useState(false); // Estado de envio
   const [token, setToken] = useState<string | null>(localStorage.getItem("app_token"));
-  const [activeTab, setActiveTab] = useState("dashboard"); // Controle de Abas
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -49,6 +56,13 @@ export default function AdminPanel() {
     whatsapp_number: "",
     fab_enabled: false,
     fab_text: "Baixar App"
+  });
+
+  // Estado do Formulário de Push (NOVO)
+  const [pushForm, setPushForm] = useState<PushCampaign>({
+      title: "",
+      message: "",
+      url: "/"
   });
 
   const [stats, setStats] = useState<DashboardStats>({
@@ -82,7 +96,6 @@ export default function AdminPanel() {
         authFetch("/stats/dashboard").then(r => r.json()),
         authFetch("/admin/store-info").then(r => r.json())
     ]).then(([dataConfig, dataStats, dataUrl]) => {
-        // Atualiza o estado com fallback seguro
         setConfig({
              app_name: dataConfig.app_name || "Minha Loja",
              theme_color: dataConfig.theme_color || "#000000",
@@ -115,6 +128,34 @@ export default function AdminPanel() {
     } catch (error) { alert("Erro ao salvar."); } finally { setSaving(false); }
   };
 
+  // Função de Envio de Push (NOVO)
+  const handleSendPush = async () => {
+      if (!token) return;
+      if (!pushForm.title || !pushForm.message) { alert("Preencha título e mensagem!"); return; }
+      
+      if(!confirm("Tem certeza que deseja enviar esta notificação para todos os clientes inscritos?")) return;
+
+      setSendingPush(true);
+      try {
+          const res = await fetch(`${API_URL}/stats/admin/send-push`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+              body: JSON.stringify(pushForm)
+          });
+          const data = await res.json();
+          if(data.status === "success") {
+              alert(`✅ Sucesso! Enviado para ${data.sent} clientes.`);
+              setPushForm({ title: "", message: "", url: "/" });
+          } else {
+              alert(`⚠️ Atenção: ${data.message || "Erro desconhecido"}`);
+          }
+      } catch (e) {
+          alert("Erro ao enviar push.");
+      } finally {
+          setSendingPush(false);
+      }
+  };
+
   const copyLink = () => { navigator.clipboard.writeText(`${storeUrl}/pages/app`); alert("Link copiado!"); };
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(storeUrl + "/pages/app")}&color=${config.theme_color.replace("#", "")}`;
 
@@ -131,6 +172,8 @@ export default function AdminPanel() {
           </div>
           <nav className="header-nav">
             <button className={activeTab === 'dashboard' ? 'nav-link active' : 'nav-link'} onClick={() => setActiveTab('dashboard')}>📊 Dashboard</button>
+            {/* NOVA ABA NO MENU */}
+            <button className={activeTab === 'campanhas' ? 'nav-link active' : 'nav-link'} onClick={() => setActiveTab('campanhas')}>🔔 Campanhas</button>
             <button className={activeTab === 'config' ? 'nav-link active' : 'nav-link'} onClick={() => setActiveTab('config')}>⚙️ Configurações</button>
             <button className={activeTab === 'planos' ? 'nav-link active' : 'nav-link'} onClick={() => setActiveTab('planos')}>💎 Planos</button>
             <button className="nav-link" onClick={() => window.open(storeUrl, '_blank')}>🛍️ Ver Loja</button>
@@ -191,25 +234,90 @@ export default function AdminPanel() {
             </section>
         )}
 
+        {/* ABA CAMPANHAS (NOVA SEÇÃO COMPLETA) */}
+        {activeTab === 'campanhas' && (
+            <div className="animate-fade-in" style={{marginTop:'20px', maxWidth:'800px', margin:'0 auto'}}>
+                <div className="config-card">
+                    <div className="card-header" style={{borderBottom:'none', paddingBottom:'0'}}>
+                        <h2 style={{margin:0}}>📢 Criar Nova Campanha</h2>
+                        <p style={{color:'#666'}}>Envie notificações push para todos os clientes que instalaram o app.</p>
+                    </div>
+                    
+                    <div style={{background:'#F3F4F6', padding:'15px', borderRadius:'8px', margin:'20px 0', display:'flex', alignItems:'center', gap:'10px'}}>
+                        <span style={{fontSize:'20px'}}>👥</span>
+                        <div>
+                            <strong>Alcance Potencial:</strong> <span style={{color:'#4F46E5', fontWeight:'bold'}}>{stats.instalacoes} dispositivos</span>
+                            <div style={{fontSize:'12px', color:'#666'}}>Clientes que instalaram o app e aceitaram notificações.</div>
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label>Título da Notificação (Curto e chamativo)</label>
+                        <input 
+                            type="text" 
+                            placeholder="Ex: Oferta Relâmpago! ⚡" 
+                            value={pushForm.title}
+                            onChange={(e) => setPushForm({...pushForm, title: e.target.value})}
+                            maxLength={50}
+                        />
+                        <small style={{textAlign:'right', display:'block'}}>{pushForm.title.length}/50</small>
+                    </div>
+
+                    <div className="form-group">
+                        <label>Mensagem Principal</label>
+                        <input 
+                            type="text" 
+                            placeholder="Ex: Todo o site com 10% OFF só até hoje às 23h." 
+                            value={pushForm.message}
+                            onChange={(e) => setPushForm({...pushForm, message: e.target.value})}
+                            maxLength={120}
+                        />
+                        <small style={{textAlign:'right', display:'block'}}>{pushForm.message.length}/120</small>
+                    </div>
+
+                    <div className="form-group">
+                        <label>Link de Destino (Ao clicar)</label>
+                        <input 
+                            type="text" 
+                            placeholder="Ex: /promocoes ou https://sualoja.com.br/produto-x" 
+                            value={pushForm.url}
+                            onChange={(e) => setPushForm({...pushForm, url: e.target.value})}
+                        />
+                    </div>
+
+                    <div style={{background:'#FEF2F2', color:'#DC2626', padding:'10px', borderRadius:'6px', fontSize:'12px', marginBottom:'20px'}}>
+                        <strong>⚠️ Regra de Ouro:</strong> Não faça spam. Envie no máximo 1 notificação por dia para não ser bloqueado pelos usuários.
+                    </div>
+
+                    <button 
+                        className="save-button" 
+                        onClick={handleSendPush} 
+                        disabled={sendingPush || stats.instalacoes === 0}
+                        style={{background: sendingPush ? '#ccc' : '#4F46E5'}}
+                    >
+                        {sendingPush ? "Enviando..." : "🚀 Enviar Notificação Agora"}
+                    </button>
+                    {stats.instalacoes === 0 && <p style={{textAlign:'center', fontSize:'12px', color:'#999', marginTop:'10px'}}>Você precisa ter instalações ativas para enviar.</p>}
+                </div>
+            </div>
+        )}
+
         {/* ABA CONFIGURAÇÕES */}
         {activeTab === 'config' && (
             <div className="editor-grid animate-fade-in" style={{marginTop: '20px'}}>
                 <div className="config-section">
                     <h2 style={{marginBottom:'20px'}}>Personalizar Aplicativo</h2>
                     
-                    {/* Link Download */}
                     <div className="config-card" style={{ background: '#f5f3ff', border: '1px solid #ddd6fe' }}>
                         <div className="card-header"><h3 style={{ color: '#7C3AED', margin:0 }}>🔗 Link de Download</h3><p style={{margin:'5px 0'}}>Divulgue este link no Instagram.</p></div>
                         <div className="form-group"><div style={{ display: 'flex', gap: '10px' }}><input type="text" readOnly value={storeUrl ? `${storeUrl}/pages/app` : "Carregando..."} style={{ backgroundColor: 'white', color: '#555', flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid #ccc' }} /><button onClick={copyLink} style={{ background: '#8B5CF6', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', padding: '0 20px', fontWeight: 'bold' }}>Copiar</button></div></div>
                     </div>
 
-                    {/* QR Code */}
                     <div className="config-card" style={{ flexDirection: 'row', alignItems: 'center', gap: '20px', display: 'flex' }}>
                         <img src={qrCodeUrl} alt="QR Code" style={{width: '80px', height: '80px', borderRadius: '8px', border: '1px solid #eee'}} />
                         <div><h3 style={{fontSize: '16px', margin: '0 0 5px 0'}}>QR Code de Balcão</h3><a href={qrCodeUrl} download="qrcode.png" target="_blank" rel="noreferrer" style={{color: config.theme_color, textDecoration: 'none', fontWeight: 'bold', fontSize: '14px'}}>⬇️ Baixar Imagem</a></div>
                     </div>
 
-                    {/* Identidade Visual */}
                     <div className="config-card">
                         <div className="card-header"><h3 style={{margin:0}}>🎨 Identidade Visual</h3></div>
                         <div className="form-group"><label>Nome do Aplicativo</label><input type="text" value={config.app_name} onChange={(e) => setConfig({...config, app_name: e.target.value})} placeholder="Ex: Minha Loja Oficial" /></div>
@@ -217,7 +325,6 @@ export default function AdminPanel() {
                         <div className="form-group"><label>Logo URL (Link da Imagem)</label><input type="text" value={config.logo_url} onChange={(e) => setConfig({...config, logo_url: e.target.value})} placeholder="https://..." /></div>
                     </div>
 
-                    {/* WIDGETS DE CONVERSÃO (NOVO CARD) */}
                     <div className="config-card">
                         <div className="card-header">
                             <h3 style={{margin:0}}>🚀 Widgets de Conversão</h3>
@@ -233,7 +340,6 @@ export default function AdminPanel() {
                                 <small style={{color:'#666', fontSize:'11px'}}>Ícone fixo no canto da tela mobile.</small>
                             </div>
                             
-                            {/* Toggle Switch Inline */}
                             <label style={{position:'relative', display:'inline-block', width:'46px', height:'24px'}}>
                                 <input 
                                     type="checkbox" 
@@ -254,7 +360,6 @@ export default function AdminPanel() {
                                 }}></span>
                             </label>
                         </div>
-
                         {config.fab_enabled && (
                             <div className="form-group animate-fade-in" style={{marginTop:'15px'}}>
                                 <label>Texto do Botão</label>
@@ -268,7 +373,6 @@ export default function AdminPanel() {
                         )}
                     </div>
 
-                    {/* Suporte (Opcional, pode remover se não usar) */}
                     <div className="config-card">
                         <div className="card-header"><h3 style={{margin:0}}>📞 Suporte</h3></div>
                         <div className="form-group"><label>WhatsApp</label><input type="text" value={config.whatsapp_number} onChange={(e) => setConfig({...config, whatsapp_number: e.target.value})} placeholder="5511999999999" /></div>
@@ -301,8 +405,6 @@ export default function AdminPanel() {
                                         <div className="skeleton-product"></div>
                                         <div className="skeleton-product"></div>
                                     </div>
-
-                                    {/* PREVIEW DO BOTÃO FLUTUANTE */}
                                     {config.fab_enabled && (
                                         <div style={{
                                             position:'absolute', bottom:'80px', right:'20px', 
@@ -315,7 +417,6 @@ export default function AdminPanel() {
                                             <span>📲</span> {config.fab_text || "Baixar App"}
                                         </div>
                                     )}
-
                                 </div>
                                 <div className="bottom-nav">
                                     <div className="nav-item" style={{ color: config.theme_color }}>
