@@ -5,7 +5,7 @@ import "../styles/AdminPanel.css";
 // Importando os Componentes Modulares
 import TabDashboard from "../components/TabDashboard";
 import TabConfig from "../components/TabConfig";
-import TabCampaigns from "../components/TabCampaigns"; // NOVO!
+import TabCampaigns from "../components/TabCampaigns";
 
 interface DashboardStats {
   receita: number;
@@ -71,7 +71,7 @@ export default function AdminPanel() {
     ticket_medio: { app: 0, site: 0 }
   });
 
-  // Autenticação e Fetch de Dados
+  // Autenticação
   useEffect(() => {
     if (tokenFromUrl) {
       localStorage.setItem("app_token", tokenFromUrl);
@@ -80,6 +80,7 @@ export default function AdminPanel() {
     }
   }, [tokenFromUrl, setSearchParams]);
 
+  // Fetch de Dados
   useEffect(() => {
     if (!token) return;
     setLoading(true);
@@ -109,6 +110,8 @@ export default function AdminPanel() {
     })
     .finally(() => setLoading(false));
 
+  }, [token, API_URL]); // <--- O ERRO ESTAVA AQUI (FALTAVA FECHAR ESTE BLOCO)
+
   const handleSave = async () => {
     if (!token) return;
     setSaving(true);
@@ -137,6 +140,7 @@ export default function AdminPanel() {
           if(data.status === "success") {
               alert(`✅ Enviado para ${data.sent} clientes.`);
               setPushForm({ title: "", message: "", url: "/" });
+              // Força atualização da aba (opcional, pode ser via state lift)
           } else {
               alert(`⚠️ Atenção: ${data.message || "Erro"}`);
           }
@@ -164,8 +168,6 @@ export default function AdminPanel() {
 
       <main className="dashboard-content">
         
-        {/* RENDERIZAÇÃO CONDICIONAL DAS ABAS */}
-        
         {activeTab === 'dashboard' && <TabDashboard stats={stats} />}
 
         {activeTab === 'config' && (
@@ -179,7 +181,6 @@ export default function AdminPanel() {
             />
         )}
 
-        {/* AGORA USANDO O COMPONENTE MODULAR (COM HISTÓRICO) */}
         {activeTab === 'campanhas' && (
              <TabCampaigns 
                 stats={stats}
