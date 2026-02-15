@@ -5,8 +5,7 @@ import "../styles/AdminPanel.css";
 // Importando os Componentes Modulares
 import TabDashboard from "../components/TabDashboard";
 import TabConfig from "../components/TabConfig";
-// Para os outros tabs, se não criar agora, podemos manter o código inline ou criar depois.
-// Vou manter Campaign e Plans inline aqui para não quebrar, mas idealmente você moveria também.
+import TabCampaigns from "../components/TabCampaigns"; // NOVO!
 
 interface DashboardStats {
   receita: number;
@@ -110,8 +109,6 @@ export default function AdminPanel() {
     })
     .finally(() => setLoading(false));
 
-  }, [token, API_URL]);
-
   const handleSave = async () => {
     if (!token) return;
     setSaving(true);
@@ -126,7 +123,6 @@ export default function AdminPanel() {
   };
 
   const handleSendPush = async () => {
-      // (Lógica de Push mantida a mesma...)
       if (!token) return;
       if (!pushForm.title || !pushForm.message) { alert("Preencha título e mensagem!"); return; }
       if(!confirm("Tem certeza que deseja enviar esta notificação?")) return;
@@ -183,17 +179,17 @@ export default function AdminPanel() {
             />
         )}
 
-        {/* MANTIVE AS OUTRAS ABAS AQUI PARA NÃO FICAR MUITA MUDANÇA DE UMA VEZ */}
+        {/* AGORA USANDO O COMPONENTE MODULAR (COM HISTÓRICO) */}
         {activeTab === 'campanhas' && (
-             <div className="animate-fade-in" style={{marginTop:'20px', maxWidth:'800px', margin:'0 auto'}}>
-                <div className="config-card">
-                    <div className="card-header"><h2>📢 Criar Nova Campanha</h2></div>
-                    <div className="form-group"><label>Título</label><input type="text" value={pushForm.title} onChange={(e) => setPushForm({...pushForm, title: e.target.value})} maxLength={50} /></div>
-                    <div className="form-group"><label>Mensagem</label><input type="text" value={pushForm.message} onChange={(e) => setPushForm({...pushForm, message: e.target.value})} maxLength={120} /></div>
-                    <div className="form-group"><label>Link</label><input type="text" value={pushForm.url} onChange={(e) => setPushForm({...pushForm, url: e.target.value})} /></div>
-                    <button className="save-button" onClick={handleSendPush} disabled={sendingPush}>{sendingPush ? "Enviando..." : "🚀 Enviar Notificação"}</button>
-                </div>
-            </div>
+             <TabCampaigns 
+                stats={stats}
+                pushForm={pushForm}
+                setPushForm={setPushForm}
+                handleSendPush={handleSendPush}
+                sendingPush={sendingPush}
+                token={token}
+                API_URL={API_URL}
+             />
         )}
 
         {activeTab === 'planos' && (
