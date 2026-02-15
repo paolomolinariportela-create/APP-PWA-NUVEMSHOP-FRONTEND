@@ -1,5 +1,5 @@
 import React from 'react';
-import PhonePreview from './PhonePreview'; // Importando o novo componente de preview
+import PhonePreview from '../pages/PhonePreview';
 
 interface AppConfig {
   app_name: string;
