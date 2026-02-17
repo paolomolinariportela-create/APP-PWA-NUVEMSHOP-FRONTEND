@@ -7,6 +7,8 @@ interface PhonePreviewProps {
   fabEnabled?: boolean;
   fabText?: string;
   storeUrl?: string; // URL real da loja para tentar carregar
+  bottomBarBg?: string;
+  bottomBarIconColor?: string;
 }
 
 const PhonePreview: React.FC<PhonePreviewProps> = ({ 
@@ -15,12 +17,16 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
   logoUrl, 
   fabEnabled, 
   fabText,
-  storeUrl 
+  storeUrl,
+  bottomBarBg,
+  bottomBarIconColor
 }) => {
   const [iframeError, setIframeError] = useState(false);
 
-  // URL segura para preview (adiciona https se faltar)
-  const safeUrl = storeUrl?.startsWith('http') ? storeUrl : `https://${storeUrl}`;
+  const safeUrl = storeUrl?.startsWith('http') ? storeUrl : (storeUrl ? `https://${storeUrl}` : undefined);
+
+  const barBg = bottomBarBg || "#FFFFFF";
+  const iconColor = bottomBarIconColor || "#6B7280";
 
   return (
     <div className="phone-mockup" style={styles.phoneMockup}>
@@ -46,7 +52,6 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
               onError={() => setIframeError(true)}
             />
           ) : (
-            // MODO SIMULAÇÃO (Se não tiver URL ou der erro no iframe)
             <>
               {/* Cabeçalho do App */}
               <div className="app-header" style={{ ...styles.appHeader, borderBottom: `2px solid ${themeColor}` }}>
@@ -78,7 +83,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
             </>
           )}
 
-          {/* BOTÃO FLUTUANTE (FAB) - SEMPRE VISÍVEL */}
+          {/* BOTÃO FLUTUANTE (FAB) */}
           {fabEnabled && (
             <div style={{
               position: 'absolute', bottom: '80px', right: '20px', 
@@ -95,17 +100,34 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
 
         </div>
 
-        {/* BARRA DE NAVEGAÇÃO INFERIOR */}
-        <div className="bottom-nav" style={styles.bottomNav}>
-          <div className="nav-item" style={{ color: themeColor, display:'flex', flexDirection:'column', alignItems:'center' }}>
+        {/* BARRA DE NAVEGAÇÃO INFERIOR (usa cores configuradas) */}
+        <div
+          className="bottom-nav"
+          style={{
+            ...styles.bottomNav,
+            background: barBg,
+            borderTop: '1px solid #e5e7eb'
+          }}
+        >
+          <div className="nav-item" style={{ ...styles.navItem, color: iconColor }}>
             <span>🏠</span>
+            <small style={styles.navLabel}>Início</small>
           </div>
-          <div className="nav-item" style={{ color: '#aaa', display:'flex', flexDirection:'column', alignItems:'center' }}><span>🔍</span></div>
-          <div className="nav-item" style={{ color: '#aaa', display:'flex', flexDirection:'column', alignItems:'center' }}><span>🛒</span></div>
-          <div className="nav-item" style={{ color: '#aaa', display:'flex', flexDirection:'column', alignItems:'center' }}><span>👤</span></div>
+          <div className="nav-item" style={{ ...styles.navItem, color: iconColor }}>
+            <span>🛒</span>
+            <small style={styles.navLabel}>Catálogo</small>
+          </div>
+          <div className="nav-item" style={{ ...styles.navItem, color: iconColor }}>
+            <span>🔔</span>
+            <small style={styles.navLabel}>Alertas</small>
+          </div>
+          <div className="nav-item" style={{ ...styles.navItem, color: iconColor }}>
+            <span>👤</span>
+            <small style={styles.navLabel}>Conta</small>
+          </div>
         </div>
 
-        {/* INDICADOR HOME (iPhone style) */}
+        {/* INDICADOR HOME */}
         <div className="home-bar" style={styles.homeBar}></div>
       </div>
     </div>
@@ -156,8 +178,22 @@ const styles: { [key: string]: React.CSSProperties } = {
     background: 'white', padding: '10px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)'
   },
   bottomNav: {
-    height: '60px', borderTop: '1px solid #eee', background: 'white',
-    display: 'flex', justifyContent: 'space-around', alignItems: 'center', fontSize: '20px'
+    height: '60px',
+    display: 'flex',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    fontSize: '18px'
+  },
+  navItem: {
+    display:'flex',
+    flexDirection:'column',
+    alignItems:'center',
+    fontSize: '11px'
+  },
+  navLabel: {
+    fontSize:'9px',
+    fontWeight:'600',
+    marginTop:'2px'
   },
   homeBar: {
     width: '100px', height: '5px', background: '#ccc', borderRadius: '10px',
