@@ -11,6 +11,9 @@ interface AppConfig {
   fab_position?: string;
   fab_icon?: string;
   fab_delay?: number;
+
+  bottom_bar_bg?: string;
+  bottom_bar_icon_color?: string;
 }
 
 interface Props {
@@ -187,7 +190,7 @@ export default function TabConfig({ config, setConfig, handleSave, saving, loadi
           {config.fab_enabled && (
             <div
               className="animate-fade-in"
-              style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '15px' }}
+              style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '15px', marginBottom:'20px' }}
             >
               <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
                 <div style={{ flex: 1 }}>
@@ -293,6 +296,53 @@ export default function TabConfig({ config, setConfig, handleSave, saving, loadi
               </div>
             </div>
           )}
+
+          {/* Bottom bar do app */}
+          <div
+            className="animate-fade-in"
+            style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '15px' }}
+          >
+            <h4 style={{ margin: '0 0 10px 0', fontSize:'14px' }}>📱 Barra inferior do App</h4>
+            <small style={{ color:'#666', fontSize:'11px', display:'block', marginBottom:'12px' }}>
+              Personalize a barra de navegação que aparece quando o cliente usa o app instalado.
+            </small>
+
+            <div className="form-group">
+              <label>Cor de fundo da barra</label>
+              <div className="color-picker-wrapper">
+                <input
+                  type="color"
+                  value={config.bottom_bar_bg || "#FFFFFF"}
+                  onChange={(e) => setConfig({ ...config, bottom_bar_bg: e.target.value })}
+                />
+                <input
+                  type="text"
+                  className="color-text"
+                  value={config.bottom_bar_bg || "#FFFFFF"}
+                  onChange={(e) => setConfig({ ...config, bottom_bar_bg: e.target.value })}
+                />
+              </div>
+              <small>Exemplo: #FFFFFF para branco.</small>
+            </div>
+
+            <div className="form-group">
+              <label>Cor dos ícones e textos</label>
+              <div className="color-picker-wrapper">
+                <input
+                  type="color"
+                  value={config.bottom_bar_icon_color || "#6B7280"}
+                  onChange={(e) => setConfig({ ...config, bottom_bar_icon_color: e.target.value })}
+                />
+                <input
+                  type="text"
+                  className="color-text"
+                  value={config.bottom_bar_icon_color || "#6B7280"}
+                  onChange={(e) => setConfig({ ...config, bottom_bar_icon_color: e.target.value })}
+                />
+              </div>
+              <small>Exemplo: #4F46E5 para roxo do App.</small>
+            </div>
+          </div>
         </div>
 
         <button
@@ -317,6 +367,8 @@ export default function TabConfig({ config, setConfig, handleSave, saving, loadi
             fabPosition={config.fab_position}
             fabIcon={config.fab_icon}
             storeUrl={storeUrl}
+            bottomBarBg={config.bottom_bar_bg}
+            bottomBarIconColor={config.bottom_bar_icon_color}
           />
         </div>
       </div>
