@@ -98,15 +98,15 @@ export default function AdminPanel() {
         authFetch("/admin/store-info").then(r => r.json())
     ]).then(([dataConfig, dataStats, dataUrl]) => {
         setConfig({
-             app_name: dataConfig.app_name || "Minha Loja",
-             theme_color: dataConfig.theme_color || "#000000",
-             logo_url: dataConfig.logo_url || "",
-             whatsapp_number: dataConfig.whatsapp_number || "",
-             fab_enabled: dataConfig.fab_enabled || false,
-             fab_text: dataConfig.fab_text || "Baixar App",
-             fab_position: dataConfig.fab_position || "right",
-             fab_icon: dataConfig.fab_icon || "📲",
-             fab_delay: dataConfig.fab_delay || 0
+             app_name: dataConfig.app_name ?? "Minha Loja",
+             theme_color: dataConfig.theme_color ?? "#000000",
+             logo_url: dataConfig.logo_url ?? "",
+             hatsapp_number: dataConfig.whatsapp_number ?? "",
+             fab_enabled: dataConfig.fab_enabled ?? false,
+             fab_text: dataConfig.fab_text ?? "Baixar App",
+             fab_position: dataConfig.fab_position ?? "right",
+             fab_icon: dataConfig.fab_icon ?? "📲",
+             fab_delay: dataConfig.fab_delay ?? 0
         });
         setStats(dataStats);
         setStoreUrl(dataUrl.url);
