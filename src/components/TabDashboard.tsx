@@ -19,6 +19,20 @@ interface Props {
 }
 
 export default function TabDashboard({ stats }: Props) {
+  // meta dinâmica de instalações
+  const currentInstalls = stats.instalacoes;
+  let metaInstalacoes: number;
+
+  if (currentInstalls < 100) {
+    metaInstalacoes = 100;
+  } else if (currentInstalls < 500) {
+    metaInstalacoes = 500;
+  } else if (currentInstalls < 1000) {
+    metaInstalacoes = 1000;
+  } else {
+    metaInstalacoes = Math.ceil(currentInstalls / 1000) * 1000;
+  }
+
   return (
     <section className="stats-grid animate-fade-in">
       <div className="stat-card" style={{ borderLeft: '4px solid #10B981' }}>
@@ -72,15 +86,26 @@ export default function TabDashboard({ stats }: Props) {
         </div>
       </div>
 
+      {/* Instalações + Meta */}
       <div className="stat-card">
         <div className="stat-icon purple">📱</div>
         <div className="stat-info">
           <h3>Instalações Ativas</h3>
           <p>{stats.instalacoes}</p>
           <span className="stat-growth">Base de clientes fiéis</span>
+          <div
+            style={{
+              marginTop: '6px',
+              fontSize: '11px',
+              color: '#555',
+            }}
+          >
+            🎯 Meta de Instalações: {stats.instalacoes} / {metaInstalacoes}
+          </div>
         </div>
       </div>
 
+      {/* Crescimento do App */}
       <div className="stat-card">
         <div className="stat-icon" style={{ background: '#ECFEFF', color: '#0891B2' }}>
           📈
