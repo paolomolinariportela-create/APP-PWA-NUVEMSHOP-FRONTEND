@@ -26,7 +26,7 @@ export default function TabDashboard({ stats }: Props) {
         </div>
         <div className="stat-card">
             <div className="stat-icon" style={{background: '#F0F9FF', color: '#0369A1'}}>💳</div>
-            <div className="stat-info"><h3>Ticket Médio</h3><div style={{marginTop: '10px'}}><div style={{display:'flex', justifyContent:'space-between', marginBottom:'5px'}}><span style={{color:'#10B981', fontWeight:'bold'}}>App: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.ticket_medio.app)}</span><span style={{fontSize:'10px', background:'#DCFCE7', color:'#15803D', padding:'2px 6px', borderRadius:'4px'}}>+30%</span></div></div></div>
+            <div className="stat-info"><h3>Ticket Médio</h3><div style={{marginTop: '10px'}}><div style={{display:'flex', justifyContent:'space-between', marginBottom:'5px'}}><span style={{color:'#10B981', fontWeight:'bold'}}>APP: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.ticket_medio.app)}</span><span style={{fontSize:'10px', background:'#DCFCE7', color:'#15803D', padding:'2px 6px', borderRadius:'4px'}}>+30%</span></div></div></div>
         </div>
         <div className="stat-card">
             <div className="stat-icon purple">📱</div>
