@@ -44,7 +44,7 @@ export default function TabDashboard({ stats }: Props) {
             <div className="stat-info" style={{width: '100%'}}>
                 <h3>Funil de Vendas 📉</h3>
                 <div style={{marginTop: '15px'}}>
-                    <div className="conversion-bar"><div className="bar-label"><span>1. Visitas</span> <strong>{stats.funil.visitas}</strong></div><div className="bar-track"><div className="bar-fill" style={{width: '100%', background: '#9CA3AF'}}></div></div></div>
+                    <div className="conversion-bar"><div className="bar-label"><span>1. Visitas Únicas</span> <strong>{stats.funil.visitas}</strong></div><div className="bar-track"><div className="bar-fill" style={{width: '100%', background: '#9CA3AF'}}></div></div></div>
                     <div className="conversion-bar"><div className="bar-label"><span>2. Carrinho</span> <strong>{stats.funil.carrinho}</strong></div><div className="bar-track"><div className="bar-fill" style={{width: `${(stats.funil.carrinho/Math.max(stats.funil.visitas,1))*100}%`, background: '#60A5FA'}}></div></div></div>
                     <div className="conversion-bar"><div className="bar-label"><span>3. Checkout</span> <strong>{stats.funil.checkout}</strong></div><div className="bar-track"><div className="bar-fill" style={{width: `${(stats.funil.checkout/Math.max(stats.funil.visitas,1))*100}%`, background: '#10B981'}}></div></div></div>
                     <small style={{display:'block', marginTop:'10px', color:'#666', fontSize:'10px'}}>{stats.taxa_conversao.app}% de conversão global</small>
