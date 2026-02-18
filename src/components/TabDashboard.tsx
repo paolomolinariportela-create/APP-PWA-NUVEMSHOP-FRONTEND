@@ -58,7 +58,7 @@ export default function TabDashboard({ stats }: Props) {
          <div className="stat-card">
             <div className="stat-info" style={{width: '100%'}}>
                 <h3>Taxa de Conversão 🏆</h3>
-                <div className="conversion-bar"><div className="bar-label"><span>App PWA</span> <strong>{stats.taxa_conversao.app}%</strong></div><div className="bar-track"><div className="bar-fill" style={{width: `${Math.min(stats.taxa_conversao.app * 20, 100)}%`, background: '#10B981'}}></div></div></div>
+                <div className="conversion-bar"><div className="bar-label"><span>APP</span> <strong>{stats.taxa_conversao.app}%</strong></div><div className="bar-track"><div className="bar-fill" style={{width: `${Math.min(stats.taxa_conversao.app * 20, 100)}%`, background: '#10B981'}}></div></div></div>
             </div>
         </div>
     </section>
