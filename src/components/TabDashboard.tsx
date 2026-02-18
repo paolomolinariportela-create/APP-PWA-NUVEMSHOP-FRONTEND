@@ -38,7 +38,7 @@ export default function TabDashboard({ stats }: Props) {
         </div>
         <div className="stat-card">
             <div className="stat-icon" style={{background:'#FFF7ED', color:'#C2410C'}}>👀</div>
-            <div className="stat-info"><h3>Engajamento</h3><p>{stats.visualizacoes.pageviews.toLocaleString()}</p><div style={{marginTop: '8px', fontSize: '11px', color: '#555'}}>⏱️ Tempo médio: <strong>{stats.visualizacoes.tempo_medio}</strong></div></div>
+            <div className="stat-info"><h3>Páginas Acessadas</h3><p>{stats.visualizacoes.pageviews.toLocaleString()}</p><div style={{marginTop: '8px', fontSize: '11px', color: '#555'}}>⏱️ Tempo médio: <strong>{stats.visualizacoes.tempo_medio}</strong></div></div>
         </div>
         <div className="stat-card" style={{gridRow: 'span 2'}}>
             <div className="stat-info" style={{width: '100%'}}>
