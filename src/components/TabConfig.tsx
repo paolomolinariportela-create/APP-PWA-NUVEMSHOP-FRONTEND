@@ -15,6 +15,15 @@ interface AppConfig {
   fab_size?: number;
   fab_color?: string;
 
+  topbar_enabled?: boolean;
+  topbar_text?: string;
+  topbar_button_text?: string;
+  topbar_icon?: string;
+  topbar_position?: 'top' | 'bottom';
+  topbar_color?: string;
+  topbar_text_color?: string;
+  topbar_size?: number;
+
   bottom_bar_enabled?: boolean;
   bottom_bar_bg?: string;
   bottom_bar_icon_color?: string;
@@ -52,6 +61,8 @@ export default function TabConfig({
   const logoToUse = config.logo_url || config.default_logo_url || '';
 
   const fabColor = config.fab_color || config.theme_color;
+  const topbarColor = config.topbar_color || '#111827';
+  const topbarTextColor = config.topbar_text_color || '#FFFFFF';
 
   return (
     <div className="editor-grid animate-fade-in" style={{ marginTop: '20px' }}>
@@ -291,7 +302,7 @@ export default function TabConfig({
           </div>
         </div>
 
-        {/* WIDGETS DE CONVERSÃO (FAB) + PREVIEW */}
+        {/* WIDGETS DE CONVERSÃO (FAB + Barra fixa) + PREVIEW */}
         <div className="config-card">
           <div className="card-header">
             <h3 style={{ margin: 0 }}>🚀 Widgets de Conversão</h3>
@@ -305,7 +316,9 @@ export default function TabConfig({
               alignItems: 'flex-start',
             }}
           >
+            {/* Coluna esquerda */}
             <div>
+              {/* FAB */}
               <div
                 style={{
                   display: 'flex',
@@ -451,7 +464,7 @@ export default function TabConfig({
                     </div>
                   </div>
 
-                  {/* Cor do botão (independente do tema) */}
+                  {/* Cor do botão */}
                   <div className="form-group">
                     <label>Cor do botão "Baixar App"</label>
                     <div className="color-picker-wrapper">
@@ -577,8 +590,360 @@ export default function TabConfig({
                   </div>
                 </div>
               )}
+
+              {/* BARRA FIXA DE DOWNLOAD */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '15px',
+                  padding: '12px',
+                  background: '#f9fafb',
+                  borderRadius: '8px',
+                  border: '1px solid #eee',
+                }}
+              >
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '14px' }}>
+                    📢 Barra Fixa de Download
+                  </h4>
+                  <small style={{ color: '#666', fontSize: '11px' }}>
+                    Banner “Baixe o app” no topo ou embaixo do site.
+                  </small>
+                </div>
+                <label
+                  style={{
+                    position: 'relative',
+                    display: 'inline-block',
+                    width: '46px',
+                    height: '24px',
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={config.topbar_enabled ?? false}
+                    onChange={(e) =>
+                      setConfig({ ...config, topbar_enabled: e.target.checked })
+                    }
+                    style={{ opacity: 0, width: 0, height: 0 }}
+                  />
+                  <span
+                    style={{
+                      position: 'absolute',
+                      cursor: 'pointer',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      backgroundColor: (config.topbar_enabled ?? false)
+                        ? '#10B981'
+                        : '#E5E7EB',
+                      transition: '.3s',
+                      borderRadius: '34px',
+                    }}
+                  />
+                  <span
+                    style={{
+                      position: 'absolute',
+                      height: '18px',
+                      width: '18px',
+                      left: '3px',
+                      bottom: '3px',
+                      backgroundColor: 'white',
+                      transition: '.3s',
+                      borderRadius: '50%',
+                      transform: (config.topbar_enabled ?? false)
+                        ? 'translateX(22px)'
+                        : 'translateX(0px)',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                    }}
+                  />
+                </label>
+              </div>
+
+              {config.topbar_enabled && (
+                <div
+                  className="animate-fade-in"
+                  style={{
+                    background: '#fff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    padding: '15px',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '15px',
+                      marginBottom: '15px',
+                    }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <label
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          color: '#374151',
+                          display: 'block',
+                          marginBottom: '5px',
+                        }}
+                      >
+                        Texto da barra
+                      </label>
+                      <input
+                        type="text"
+                        value={
+                          config.topbar_text ??
+                          'Instale o app e ganhe 10% OFF na primeira compra'
+                        }
+                        onChange={(e) =>
+                          setConfig({ ...config, topbar_text: e.target.value })
+                        }
+                        placeholder="Mensagem principal do banner"
+                        style={{
+                          width: '100%',
+                          padding: '8px',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '6px',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '15px',
+                      marginBottom: '15px',
+                    }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <label
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          color: '#374151',
+                          display: 'block',
+                          marginBottom: '5px',
+                        }}
+                      >
+                        Texto do botão
+                      </label>
+                      <input
+                        type="text"
+                        value={config.topbar_button_text ?? 'Instalar agora'}
+                        onChange={(e) =>
+                          setConfig({
+                            ...config,
+                            topbar_button_text: e.target.value,
+                          })
+                        }
+                        placeholder="Ex: Instalar agora"
+                        style={{
+                          width: '100%',
+                          padding: '8px',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '6px',
+                        }}
+                      />
+                    </div>
+                    <div style={{ width: '80px' }}>
+                      <label
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          color: '#374151',
+                          display: 'block',
+                          marginBottom: '5px',
+                        }}
+                      >
+                        Ícone
+                      </label>
+                      <input
+                        type="text"
+                        value={config.topbar_icon ?? '📲'}
+                        onChange={(e) =>
+                          setConfig({
+                            ...config,
+                            topbar_icon: e.target.value,
+                          })
+                        }
+                        style={{
+                          width: '100%',
+                          padding: '8px',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '6px',
+                          textAlign: 'center',
+                        }}
+                        placeholder="Ex: 📲, 🎁"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Posição + tamanho */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '15px',
+                      marginBottom: '15px',
+                    }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <label
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          color: '#374151',
+                          display: 'block',
+                          marginBottom: '5px',
+                        }}
+                      >
+                        Posição
+                      </label>
+                      <select
+                        value={config.topbar_position ?? 'top'}
+                        onChange={(e) =>
+                          setConfig({
+                            ...config,
+                            topbar_position: e.target.value as
+                              | 'top'
+                              | 'bottom',
+                          })
+                        }
+                        style={{
+                          width: '100%',
+                          padding: '8px',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '6px',
+                          background: 'white',
+                        }}
+                      >
+                        <option value="top">Topo</option>
+                        <option value="bottom">Embaixo</option>
+                      </select>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          color: '#374151',
+                          display: 'block',
+                          marginBottom: '5px',
+                        }}
+                      >
+                        Altura / tamanho
+                      </label>
+                      <input
+                        type="range"
+                        min="0.8"
+                        max="1.4"
+                        step="0.1"
+                        value={config.topbar_size ?? 1}
+                        onChange={(e) =>
+                          setConfig({
+                            ...config,
+                            topbar_size: parseFloat(e.target.value),
+                          })
+                        }
+                        style={{
+                          width: '100%',
+                          cursor: 'pointer',
+                          accentColor: config.theme_color,
+                        }}
+                      />
+                      <small style={{ fontSize: '10px', color: '#666' }}>
+                        Ajuste o tamanho visual da barra.
+                      </small>
+                    </div>
+                  </div>
+
+                  {/* Cores */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '15px',
+                    }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <label
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          color: '#374151',
+                          display: 'block',
+                          marginBottom: '5px',
+                        }}
+                      >
+                        Cor de fundo
+                      </label>
+                      <div className="color-picker-wrapper">
+                        <input
+                          type="color"
+                          value={topbarColor}
+                          onChange={(e) =>
+                            setConfig({
+                              ...config,
+                              topbar_color: e.target.value,
+                            })
+                          }
+                        />
+                        <input
+                          type="text"
+                          className="color-text"
+                          value={topbarColor}
+                          onChange={(e) =>
+                            setConfig({
+                              ...config,
+                              topbar_color: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          color: '#374151',
+                          display: 'block',
+                          marginBottom: '5px',
+                        }}
+                      >
+                        Cor do texto
+                      </label>
+                      <div className="color-picker-wrapper">
+                        <input
+                          type="color"
+                          value={topbarTextColor}
+                          onChange={(e) =>
+                            setConfig({
+                              ...config,
+                              topbar_text_color: e.target.value,
+                            })
+                          }
+                        />
+                        <input
+                          type="text"
+                          className="color-text"
+                          value={topbarTextColor}
+                          onChange={(e) =>
+                            setConfig({
+                              ...config,
+                              topbar_text_color: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
+            {/* Coluna direita – preview */}
             <div>
               <h4
                 style={{
@@ -587,7 +952,7 @@ export default function TabConfig({
                   textAlign: 'center',
                 }}
               >
-                Botão flutuante dentro do app
+                Widgets dentro do app
               </h4>
               <PhonePreview
                 appName={config.app_name}
@@ -599,6 +964,14 @@ export default function TabConfig({
                 fabIcon={config.fab_icon}
                 fab_size={config.fab_size}
                 fab_color={fabColor}
+                topbar_enabled={config.topbar_enabled}
+                topbar_text={config.topbar_text}
+                topbar_button_text={config.topbar_button_text}
+                topbar_icon={config.topbar_icon}
+                topbar_position={config.topbar_position}
+                topbar_color={topbarColor}
+                topbar_text_color={topbarTextColor}
+                topbar_size={config.topbar_size}
                 storeUrl={storeUrl}
                 mode="app"
               />
@@ -633,7 +1006,7 @@ export default function TabConfig({
                   padding: '12px',
                   background: '#f9fafb',
                   borderRadius: '8px',
-                  border: '1px solid #eee',
+                  border: '1px solid '#eee',
                 }}
               >
                 <div>
