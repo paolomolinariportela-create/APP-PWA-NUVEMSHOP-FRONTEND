@@ -6,11 +6,13 @@ interface AppConfig {
   theme_color: string;
   logo_url: string;
   whatsapp_number: string;
+
   fab_enabled?: boolean;
   fab_text?: string;
   fab_position?: string;
   fab_icon?: string;
   fab_delay?: number;
+  fab_size?: number;
 
   bottom_bar_enabled?: boolean;
   bottom_bar_bg?: string;
@@ -441,8 +443,45 @@ export default function TabConfig({
                           borderRadius: '6px',
                           textAlign: 'center',
                         }}
+                        placeholder="Ex: 📲, 🛒, ⭐"
                       />
                     </div>
+                  </div>
+
+                  {/* Tamanho do botão */}
+                  <div style={{ marginBottom: '15px' }}>
+                    <label
+                      style={{
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        color: '#374151',
+                        display: 'block',
+                        marginBottom: '5px',
+                      }}
+                    >
+                      Tamanho do botão
+                    </label>
+                    <input
+                      type="range"
+                      min="0.7"
+                      max="1.5"
+                      step="0.1"
+                      value={config.fab_size ?? 1}
+                      onChange={(e) =>
+                        setConfig({
+                          ...config,
+                          fab_size: parseFloat(e.target.value),
+                        })
+                      }
+                      style={{
+                        width: '100%',
+                        cursor: 'pointer',
+                        accentColor: config.theme_color,
+                      }}
+                    />
+                    <small style={{ fontSize: '10px', color: '#666' }}>
+                      Ajuste o tamanho do botão no app (pequeno → grande).
+                    </small>
                   </div>
 
                   <div style={{ display: 'flex', gap: '15px' }}>
@@ -532,6 +571,7 @@ export default function TabConfig({
                 fabText={config.fab_text}
                 fabPosition={config.fab_position}
                 fabIcon={config.fab_icon}
+                fab_size={config.fab_size}
                 storeUrl={storeUrl}
                 mode="app"
               />
