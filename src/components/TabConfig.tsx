@@ -12,6 +12,7 @@ interface AppConfig {
   fab_icon?: string;
   fab_delay?: number;
 
+  bottom_bar_enabled?: boolean;
   bottom_bar_bg?: string;
   bottom_bar_icon_color?: string;
 
@@ -288,7 +289,7 @@ export default function TabConfig({
           </div>
         </div>
 
-        {/* --- WIDGETS DE CONVERSÃO (só FAB) + PREVIEW --- */}
+        {/* --- WIDGETS DE CONVERSÃO (FAB) + PREVIEW --- */}
         <div className="config-card">
           <div className="card-header">
             <h3 style={{ margin: 0 }}>🚀 Widgets de Conversão</h3>
@@ -302,7 +303,7 @@ export default function TabConfig({
               alignItems: 'flex-start',
             }}
           >
-            {/* Coluna esquerda – Botão Flutuante */}
+            {/* Coluna esquerda – FAB */}
             <div>
               <div
                 style={{
@@ -469,7 +470,7 @@ export default function TabConfig({
                         style={{
                           width: '100%',
                           padding: '8px',
-                          border: '1px solid #d1d5db',
+                          border: '1px solid '#d1d5db',
                           borderRadius: '6px',
                           background: 'white',
                         }}
@@ -517,7 +518,7 @@ export default function TabConfig({
               )}
             </div>
 
-            {/* Coluna direita – preview do FAB dentro do app */}
+            {/* Coluna direita – preview FAB */}
             <div>
               <h4
                 style={{
@@ -543,7 +544,7 @@ export default function TabConfig({
           </div>
         </div>
 
-        {/* --- NOVO CARD: Configurações após instalação (barra inferior) --- */}
+        {/* --- CONFIGURAÇÕES APÓS INSTALAÇÃO (barra inferior) + toggle --- */}
         <div className="config-card">
           <div className="card-header">
             <h3 style={{ margin: 0 }}>⚙️ Configurações após instalação</h3>
@@ -560,60 +561,144 @@ export default function TabConfig({
               alignItems: 'flex-start',
             }}
           >
-            {/* Coluna esquerda – barra inferior */}
+            {/* Coluna esquerda – toggle + campos */}
             <div>
-              <div className="form-group">
-                <label>Cor de fundo da barra</label>
-                <div className="color-picker-wrapper">
-                  <input
-                    type="color"
-                    value={config.bottom_bar_bg || '#FFFFFF'}
-                    onChange={(e) =>
-                      setConfig({ ...config, bottom_bar_bg: e.target.value })
-                    }
-                  />
-                  <input
-                    type="text"
-                    className="color-text"
-                    value={config.bottom_bar_bg || '#FFFFFF'}
-                    onChange={(e) =>
-                      setConfig({ ...config, bottom_bar_bg: e.target.value })
-                    }
-                  />
+              {/* Toggle barra inferior (mesma lógica/visual do FAB) */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '15px',
+                  padding: '12px',
+                  background: '#f9fafb',
+                  borderRadius: '8px',
+                  border: '1px solid #eee',
+                }}
+              >
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '14px' }}>
+                    📱 Barra inferior do App
+                  </h4>
+                  <small style={{ color: '#666', fontSize: '11px' }}>
+                    Ative ou desligue a barra fixa de navegação.
+                  </small>
                 </div>
-                <small>Exemplo: #FFFFFF para branco.</small>
+                <label
+                  style={{
+                    position: 'relative',
+                    display: 'inline-block',
+                    width: '46px',
+                    height: '24px',
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={config.bottom_bar_enabled ?? true}
+                    onChange={(e) =>
+                      setConfig({
+                        ...config,
+                        bottom_bar_enabled: e.target.checked,
+                      })
+                    }
+                    style={{ opacity: 0, width: 0, height: 0 }}
+                  />
+                  <span
+                    style={{
+                      position: 'absolute',
+                      cursor: 'pointer',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      backgroundColor: (config.bottom_bar_enabled ?? true)
+                        ? '#10B981'
+                        : '#E5E7EB',
+                      transition: '.3s',
+                      borderRadius: '34px',
+                    }}
+                  />
+                  <span
+                    style={{
+                      position: 'absolute',
+                      height: '18px',
+                      width: '18px',
+                      left: '3px',
+                      bottom: '3px',
+                      backgroundColor: 'white',
+                      transition: '.3s',
+                      borderRadius: '50%',
+                      transform: (config.bottom_bar_enabled ?? true)
+                        ? 'translateX(22px)'
+                        : 'translateX(0px)',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                    }}
+                  />
+                </label>
               </div>
 
-              <div className="form-group">
-                <label>Cor dos ícones e textos</label>
-                <div className="color-picker-wrapper">
-                  <input
-                    type="color"
-                    value={config.bottom_bar_icon_color || '#6B7280'}
-                    onChange={(e) =>
-                      setConfig({
-                        ...config,
-                        bottom_bar_icon_color: e.target.value,
-                      })
-                    }
-                  />
-                  <input
-                    type="text"
-                    className="color-text"
-                    value={config.bottom_bar_icon_color || '#6B7280'}
-                    onChange={(e) =>
-                      setConfig({
-                        ...config,
-                        bottom_bar_icon_color: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <small>Exemplo: #4F46E5 para roxo do App.</small>
-              </div>
+              {config.bottom_bar_enabled !== false && (
+                <>
+                  <div className="form-group">
+                    <label>Cor de fundo da barra</label>
+                    <div className="color-picker-wrapper">
+                      <input
+                        type="color"
+                        value={config.bottom_bar_bg || '#FFFFFF'}
+                        onChange={(e) =>
+                          setConfig({
+                            ...config,
+                            bottom_bar_bg: e.target.value,
+                          })
+                        }
+                      />
+                      <input
+                        type="text"
+                        className="color-text"
+                        value={config.bottom_bar_bg || '#FFFFFF'}
+                        onChange={(e) =>
+                          setConfig({
+                            ...config,
+                            bottom_bar_bg: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                    <small>Exemplo: #FFFFFF para branco.</small>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Cor dos ícones e textos</label>
+                    <div className="color-picker-wrapper">
+                      <input
+                        type="color"
+                        value={config.bottom_bar_icon_color || '#6B7280'}
+                        onChange={(e) =>
+                          setConfig({
+                            ...config,
+                            bottom_bar_icon_color: e.target.value,
+                          })
+                        }
+                      />
+                      <input
+                        type="text"
+                        className="color-text"
+                        value={config.bottom_bar_icon_color || '#6B7280'}
+                        onChange={(e) =>
+                          setConfig({
+                            ...config,
+                            bottom_bar_icon_color: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                    <small>Exemplo: #4F46E5 para roxo do App.</small>
+                  </div>
+                </>
+              )}
             </div>
 
-            {/* Coluna direita – preview focado na barra inferior */}
+            {/* Coluna direita – preview barra inferior (só se ligada) */}
             <div>
               <h4
                 style={{
@@ -624,16 +709,18 @@ export default function TabConfig({
               >
                 Barra inferior dentro do app
               </h4>
-              <PhonePreview
-                appName={config.app_name}
-                themeColor={config.theme_color}
-                logoUrl={logoToUse}
-                fabEnabled={false}
-                storeUrl={storeUrl}
-                bottomBarBg={config.bottom_bar_bg}
-                bottomBarIconColor={config.bottom_bar_icon_color}
-                mode="app"
-              />
+              {config.bottom_bar_enabled !== false && (
+                <PhonePreview
+                  appName={config.app_name}
+                  themeColor={config.theme_color}
+                  logoUrl={logoToUse}
+                  fabEnabled={false}
+                  storeUrl={storeUrl}
+                  bottomBarBg={config.bottom_bar_bg}
+                  bottomBarIconColor={config.bottom_bar_icon_color}
+                  mode="app"
+                />
+              )}
             </div>
           </div>
         </div>
