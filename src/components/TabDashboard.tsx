@@ -12,6 +12,7 @@ interface DashboardStats {
   funil: { visitas: number; carrinho: number; checkout: number };
   recorrencia: { clientes_2x: number; taxa_recompra: number };
   ticket_medio: { app: number; site: number };
+  visitas?: { app: number; site: number; total: number };
 }
 
 interface Props {
@@ -64,7 +65,7 @@ export default function TabDashboard({ stats }: Props) {
               }}
             >
               <span style={{ color: '#10B981', fontWeight: 'bold' }}>
-                APP:{' '}
+                APP{' '}
                 {new Intl.NumberFormat('pt-BR', {
                   style: 'currency',
                   currency: 'BRL',
@@ -210,7 +211,7 @@ export default function TabDashboard({ stats }: Props) {
                 fontSize: '10px',
               }}
             >
-              {stats.taxa_conversao.app}% de conversão global
+              {stats.taxa_conversao.app}% de conversão global do APP
             </small>
           </div>
         </div>
@@ -262,6 +263,7 @@ export default function TabDashboard({ stats }: Props) {
               ></div>
             </div>
           </div>
+          {/* se quiser depois, pode adicionar uma barrinha para o site usando stats.taxa_conversao.site */}
         </div>
       </div>
     </section>
