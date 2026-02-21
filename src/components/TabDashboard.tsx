@@ -70,6 +70,7 @@ export default function TabDashboard({ stats }: Props) {
 
   return (
     <section className="stats-grid animate-fade-in">
+      {/* RECEITA APP */}
       <div className="stat-card" style={{ borderLeft: '4px solid #10B981' }}>
         <div className="stat-icon green">💰</div>
         <div className="stat-info">
@@ -98,37 +99,46 @@ export default function TabDashboard({ stats }: Props) {
         </div>
       </div>
 
+      {/* TICKET MÉDIO APP x SITE */}
       <div className="stat-card">
         <div className="stat-icon" style={{ background: '#F0F9FF', color: '#0369A1' }}>
           💳
         </div>
         <div className="stat-info">
           <h3>Ticket Médio</h3>
-          <div style={{ marginTop: '10px' }}>
+          <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <div
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                marginBottom: '5px',
+                alignItems: 'center',
               }}
             >
-              <span style={{ color: '#10B981', fontWeight: 'bold' }}>
-                APP{' '}
+              <span style={{ color: '#10B981', fontWeight: 'bold', fontSize: '12px' }}>
+                APP
+              </span>
+              <span>
                 {new Intl.NumberFormat('pt-BR', {
                   style: 'currency',
                   currency: 'BRL',
                 }).format(stats.ticket_medio.app)}
               </span>
-              <span
-                style={{
-                  fontSize: '10px',
-                  background: '#DCFCE7',
-                  color: '#15803D',
-                  padding: '2px 6px',
-                  borderRadius: '4px',
-                }}
-              >
-                +30%
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                fontSize: '12px',
+                color: '#4B5563',
+              }}
+            >
+              <span>Site</span>
+              <span>
+                {new Intl.NumberFormat('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL',
+                }).format(stats.ticket_medio.site)}
               </span>
             </div>
           </div>
@@ -143,7 +153,6 @@ export default function TabDashboard({ stats }: Props) {
           <p>{stats.instalacoes}</p>
           <span className="stat-growth">Base de clientes fiéis</span>
 
-          {/* Visitas App x Site usando extra_pwa */}
           {stats.extra_pwa && (
             <div
               style={{
@@ -181,6 +190,7 @@ export default function TabDashboard({ stats }: Props) {
         </div>
       </div>
 
+      {/* Clientes recorrentes + meta */}
       <div className="stat-card">
         <div className="stat-icon blue">🔁</div>
         <div className="stat-info">
@@ -195,7 +205,6 @@ export default function TabDashboard({ stats }: Props) {
           >
             Taxa de Recompra: <strong>{stats.recorrencia.taxa_recompra}%</strong>
           </div>
-
           <div
             style={{
               marginTop: '6px',
@@ -208,6 +217,7 @@ export default function TabDashboard({ stats }: Props) {
         </div>
       </div>
 
+      {/* Páginas visualizadas */}
       <div className="stat-card">
         <div className="stat-icon" style={{ background: '#FFF7ED', color: '#C2410C' }}>
           👀
@@ -328,6 +338,7 @@ export default function TabDashboard({ stats }: Props) {
         </div>
       )}
 
+      {/* Funil de vendas */}
       <div className="stat-card" style={{ gridRow: 'span 2' }}>
         <div className="stat-info" style={{ width: '100%' }}>
           <h3>Funil de Vendas 📉</h3>
@@ -391,6 +402,7 @@ export default function TabDashboard({ stats }: Props) {
         </div>
       </div>
 
+      {/* Carrinhos abandonados */}
       <div className="stat-card" style={{ borderLeft: '4px solid #ef4444' }}>
         <div className="stat-icon red">💸</div>
         <div className="stat-info">
@@ -432,10 +444,13 @@ export default function TabDashboard({ stats }: Props) {
         </div>
       </div>
 
+      {/* Taxa de conversão APP x SITE */}
       <div className="stat-card">
         <div className="stat-info" style={{ width: '100%' }}>
           <h3>Taxa de Conversão 🏆</h3>
-          <div className="conversion-bar">
+
+          {/* APP */}
+          <div className="conversion-bar" style={{ marginBottom: '6px' }}>
             <div className="bar-label">
               <span>APP</span>{' '}
               <strong>{stats.taxa_conversao.app}%</strong>
@@ -444,13 +459,29 @@ export default function TabDashboard({ stats }: Props) {
               <div
                 className="bar-fill"
                 style={{
-                  width: `${Math.min(stats.taxa_conversao.app * 20, 100)}%`,
+                  width: `${Math.min(stats.taxa_conversao.app, 100)}%`,
                   background: '#10B981',
                 }}
               ></div>
             </div>
           </div>
-          {/* se quiser depois, pode adicionar uma barrinha para o site usando stats.taxa_conversao.site */}
+
+          {/* SITE */}
+          <div className="conversion-bar">
+            <div className="bar-label">
+              <span>Site</span>{' '}
+              <strong>{stats.taxa_conversao.site}%</strong>
+            </div>
+            <div className="bar-track">
+              <div
+                className="bar-fill"
+                style={{
+                  width: `${Math.min(stats.taxa_conversao.site, 100)}%`,
+                  background: '#3B82F6',
+                }}
+              ></div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
