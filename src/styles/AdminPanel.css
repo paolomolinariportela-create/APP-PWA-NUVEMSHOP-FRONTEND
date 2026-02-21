@@ -260,7 +260,6 @@ body {
 
 @media (max-width: 900px) {
   .editor-grid { grid-template-columns: 1fr; }
-  .sticky-wrapper { position: relative; top: 0; }
   
   .dashboard-header { flex-direction: column; height: auto; padding: 15px; gap: 15px; }
   .header-left { flex-direction: column; gap: 15px; width: 100%; }
@@ -400,7 +399,7 @@ body {
   transition: transform 0.2s ease;
   background: #fff;
 }
-.plan-card:hover {
+plan-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
