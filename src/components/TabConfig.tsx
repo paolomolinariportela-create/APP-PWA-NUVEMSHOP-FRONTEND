@@ -346,7 +346,7 @@ export default function TabConfig({
               className="animate-fade-in"
               style={{
                 background: '#fff',
-                border: '1px solid '#e5e7eb',
+                border: '1px solid #e5e7eb',
                 borderRadius: '8px',
                 padding: '15px',
                 marginBottom: '20px',
