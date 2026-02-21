@@ -349,9 +349,22 @@ export default function TabDashboard({ stats }: Props) {
               currency: 'BRL',
             }).format(stats.carrinhos_abandonados.valor)}
           </p>
+
+          <div
+            style={{
+              marginTop: '4px',
+              fontSize: '11px',
+              color: '#555',
+            }}
+          >
+            {stats.carrinhos_abandonados.qtd} carrinho
+            {stats.carrinhos_abandonados.qtd === 1 ? '' : 's'} abandonado
+            {stats.carrinhos_abandonados.qtd === 1 ? '' : 's'}
+          </div>
+
           <button
             style={{
-              marginTop: '5px',
+              marginTop: '8px',
               background: '#dc2626',
               color: 'white',
               border: 'none',
