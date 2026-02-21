@@ -343,7 +343,12 @@ body {
 
 /* PHONE MOCKUP */
 .preview-section { display: flex; justify-content: center; width: 100%; }
-.sticky-wrapper { position: sticky; top: 80px; width: 100%; display: flex; flex-direction: column; align-items: center; }
+.sticky-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
 .phone-mockup {
   width: 320px;
