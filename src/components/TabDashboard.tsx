@@ -40,6 +40,34 @@ export default function TabDashboard({ stats }: Props) {
     metaInstalacoes = Math.ceil(currentInstalls / 1000) * 1000;
   }
 
+  // meta dinâmica de receita
+  const receita = stats.receita;
+  let metaReceita: number;
+
+  if (receita < 500) {
+    metaReceita = 500;
+  } else if (receita < 1000) {
+    metaReceita = 1000;
+  } else if (receita < 5000) {
+    metaReceita = 5000;
+  } else {
+    metaReceita = Math.ceil(receita / 5000) * 5000;
+  }
+
+  // meta dinâmica de clientes recorrentes
+  const clientesRec = stats.recorrencia.clientes_2x;
+  let metaRecorrentes: number;
+
+  if (clientesRec < 10) {
+    metaRecorrentes = 10;
+  } else if (clientesRec < 50) {
+    metaRecorrentes = 50;
+  } else if (clientesRec < 100) {
+    metaRecorrentes = 100;
+  } else {
+    metaRecorrentes = Math.ceil(clientesRec / 100) * 100;
+  }
+
   return (
     <section className="stats-grid animate-fade-in">
       <div className="stat-card" style={{ borderLeft: '4px solid #10B981' }}>
@@ -53,6 +81,20 @@ export default function TabDashboard({ stats }: Props) {
             }).format(stats.receita)}
           </p>
           <span className="stat-growth">🔥 {stats.vendas} pedidos realizados</span>
+
+          <div
+            style={{
+              marginTop: '6px',
+              fontSize: '11px',
+              color: '#555',
+            }}
+          >
+            🎯 Próxima meta:{' '}
+            {new Intl.NumberFormat('pt-BR', {
+              style: 'currency',
+              currency: 'BRL',
+            }).format(metaReceita)}
+          </div>
         </div>
       </div>
 
@@ -153,6 +195,16 @@ export default function TabDashboard({ stats }: Props) {
           >
             Taxa de Recompra: <strong>{stats.recorrencia.taxa_recompra}%</strong>
           </div>
+
+          <div
+            style={{
+              marginTop: '6px',
+              fontSize: '11px',
+              color: '#555',
+            }}
+          >
+            🎯 Próxima meta: {metaRecorrentes} clientes
+          </div>
         </div>
       </div>
 
@@ -193,7 +245,7 @@ export default function TabDashboard({ stats }: Props) {
               }}
             >
               {stats.visualizacoes.top_paginas_pwa
-                .filter(pagina => pagina !== 'install') // nunca mostra "install"
+                .filter(pagina => pagina !== 'install')
                 .slice(0, 5)
                 .map((pagina, idx) => {
                   let label = pagina || '/';
