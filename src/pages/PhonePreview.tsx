@@ -6,12 +6,23 @@ interface PhonePreviewProps {
   appName: string;
   themeColor: string;
   logoUrl: string;
+
   fabEnabled?: boolean;
   fabText?: string;
   fabPosition?: string;
   fabIcon?: string;
   fab_size?: number;
   fab_color?: string;
+
+  topbar_enabled?: boolean;
+  topbar_text?: string;
+  topbar_button_text?: string;
+  topbar_icon?: string;
+  topbar_position?: 'top' | 'bottom';
+  topbar_color?: string;
+  topbar_text_color?: string;
+  topbar_size?: number;
+
   storeUrl?: string;
   bottomBarBg?: string;
   bottomBarIconColor?: string;
@@ -22,12 +33,23 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
   appName,
   themeColor,
   logoUrl,
+
   fabEnabled,
   fabText,
   fabPosition,
   fabIcon,
   fab_size = 1,
   fab_color,
+
+  topbar_enabled,
+  topbar_text,
+  topbar_button_text,
+  topbar_icon,
+  topbar_position = 'top',
+  topbar_color,
+  topbar_text_color,
+  topbar_size = 1,
+
   storeUrl,
   bottomBarBg,
   bottomBarIconColor,
@@ -46,7 +68,15 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
   const appInitial = (appName || 'App').trim().charAt(0).toUpperCase();
 
   const isSplash = mode === 'splash';
+
   const fabBgColor = fab_color || themeColor;
+
+  const bannerBg = topbar_color || '#111827'; // quase preto
+  const bannerTextColor = topbar_text_color || '#FFFFFF';
+  const bannerMessage = topbar_text || 'Instale o app e ganhe 10% OFF na primeira compra';
+  const bannerButtonText = topbar_button_text || 'Instalar agora';
+
+  const showTopbar = !isSplash && topbar_enabled;
 
   return (
     <div className="phone-mockup" style={styles.phoneMockup}>
@@ -65,6 +95,41 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
           </span>
           <div style={{ color: 'white', fontSize: '10px' }}>📶 🔋</div>
         </div>
+
+        {/* BANNER FIXO NO TOPO (se posição = top) */}
+        {!isSplash && showTopbar && topbar_position === 'top' && (
+          <div
+            style={{
+              ...styles.topbar,
+              background: bannerBg,
+              color: bannerTextColor,
+              padding: `${6 * topbar_size}px ${10 * topbar_size}px`,
+              fontSize: `${10 * topbar_size}px`,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              {topbar_icon && (
+                <span style={{ fontSize: `${12 * topbar_size}px` }}>
+                  {topbar_icon}
+                </span>
+              )}
+              <span style={{ flex: 1 }}>{bannerMessage}</span>
+              <button
+                style={{
+                  background: '#FBBF24',
+                  border: 'none',
+                  borderRadius: 999,
+                  padding: `${4 * topbar_size}px ${10 * topbar_size}px`,
+                  fontSize: `${10 * topbar_size}px`,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                {bannerButtonText}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* CONTEÚDO PRINCIPAL (mode="app") */}
         {!isSplash && (
@@ -182,6 +247,42 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                 </div>
               )}
             </div>
+
+            {/* BANNER FIXO EMBAIXO (se posição = bottom) */}
+            {!isSplash && showTopbar && topbar_position === 'bottom' && (
+              <div
+                style={{
+                  ...styles.topbar,
+                  background: bannerBg,
+                  color: bannerTextColor,
+                  padding: `${6 * topbar_size}px ${10 * topbar_size}px`,
+                  fontSize: `${10 * topbar_size}px`,
+                  borderTop: '1px solid rgba(0,0,0,0.1)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {topbar_icon && (
+                    <span style={{ fontSize: `${12 * topbar_size}px` }}>
+                      {topbar_icon}
+                    </span>
+                  )}
+                  <span style={{ flex: 1 }}>{bannerMessage}</span>
+                  <button
+                    style={{
+                      background: '#FBBF24',
+                      border: 'none',
+                      borderRadius: 999,
+                      padding: `${4 * topbar_size}px ${10 * topbar_size}px`,
+                      fontSize: `${10 * topbar_size}px`,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {bannerButtonText}
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* BARRA INFERIOR */}
             <div
@@ -333,6 +434,9 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: 'center',
     padding: '0 20px',
     paddingTop: '5px',
+  },
+  topbar: {
+    width: '100%',
   },
   appContent: {
     flex: 1,
