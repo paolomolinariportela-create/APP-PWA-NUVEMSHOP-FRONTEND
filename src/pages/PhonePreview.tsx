@@ -10,7 +10,8 @@ interface PhonePreviewProps {
   fabText?: string;
   fabPosition?: string;
   fabIcon?: string;
-  fab_size?: number; // NOVO
+  fab_size?: number;
+  fab_color?: string;
   storeUrl?: string;
   bottomBarBg?: string;
   bottomBarIconColor?: string;
@@ -25,7 +26,8 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
   fabText,
   fabPosition,
   fabIcon,
-  fab_size = 1, // padrão
+  fab_size = 1,
+  fab_color,
   storeUrl,
   bottomBarBg,
   bottomBarIconColor,
@@ -44,6 +46,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
   const appInitial = (appName || 'App').trim().charAt(0).toUpperCase();
 
   const isSplash = mode === 'splash';
+  const fabBgColor = fab_color || themeColor;
 
   return (
     <div className="phone-mockup" style={styles.phoneMockup}>
@@ -63,7 +66,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
           <div style={{ color: 'white', fontSize: '10px' }}>📶 🔋</div>
         </div>
 
-        {/* CONTEÚDO PRINCIPAL (só aparece em mode="app") */}
+        {/* CONTEÚDO PRINCIPAL (mode="app") */}
         {!isSplash && (
           <>
             <div className="app-content" style={styles.appContent}>
@@ -107,7 +110,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                     </span>
                   </div>
 
-                  {/* Banner Fake (loja genérica) */}
+                  {/* Banner Fake */}
                   <div className="skeleton-banner" style={styles.banner}>
                     <span style={{ color: '#aaa', fontSize: '10px' }}>
                       Banner da loja (exemplo)
@@ -158,7 +161,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                     position: 'absolute',
                     bottom: '80px',
                     [fabPosition === 'left' ? 'left' : 'right']: '20px',
-                    background: themeColor,
+                    background: fabBgColor,
                     color: 'white',
                     padding: `${8 * fab_size}px ${16 * fab_size}px`,
                     borderRadius: '30px',
