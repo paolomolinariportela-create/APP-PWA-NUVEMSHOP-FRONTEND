@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import PhonePreview from '../pages/PhonePreview';
 
 interface AppConfig {
@@ -36,7 +36,6 @@ export default function TabConfig({
   storeUrl,
 }: Props) {
   const [previewMode, setPreviewMode] = useState<'splash' | 'app'>('splash');
-  const widgetsRef = useRef<HTMLDivElement | null>(null);
 
   const copyLink = () => {
     navigator.clipboard.writeText(`${storeUrl}/pages/app`);
@@ -50,23 +49,10 @@ export default function TabConfig({
   const appInitial = (config.app_name || 'App').trim().charAt(0).toUpperCase();
   const logoToUse = config.logo_url || config.default_logo_url || '';
 
-  const handleEnterSplash = () => {
-    setPreviewMode('splash');
-  };
-
-  const handleEnterWidgets = () => {
-    setPreviewMode('app');
-    if (widgetsRef.current) {
-      widgetsRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    }
-  };
-
   return (
     <div className="editor-grid animate-fade-in" style={{ marginTop: '20px' }}>
-      <div className="config-section">
+      {/* Agora usamos só a coluna esquerda da grid; a direita não é mais usada */}
+      <div className="config-section" style={{ gridColumn: '1 / -1' }}>
         <h2 style={{ marginBottom: '20px' }}>Personalizar Aplicativo</h2>
 
         {/* Link e QR Code */}
@@ -151,10 +137,10 @@ export default function TabConfig({
           </div>
         </div>
 
-        {/* Identidade Visual */}
+        {/* Identidade Visual – mantém splash no preview interno do card Widgets */}
         <div
           className="config-card"
-          onMouseEnter={handleEnterSplash}
+          onMouseEnter={() => setPreviewMode('splash')}
         >
           <div className="card-header" style={{ marginBottom: '1rem' }}>
             <h3 style={{ margin: 0 }}>🎨 Identidade Visual</h3>
@@ -277,303 +263,334 @@ export default function TabConfig({
           </div>
         </div>
 
-        {/* Widgets de Conversão */}
+        {/* Widgets de Conversão + Preview ao lado */}
         <div
-          ref={widgetsRef}
           className="config-card"
-          onMouseEnter={handleEnterWidgets}
+          onMouseEnter={() => setPreviewMode('app')}
         >
           <div className="card-header">
             <h3 style={{ margin: 0 }}>🚀 Widgets de Conversão</h3>
           </div>
 
-          {/* Toggle FAB */}
           <div
             style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '15px',
-              padding: '12px',
-              background: '#f9fafb',
-              borderRadius: '8px',
-              border: '1px solid #eee',
+              display: 'grid',
+              gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1.4fr)',
+              gap: '24px',
+              alignItems: 'flex-start',
             }}
           >
+            {/* Coluna esquerda – configurações */}
             <div>
-              <h4 style={{ margin: 0, fontSize: '14px' }}>
-                📲 Botão Flutuante (FAB)
-              </h4>
-              <small style={{ color: '#666', fontSize: '11px' }}>
-                Ícone de download fixo no canto da tela.
-              </small>
-            </div>
-            <label
-              style={{
-                position: 'relative',
-                display: 'inline-block',
-                width: '46px',
-                height: '24px',
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={config.fab_enabled ?? false}
-                onChange={(e) =>
-                  setConfig({ ...config, fab_enabled: e.target.checked })
-                }
-                style={{ opacity: 0, width: 0, height: 0 }}
-              />
-              <span
-                style={{
-                  position: 'absolute',
-                  cursor: 'pointer',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  backgroundColor: (config.fab_enabled ?? false)
-                    ? '#10B981'
-                    : '#E5E7EB',
-                  transition: '.3s',
-                  borderRadius: '34px',
-                }}
-              />
-              <span
-                style={{
-                  position: 'absolute',
-                  height: '18px',
-                  width: '18px',
-                  left: '3px',
-                  bottom: '3px',
-                  backgroundColor: 'white',
-                  transition: '.3s',
-                  borderRadius: '50%',
-                  transform: (config.fab_enabled ?? false)
-                    ? 'translateX(22px)'
-                    : 'translateX(0px)',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                }}
-              />
-            </label>
-          </div>
-
-          {/* Opções Expandidas do FAB */}
-          {config.fab_enabled && (
-            <div
-              className="animate-fade-in"
-              style={{
-                background: '#fff',
-                border: '1px solid #e5e7eb',
-                borderRadius: '8px',
-                padding: '15px',
-                marginBottom: '20px',
-              }}
-            >
+              {/* Toggle FAB */}
               <div
                 style={{
                   display: 'flex',
-                  gap: '15px',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
                   marginBottom: '15px',
+                  padding: '12px',
+                  background: '#f9fafb',
+                  borderRadius: '8px',
+                  border: '1px solid #eee',
                 }}
               >
-                <div style={{ flex: 1 }}>
-                  <label
-                    style={{
-                      fontSize: '12px',
-                      fontWeight: 'bold',
-                      color: '#374151',
-                      display: 'block',
-                      marginBottom: '5px',
-                    }}
-                  >
-                    Texto do Botão
-                  </label>
-                  <input
-                    type="text"
-                    value={config.fab_text ?? 'Baixar App'}
-                    onChange={(e) =>
-                      setConfig({ ...config, fab_text: e.target.value })
-                    }
-                    placeholder="Ex: Instalar Agora"
-                    style={{
-                      width: '100%',
-                      padding: '8px',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '6px',
-                    }}
-                  />
-                </div>
-                <div style={{ width: '80px' }}>
-                  <label
-                    style={{
-                      fontSize: '12px',
-                      fontWeight: 'bold',
-                      color: '#374151',
-                      display: 'block',
-                      marginBottom: '5px',
-                    }}
-                  >
-                    Ícone
-                  </label>
-                  <input
-                    type="text"
-                    value={config.fab_icon ?? '📲'}
-                    onChange={(e) =>
-                      setConfig({ ...config, fab_icon: e.target.value })
-                    }
-                    style={{
-                      width: '100%',
-                      padding: '8px',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '6px',
-                      textAlign: 'center',
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '15px' }}>
-                <div style={{ flex: 1 }}>
-                  <label
-                    style={{
-                      fontSize: '12px',
-                      fontWeight: 'bold',
-                      color: '#374151',
-                      display: 'block',
-                      marginBottom: '5px',
-                    }}
-                  >
-                    Posição na Tela
-                  </label>
-                  <select
-                    value={config.fab_position ?? 'right'}
-                    onChange={(e) =>
-                      setConfig({ ...config, fab_position: e.target.value })
-                    }
-                    style={{
-                      width: '100%',
-                      padding: '8px',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '6px',
-                      background: 'white',
-                    }}
-                  >
-                    <option value="right">Direita (Padrão)</option>
-                    <option value="left">Esquerda</option>
-                  </select>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label
-                    style={{
-                      fontSize: '12px',
-                      fontWeight: 'bold',
-                      color: '#374151',
-                      display: 'block',
-                      marginBottom: '5px',
-                    }}
-                  >
-                    Atraso: {config.fab_delay ?? 0} segundos
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="10"
-                    step="1"
-                    value={config.fab_delay ?? 0}
-                    onChange={(e) =>
-                      setConfig({
-                        ...config,
-                        fab_delay: parseInt(e.target.value, 10),
-                      })
-                    }
-                    style={{
-                      width: '100%',
-                      cursor: 'pointer',
-                      accentColor: config.theme_color,
-                    }}
-                  />
-                  <small style={{ fontSize: '10px', color: '#666' }}>
-                    Tempo para aparecer após abrir o site.
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '14px' }}>
+                    📲 Botão Flutuante (FAB)
+                  </h4>
+                  <small style={{ color: '#666', fontSize: '11px' }}>
+                    Ícone de download fixo no canto da tela.
                   </small>
                 </div>
+                <label
+                  style={{
+                    position: 'relative',
+                    display: 'inline-block',
+                    width: '46px',
+                    height: '24px',
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={config.fab_enabled ?? false}
+                    onChange={(e) =>
+                      setConfig({ ...config, fab_enabled: e.target.checked })
+                    }
+                    style={{ opacity: 0, width: 0, height: 0 }}
+                  />
+                  <span
+                    style={{
+                      position: 'absolute',
+                      cursor: 'pointer',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      backgroundColor: (config.fab_enabled ?? false)
+                        ? '#10B981'
+                        : '#E5E7EB',
+                      transition: '.3s',
+                      borderRadius: '34px',
+                    }}
+                  />
+                  <span
+                    style={{
+                      position: 'absolute',
+                      height: '18px',
+                      width: '18px',
+                      left: '3px',
+                      bottom: '3px',
+                      backgroundColor: 'white',
+                      transition: '.3s',
+                      borderRadius: '50%',
+                      transform: (config.fab_enabled ?? false)
+                        ? 'translateX(22px)'
+                        : 'translateX(0px)',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                    }}
+                  />
+                </label>
+              </div>
+
+              {/* Opções Expandidas do FAB */}
+              {config.fab_enabled && (
+                <div
+                  className="animate-fade-in"
+                  style={{
+                    background: '#fff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    padding: '15px',
+                    marginBottom: '20px',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '15px',
+                      marginBottom: '15px',
+                    }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <label
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          color: '#374151',
+                          display: 'block',
+                          marginBottom: '5px',
+                        }}
+                      >
+                        Texto do Botão
+                      </label>
+                      <input
+                        type="text"
+                        value={config.fab_text ?? 'Baixar App'}
+                        onChange={(e) =>
+                          setConfig({ ...config, fab_text: e.target.value })
+                        }
+                        placeholder="Ex: Instalar Agora"
+                        style={{
+                          width: '100%',
+                          padding: '8px',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '6px',
+                        }}
+                      />
+                    </div>
+                    <div style={{ width: '80px' }}>
+                      <label
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          color: '#374151',
+                          display: 'block',
+                          marginBottom: '5px',
+                        }}
+                      >
+                        Ícone
+                      </label>
+                      <input
+                        type="text"
+                        value={config.fab_icon ?? '📲'}
+                        onChange={(e) =>
+                          setConfig({ ...config, fab_icon: e.target.value })
+                        }
+                        style={{
+                          width: '100%',
+                          padding: '8px',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '6px',
+                          textAlign: 'center',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '15px' }}>
+                    <div style={{ flex: 1 }}>
+                      <label
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          color: '#374151',
+                          display: 'block',
+                          marginBottom: '5px',
+                        }}
+                      >
+                        Posição na Tela
+                      </label>
+                      <select
+                        value={config.fab_position ?? 'right'}
+                        onChange={(e) =>
+                          setConfig({ ...config, fab_position: e.target.value })
+                        }
+                        style={{
+                          width: '100%',
+                          padding: '8px',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '6px',
+                          background: 'white',
+                        }}
+                      >
+                        <option value="right">Direita (Padrão)</option>
+                        <option value="left">Esquerda</option>
+                      </select>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          color: '#374151',
+                          display: 'block',
+                          marginBottom: '5px',
+                        }}
+                      >
+                        Atraso: {config.fab_delay ?? 0} segundos
+                      </label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="10"
+                        step="1"
+                        value={config.fab_delay ?? 0}
+                        onChange={(e) =>
+                          setConfig({
+                            ...config,
+                            fab_delay: parseInt(e.target.value, 10),
+                          })
+                        }
+                        style={{
+                          width: '100%',
+                          cursor: 'pointer',
+                          accentColor: config.theme_color,
+                        }}
+                      />
+                      <small style={{ fontSize: '10px', color: '#666' }}>
+                        Tempo para aparecer após abrir o site.
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Bottom bar do app */}
+              <div
+                className="animate-fade-in"
+                style={{
+                  background: '#fff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  padding: '15px',
+                }}
+              >
+                <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>
+                  📱 Barra inferior do App
+                </h4>
+                <small
+                  style={{
+                    color: '#666',
+                    fontSize: '11px',
+                    display: 'block',
+                    marginBottom: '12px',
+                  }}
+                >
+                  Personalize a barra de navegação que aparece quando o cliente
+                  usa o app instalado.
+                </small>
+
+                <div className="form-group">
+                  <label>Cor de fundo da barra</label>
+                  <div className="color-picker-wrapper">
+                    <input
+                      type="color"
+                      value={config.bottom_bar_bg || '#FFFFFF'}
+                      onChange={(e) =>
+                        setConfig({ ...config, bottom_bar_bg: e.target.value })
+                      }
+                    />
+                    <input
+                      type="text"
+                      className="color-text"
+                      value={config.bottom_bar_bg || '#FFFFFF'}
+                      onChange={(e) =>
+                        setConfig({ ...config, bottom_bar_bg: e.target.value })
+                      }
+                    />
+                  </div>
+                  <small>Exemplo: #FFFFFF para branco.</small>
+                </div>
+
+                <div className="form-group">
+                  <label>Cor dos ícones e textos</label>
+                  <div className="color-picker-wrapper">
+                    <input
+                      type="color"
+                      value={config.bottom_bar_icon_color || '#6B7280'}
+                      onChange={(e) =>
+                        setConfig({
+                          ...config,
+                          bottom_bar_icon_color: e.target.value,
+                        })
+                      }
+                    />
+                    <input
+                      type="text"
+                      className="color-text"
+                      value={config.bottom_bar_icon_color || '#6B7280'}
+                      onChange={(e) =>
+                        setConfig({
+                          ...config,
+                          bottom_bar_icon_color: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <small>Exemplo: #4F46E5 para roxo do App.</small>
+                </div>
               </div>
             </div>
-          )}
 
-          {/* Bottom bar do app */}
-          <div
-            className="animate-fade-in"
-            style={{
-              background: '#fff',
-              border: '1px solid #e5e7eb',
-              borderRadius: '8px',
-              padding: '15px',
-            }}
-          >
-            <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>
-              📱 Barra inferior do App
-            </h4>
-            <small
-              style={{
-                color: '#666',
-                fontSize: '11px',
-                display: 'block',
-                marginBottom: '12px',
-              }}
-            >
-              Personalize a barra de navegação que aparece quando o cliente usa
-              o app instalado.
-            </small>
-
-            <div className="form-group">
-              <label>Cor de fundo da barra</label>
-              <div className="color-picker-wrapper">
-                <input
-                  type="color"
-                  value={config.bottom_bar_bg || '#FFFFFF'}
-                  onChange={(e) =>
-                    setConfig({ ...config, bottom_bar_bg: e.target.value })
-                  }
-                />
-                <input
-                  type="text"
-                  className="color-text"
-                  value={config.bottom_bar_bg || '#FFFFFF'}
-                  onChange={(e) =>
-                    setConfig({ ...config, bottom_bar_bg: e.target.value })
-                  }
-                />
-              </div>
-              <small>Exemplo: #FFFFFF para branco.</small>
-            </div>
-
-            <div className="form-group">
-              <label>Cor dos ícones e textos</label>
-              <div className="color-picker-wrapper">
-                <input
-                  type="color"
-                  value={config.bottom_bar_icon_color || '#6B7280'}
-                  onChange={(e) =>
-                    setConfig({
-                      ...config,
-                      bottom_bar_icon_color: e.target.value,
-                    })
-                  }
-                />
-                <input
-                  type="text"
-                  className="color-text"
-                  value={config.bottom_bar_icon_color || '#6B7280'}
-                  onChange={(e) =>
-                    setConfig({
-                      ...config,
-                      bottom_bar_icon_color: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <small>Exemplo: #4F46E5 para roxo do App.</small>
+            {/* Coluna direita – preview do celular ao lado do card */}
+            <div>
+              <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', textAlign: 'center' }}>
+                Preview ao vivo
+              </h4>
+              <PhonePreview
+                appName={config.app_name}
+                themeColor={config.theme_color}
+                logoUrl={logoToUse}
+                fabEnabled={config.fab_enabled}
+                fabText={config.fab_text}
+                fabPosition={config.fab_position}
+                fabIcon={config.fab_icon}
+                storeUrl={storeUrl}
+                bottomBarBg={config.bottom_bar_bg}
+                bottomBarIconColor={config.bottom_bar_icon_color}
+                mode={previewMode}
+              />
             </div>
           </div>
         </div>
@@ -585,28 +602,6 @@ export default function TabConfig({
         >
           {saving ? 'Salvando...' : 'Salvar Alterações'}
         </button>
-      </div>
-
-      {/* PREVIEW DO CELULAR */}
-      <div className="preview-section">
-        <div className="sticky-wrapper">
-          <h3 style={{ textAlign: 'center', marginBottom: '10px' }}>
-            Preview ao Vivo
-          </h3>
-          <PhonePreview
-            appName={config.app_name}
-            themeColor={config.theme_color}
-            logoUrl={logoToUse}
-            fabEnabled={config.fab_enabled}
-            fabText={config.fab_text}
-            fabPosition={config.fab_position}
-            fabIcon={config.fab_icon}
-            storeUrl={storeUrl}
-            bottomBarBg={config.bottom_bar_bg}
-            bottomBarIconColor={config.bottom_bar_icon_color}
-            mode={previewMode}
-          />
-        </div>
       </div>
     </div>
   );
