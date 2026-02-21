@@ -6,7 +6,6 @@ import TabDashboard from "../components/TabDashboard";
 import TabConfig from "../components/TabConfig";
 import TabCampaigns from "../components/TabCampaigns";
 
-// Interfaces mantidas...
 interface DashboardStats {
   receita: number;
   vendas: number;
@@ -139,10 +138,6 @@ export default function AdminPanel() {
       })
       .catch((err) => {
         console.error(err);
-        // se o backend devolver {status: 401} em JSON, esse check não funciona,
-        // mas se o fetch lançar erro com 'status', mantém como estava:
-        // ideal seria testar pelo response antes de dar .json()
-        // aqui mantive sua lógica original
         // @ts-ignore
         if (err.status === 401) {
           localStorage.removeItem("app_token");
@@ -156,7 +151,6 @@ export default function AdminPanel() {
     if (!token) return;
     setSaving(true);
     try {
-      // não enviar o fallback default_logo_url para o backend
       const { default_logo_url, ...payload } = config;
 
       await fetch(`${API_URL}/admin/config`, {
