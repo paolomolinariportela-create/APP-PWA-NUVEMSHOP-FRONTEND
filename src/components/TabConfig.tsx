@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import PhonePreview from '../pages/PhonePreview';
 
 interface AppConfig {
@@ -15,7 +15,6 @@ interface AppConfig {
   bottom_bar_bg?: string;
   bottom_bar_icon_color?: string;
 
-  // fallback visual vindo da API (/admin/store-info)
   default_logo_url?: string;
 }
 
@@ -36,25 +35,34 @@ export default function TabConfig({
   loading,
   storeUrl,
 }: Props) {
-  // controla o que o preview mostra
   const [previewMode, setPreviewMode] = useState<'splash' | 'app'>('splash');
+  const widgetsRef = useRef<HTMLDivElement | null>(null);
 
   const copyLink = () => {
     navigator.clipboard.writeText(`${storeUrl}/pages/app`);
     alert('Link copiado!');
   };
 
-  // QR code com cor fixa (preto), para não depender do theme_color
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
     storeUrl + '/pages/app'
   )}&color=000000`;
 
-  // inicial do app para usar no placeholder
   const appInitial = (config.app_name || 'App').trim().charAt(0).toUpperCase();
-
-  // logo que será exibida: prioridade para o que o usuário digitou,
-  // senão usa a logo padrão da loja vinda do backend
   const logoToUse = config.logo_url || config.default_logo_url || '';
+
+  const handleEnterSplash = () => {
+    setPreviewMode('splash');
+  };
+
+  const handleEnterWidgets = () => {
+    setPreviewMode('app');
+    if (widgetsRef.current) {
+      widgetsRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  };
 
   return (
     <div className="editor-grid animate-fade-in" style={{ marginTop: '20px' }}>
@@ -132,7 +140,7 @@ export default function TabConfig({
               target="_blank"
               rel="noreferrer"
               style={{
-                color: '#7C3AED', // cor fixa, não depende do theme_color
+                color: '#7C3AED',
                 textDecoration: 'none',
                 fontWeight: 'bold',
                 fontSize: '14px',
@@ -146,14 +154,12 @@ export default function TabConfig({
         {/* Identidade Visual */}
         <div
           className="config-card"
-          // quando o mouse entrar aqui, garantimos que o preview esteja em modo splash
-          onMouseEnter={() => setPreviewMode('splash')}
+          onMouseEnter={handleEnterSplash}
         >
           <div className="card-header" style={{ marginBottom: '1rem' }}>
             <h3 style={{ margin: 0 }}>🎨 Identidade Visual</h3>
           </div>
 
-          {/* Linha com campos + mini preview do ícone */}
           <div
             style={{
               display: 'flex',
@@ -273,9 +279,9 @@ export default function TabConfig({
 
         {/* Widgets de Conversão */}
         <div
+          ref={widgetsRef}
           className="config-card"
-          // quando o mouse entrar aqui, mostramos o app com botão de instalar
-          onMouseEnter={() => setPreviewMode('app')}
+          onMouseEnter={handleEnterWidgets}
         >
           <div className="card-header">
             <h3 style={{ margin: 0 }}>🚀 Widgets de Conversão</h3>
