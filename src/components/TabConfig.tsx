@@ -1006,7 +1006,7 @@ export default function TabConfig({
                   padding: '12px',
                   background: '#f9fafb',
                   borderRadius: '8px',
-                  border: '1px solid '#eee',
+                  border: '1px solid #eee',
                 }}
               >
                 <div>
