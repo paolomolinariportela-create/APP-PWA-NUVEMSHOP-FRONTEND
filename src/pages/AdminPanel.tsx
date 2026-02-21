@@ -29,11 +29,17 @@ interface AppConfig {
   theme_color: string;
   logo_url: string;
   whatsapp_number: string;
+
   fab_enabled?: boolean;
   fab_text?: string;
   fab_position?: string;
   fab_icon?: string;
   fab_delay?: number;
+  fab_size?: number;
+
+  bottom_bar_enabled?: boolean;
+  bottom_bar_bg?: string;
+  bottom_bar_icon_color?: string;
 
   // fallback visual: logo padrão da loja vinda da API
   default_logo_url?: string;
@@ -71,6 +77,10 @@ export default function AdminPanel() {
     fab_position: "right",
     fab_icon: "📲",
     fab_delay: 0,
+    fab_size: 1,
+    bottom_bar_enabled: true,
+    bottom_bar_bg: "#FFFFFF",
+    bottom_bar_icon_color: "#6B7280",
     default_logo_url: "",
   });
 
@@ -129,6 +139,10 @@ export default function AdminPanel() {
           fab_position: dataConfig.fab_position ?? "right",
           fab_icon: dataConfig.fab_icon ?? "📲",
           fab_delay: dataConfig.fab_delay ?? 0,
+          fab_size: dataConfig.fab_size ?? 1,
+          bottom_bar_enabled: dataConfig.bottom_bar_enabled ?? true,
+          bottom_bar_bg: dataConfig.bottom_bar_bg ?? "#FFFFFF",
+          bottom_bar_icon_color: dataConfig.bottom_bar_icon_color ?? "#6B7280",
           default_logo_url: lojaLogo,
         });
 
