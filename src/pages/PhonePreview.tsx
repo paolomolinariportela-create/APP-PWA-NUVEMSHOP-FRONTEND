@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+type PhonePreviewMode = 'splash' | 'app';
+
 interface PhonePreviewProps {
   appName: string;
   themeColor: string;
@@ -11,6 +13,9 @@ interface PhonePreviewProps {
   storeUrl?: string;
   bottomBarBg?: string;
   bottomBarIconColor?: string;
+
+  // novo: controle externo de modo
+  mode?: PhonePreviewMode;
 }
 
 const PhonePreview: React.FC<PhonePreviewProps> = ({
@@ -24,6 +29,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
   storeUrl,
   bottomBarBg,
   bottomBarIconColor,
+  mode = 'app',
 }) => {
   const [iframeError, setIframeError] = useState(false);
 
@@ -36,6 +42,8 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
   const barBg = bottomBarBg || '#FFFFFF';
   const iconColor = bottomBarIconColor || '#6B7280';
   const appInitial = (appName || 'App').trim().charAt(0).toUpperCase();
+
+  const isSplash = mode === 'splash';
 
   return (
     <div className="phone-mockup" style={styles.phoneMockup}>
@@ -55,229 +63,233 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
           <div style={{ color: 'white', fontSize: '10px' }}>📶 🔋</div>
         </div>
 
-        {/* CONTEÚDO */}
-        <div className="app-content" style={styles.appContent}>
-          {safeUrl && !iframeError ? (
-            <iframe
-              src={safeUrl}
-              style={styles.iframe}
-              title="Preview Loja"
-              onError={() => setIframeError(true)}
-            />
-          ) : (
-            <>
-              {/* Cabeçalho do App */}
-              <div
-                className="app-header"
-                style={{
-                  ...styles.appHeader,
-                  borderBottom: `2px solid ${themeColor}`,
-                }}
-              >
-                {logoUrl ? (
-                  <img src={logoUrl} alt="Logo" style={styles.logo} />
-                ) : (
+        {/* CONTEÚDO PRINCIPAL (só aparece em mode="app") */}
+        {!isSplash && (
+          <>
+            <div className="app-content" style={styles.appContent}>
+              {safeUrl && !iframeError ? (
+                <iframe
+                  src={safeUrl}
+                  style={styles.iframe}
+                  title="Preview Loja"
+                  onError={() => setIframeError(true)}
+                />
+              ) : (
+                <>
+                  {/* Cabeçalho do App */}
                   <div
+                    className="app-header"
                     style={{
-                      ...styles.logoPlaceholder,
-                      background: themeColor,
+                      ...styles.appHeader,
+                      borderBottom: `2px solid ${themeColor}`,
                     }}
                   >
-                    {appInitial}
+                    {logoUrl ? (
+                      <img src={logoUrl} alt="Logo" style={styles.logo} />
+                    ) : (
+                      <div
+                        style={{
+                          ...styles.logoPlaceholder,
+                          background: themeColor,
+                        }}
+                      >
+                        {appInitial}
+                      </div>
+                    )}
+                    <span
+                      style={{
+                        color: themeColor,
+                        fontWeight: 'bold',
+                        fontSize: '14px',
+                      }}
+                    >
+                      {appName || 'Minha Loja'}
+                    </span>
                   </div>
-                )}
-                <span
+
+                  {/* Banner Fake (loja genérica) */}
+                  <div className="skeleton-banner" style={styles.banner}>
+                    <span style={{ color: '#aaa', fontSize: '10px' }}>
+                      Banner da loja (exemplo)
+                    </span>
+                  </div>
+
+                  {/* Grid Fake */}
+                  <div className="skeleton-grid" style={styles.grid}>
+                    {[1, 2, 3, 4].map((i) => (
+                      <div
+                        key={i}
+                        className="skeleton-product"
+                        style={styles.product}
+                      >
+                        <div
+                          style={{
+                            height: '60px',
+                            background: '#eee',
+                            marginBottom: '5px',
+                          }}
+                        ></div>
+                        <div
+                          style={{
+                            height: '8px',
+                            width: '80%',
+                            background: '#eee',
+                            marginBottom: '3px',
+                          }}
+                        ></div>
+                        <div
+                          style={{
+                            height: '8px',
+                            width: '40%',
+                            background: themeColor,
+                            opacity: 0.5,
+                          }}
+                        ></div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* BOTÃO FLUTUANTE (só aparece em mode="app") */}
+              {fabEnabled && (
+                <div
                   style={{
-                    color: themeColor,
+                    position: 'absolute',
+                    bottom: '80px',
+                    [fabPosition === 'left' ? 'left' : 'right']: '20px',
+                    background: themeColor,
+                    color: 'white',
+                    padding: '10px 20px',
+                    borderRadius: '30px',
+                    fontSize: '12px',
                     fontWeight: 'bold',
-                    fontSize: '14px',
+                    boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    zIndex: 100,
+                    cursor: 'pointer',
                   }}
                 >
-                  {appName || 'Minha Loja'}
-                </span>
-              </div>
+                  <span>{fabIcon || '📲'}</span> {fabText || 'Baixar App'}
+                </div>
+              )}
+            </div>
 
-              {/* Banner Fake */}
-              <div className="skeleton-banner" style={styles.banner}>
-                <span style={{ color: '#aaa', fontSize: '10px' }}>
-                  Banner Promocional
-                </span>
-              </div>
-
-              {/* Grid Fake */}
-              <div className="skeleton-grid" style={styles.grid}>
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="skeleton-product"
-                    style={styles.product}
-                  >
-                    <div
-                      style={{
-                        height: '60px',
-                        background: '#eee',
-                        marginBottom: '5px',
-                      }}
-                    ></div>
-                    <div
-                      style={{
-                        height: '8px',
-                        width: '80%',
-                        background: '#eee',
-                        marginBottom: '3px',
-                      }}
-                    ></div>
-                    <div
-                      style={{
-                        height: '8px',
-                        width: '40%',
-                        background: themeColor,
-                        opacity: 0.5,
-                      }}
-                    ></div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-
-          {/* BOTÃO FLUTUANTE */}
-          {fabEnabled && (
+            {/* BARRA INFERIOR */}
             <div
+              className="bottom-nav"
               style={{
-                position: 'absolute',
-                bottom: '80px',
-                [fabPosition === 'left' ? 'left' : 'right']: '20px',
-                background: themeColor,
-                color: 'white',
-                padding: '10px 20px',
-                borderRadius: '30px',
-                fontSize: '12px',
-                fontWeight: 'bold',
-                boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
-                zIndex: 100,
-                cursor: 'pointer',
+                ...styles.bottomNav,
+                background: barBg,
+                borderTop: '1px solid #e5e7eb',
               }}
             >
-              <span>{fabIcon || '📲'}</span> {fabText || 'Baixar App'}
+              <div
+                className="nav-item"
+                style={{ ...styles.navItem, color: iconColor }}
+              >
+                <span>🏠</span>
+                <small style={styles.navLabel}>Início</small>
+              </div>
+              <div
+                className="nav-item"
+                style={{ ...styles.navItem, color: iconColor }}
+              >
+                <span>🛒</span>
+                <small style={styles.navLabel}>Catálogo</small>
+              </div>
+              <div
+                className="nav-item"
+                style={{ ...styles.navItem, color: iconColor }}
+              >
+                <span>🔔</span>
+                <small style={styles.navLabel}>Alertas</small>
+              </div>
+              <div
+                className="nav-item"
+                style={{ ...styles.navItem, color: iconColor }}
+              >
+                <span>👤</span>
+                <small style={styles.navLabel}>Conta</small>
+              </div>
             </div>
-          )}
-        </div>
-
-        {/* BARRA INFERIOR */}
-        <div
-          className="bottom-nav"
-          style={{
-            ...styles.bottomNav,
-            background: barBg,
-            borderTop: '1px solid #e5e7eb',
-          }}
-        >
-          <div
-            className="nav-item"
-            style={{ ...styles.navItem, color: iconColor }}
-          >
-            <span>🏠</span>
-            <small style={styles.navLabel}>Início</small>
-          </div>
-          <div
-            className="nav-item"
-            style={{ ...styles.navItem, color: iconColor }}
-          >
-            <span>🛒</span>
-            <small style={styles.navLabel}>Catálogo</small>
-          </div>
-          <div
-            className="nav-item"
-            style={{ ...styles.navItem, color: iconColor }}
-          >
-            <span>🔔</span>
-            <small style={styles.navLabel}>Alertas</small>
-          </div>
-          <div
-            className="nav-item"
-            style={{ ...styles.navItem, color: iconColor }}
-          >
-            <span>👤</span>
-            <small style={styles.navLabel}>Conta</small>
-          </div>
-        </div>
+          </>
+        )}
 
         {/* INDICADOR HOME */}
         <div className="home-bar" style={styles.homeBar}></div>
 
-        {/* SPLASH DE PREVIEW POR CIMA (simula instalação/abertura) */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: themeColor || '#000000',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#ffffff',
-            pointerEvents: 'none',
-          }}
-        >
+        {/* SPLASH (aparece quando mode === 'splash') */}
+        {isSplash && (
           <div
             style={{
-              width: 96,
-              height: 96,
-              borderRadius: 24,
-              background: 'rgba(0,0,0,0.15)',
+              position: 'absolute',
+              inset: 0,
+              background: themeColor || '#000000',
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              overflow: 'hidden',
-              marginBottom: 16,
+              color: '#ffffff',
             }}
           >
-            {logoUrl ? (
-              <img
-                src={logoUrl}
-                alt="App icon"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            ) : (
-              <span
-                style={{
-                  fontSize: 40,
-                  fontWeight: 700,
-                  color: '#ffffff',
-                }}
-              >
-                {appInitial}
-              </span>
-            )}
+            <div
+              style={{
+                width: 96,
+                height: 96,
+                borderRadius: 24,
+                background: 'rgba(0,0,0,0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                marginBottom: 16,
+              }}
+            >
+              {logoUrl ? (
+                <img
+                  src={logoUrl}
+                  alt="App icon"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                <span
+                  style={{
+                    fontSize: 40,
+                    fontWeight: 700,
+                    color: '#ffffff',
+                  }}
+                >
+                  {appInitial}
+                </span>
+              )}
+            </div>
+            <div
+              style={{
+                fontSize: 16,
+                fontWeight: 600,
+                marginBottom: 8,
+              }}
+            >
+              {appName || 'Minha Loja'}
+            </div>
+            <div
+              style={{
+                fontSize: 12,
+                opacity: 0.9,
+              }}
+            >
+              Abrindo aplicativo…
+            </div>
           </div>
-          <div
-            style={{
-              fontSize: 16,
-              fontWeight: 600,
-              marginBottom: 8,
-            }}
-          >
-            {appName || 'Minha Loja'}
-          </div>
-          <div
-            style={{
-              fontSize: 12,
-              opacity: 0.9,
-            }}
-          >
-            Abrindo aplicativo…
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
 };
 
-// estilos
 const styles: { [key: string]: React.CSSProperties } = {
   phoneMockup: {
     width: '300px',
