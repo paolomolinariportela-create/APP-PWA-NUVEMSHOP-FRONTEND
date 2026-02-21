@@ -10,6 +10,7 @@ interface PhonePreviewProps {
   fabText?: string;
   fabPosition?: string;
   fabIcon?: string;
+  fab_size?: number; // NOVO
   storeUrl?: string;
   bottomBarBg?: string;
   bottomBarIconColor?: string;
@@ -24,6 +25,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
   fabText,
   fabPosition,
   fabIcon,
+  fab_size = 1, // padrão
   storeUrl,
   bottomBarBg,
   bottomBarIconColor,
@@ -158,9 +160,9 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                     [fabPosition === 'left' ? 'left' : 'right']: '20px',
                     background: themeColor,
                     color: 'white',
-                    padding: '10px 20px',
+                    padding: `${8 * fab_size}px ${16 * fab_size}px`,
                     borderRadius: '30px',
-                    fontSize: '12px',
+                    fontSize: `${12 * fab_size}px`,
                     fontWeight: 'bold',
                     boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
                     display: 'flex',
@@ -170,7 +172,10 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                     cursor: 'pointer',
                   }}
                 >
-                  <span>{fabIcon || '📲'}</span> {fabText || 'Baixar App'}
+                  <span style={{ fontSize: `${14 * fab_size}px` }}>
+                    {fabIcon || '📲'}
+                  </span>
+                  {fabText || 'Baixar App'}
                 </div>
               )}
             </div>
