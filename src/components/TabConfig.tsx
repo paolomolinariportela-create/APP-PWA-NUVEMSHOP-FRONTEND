@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PhonePreview from '../pages/PhonePreview';
 
 interface AppConfig {
@@ -36,6 +36,9 @@ export default function TabConfig({
   loading,
   storeUrl,
 }: Props) {
+  // controla o que o preview mostra
+  const [previewMode, setPreviewMode] = useState<'splash' | 'app'>('splash');
+
   const copyLink = () => {
     navigator.clipboard.writeText(`${storeUrl}/pages/app`);
     alert('Link copiado!');
@@ -141,7 +144,11 @@ export default function TabConfig({
         </div>
 
         {/* Identidade Visual */}
-        <div className="config-card">
+        <div
+          className="config-card"
+          // quando o mouse entrar aqui, garantimos que o preview esteja em modo splash
+          onMouseEnter={() => setPreviewMode('splash')}
+        >
           <div className="card-header" style={{ marginBottom: '1rem' }}>
             <h3 style={{ margin: 0 }}>🎨 Identidade Visual</h3>
           </div>
@@ -265,7 +272,11 @@ export default function TabConfig({
         </div>
 
         {/* Widgets de Conversão */}
-        <div className="config-card">
+        <div
+          className="config-card"
+          // quando o mouse entrar aqui, mostramos o app com botão de instalar
+          onMouseEnter={() => setPreviewMode('app')}
+        >
           <div className="card-header">
             <h3 style={{ margin: 0 }}>🚀 Widgets de Conversão</h3>
           </div>
@@ -587,6 +598,7 @@ export default function TabConfig({
             storeUrl={storeUrl}
             bottomBarBg={config.bottom_bar_bg}
             bottomBarIconColor={config.bottom_bar_icon_color}
+            mode={previewMode}
           />
         </div>
       </div>
