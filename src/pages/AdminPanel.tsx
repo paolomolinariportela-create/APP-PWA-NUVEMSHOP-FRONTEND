@@ -38,6 +38,15 @@ interface AppConfig {
   fab_size?: number;
   fab_color?: string;
 
+  topbar_enabled?: boolean;
+  topbar_text?: string;
+  topbar_button_text?: string;
+  topbar_icon?: string;
+  topbar_position?: "top" | "bottom";
+  topbar_color?: string;
+  topbar_text_color?: string;
+  topbar_size?: number;
+
   bottom_bar_enabled?: boolean;
   bottom_bar_bg?: string;
   bottom_bar_icon_color?: string;
@@ -80,6 +89,16 @@ export default function AdminPanel() {
     fab_delay: 0,
     fab_size: 1,
     fab_color: "#000000",
+
+    topbar_enabled: false,
+    topbar_text: "Instale o app e ganhe 10% OFF na primeira compra",
+    topbar_button_text: "Instalar agora",
+    topbar_icon: "📲",
+    topbar_position: "top",
+    topbar_color: "#111827",
+    topbar_text_color: "#FFFFFF",
+    topbar_size: 1,
+
     bottom_bar_enabled: true,
     bottom_bar_bg: "#FFFFFF",
     bottom_bar_icon_color: "#6B7280",
@@ -142,10 +161,25 @@ export default function AdminPanel() {
           fab_icon: dataConfig.fab_icon ?? "📲",
           fab_delay: dataConfig.fab_delay ?? 0,
           fab_size: dataConfig.fab_size ?? 1,
-          fab_color: dataConfig.fab_color ?? (dataConfig.theme_color ?? "#000000"),
+          fab_color:
+            dataConfig.fab_color ??
+            (dataConfig.theme_color ?? "#000000"),
+
+          topbar_enabled: dataConfig.topbar_enabled ?? false,
+          topbar_text:
+            dataConfig.topbar_text ??
+            "Instale o app e ganhe 10% OFF na primeira compra",
+          topbar_button_text: dataConfig.topbar_button_text ?? "Instalar agora",
+          topbar_icon: dataConfig.topbar_icon ?? "📲",
+          topbar_position: dataConfig.topbar_position ?? "top",
+          topbar_color: dataConfig.topbar_color ?? "#111827",
+          topbar_text_color: dataConfig.topbar_text_color ?? "#FFFFFF",
+          topbar_size: dataConfig.topbar_size ?? 1,
+
           bottom_bar_enabled: dataConfig.bottom_bar_enabled ?? true,
           bottom_bar_bg: dataConfig.bottom_bar_bg ?? "#FFFFFF",
-          bottom_bar_icon_color: dataConfig.bottom_bar_icon_color ?? "#6B7280",
+          bottom_bar_icon_color:
+            dataConfig.bottom_bar_icon_color ?? "#6B7280",
           default_logo_url: lojaLogo,
         });
 
