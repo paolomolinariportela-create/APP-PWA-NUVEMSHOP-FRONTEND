@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PhonePreview from '../pages/PhonePreview';
 
 interface AppConfig {
@@ -35,8 +35,6 @@ export default function TabConfig({
   loading,
   storeUrl,
 }: Props) {
-  const [previewMode, setPreviewMode] = useState<'splash' | 'app'>('splash');
-
   const copyLink = () => {
     navigator.clipboard.writeText(`${storeUrl}/pages/app`);
     alert('Link copiado!');
@@ -51,7 +49,7 @@ export default function TabConfig({
 
   return (
     <div className="editor-grid animate-fade-in" style={{ marginTop: '20px' }}>
-      {/* Agora usamos só a coluna esquerda da grid; a direita não é mais usada */}
+      {/* usamos a grid só para largura, tudo em uma coluna visual */}
       <div className="config-section" style={{ gridColumn: '1 / -1' }}>
         <h2 style={{ marginBottom: '20px' }}>Personalizar Aplicativo</h2>
 
@@ -137,137 +135,164 @@ export default function TabConfig({
           </div>
         </div>
 
-        {/* Identidade Visual – mantém splash no preview interno do card Widgets */}
-        <div
-          className="config-card"
-          onMouseEnter={() => setPreviewMode('splash')}
-        >
+        {/* --- IDENTIDADE VISUAL + PREVIEW LOCAL (só splash) --- */}
+        <div className="config-card">
           <div className="card-header" style={{ marginBottom: '1rem' }}>
             <h3 style={{ margin: 0 }}>🎨 Identidade Visual</h3>
           </div>
 
           <div
             style={{
-              display: 'flex',
-              gap: '18px',
+              display: 'grid',
+              gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1.4fr)',
+              gap: '24px',
               alignItems: 'flex-start',
-              flexWrap: 'wrap',
             }}
           >
-            <div style={{ flex: 1, minWidth: '220px' }}>
-              <div className="form-group">
-                <label>Nome do Aplicativo</label>
-                <input
-                  type="text"
-                  value={config.app_name}
-                  onChange={(e) =>
-                    setConfig({ ...config, app_name: e.target.value })
-                  }
-                  placeholder="Ex: Minha Loja Oficial"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Cor Principal (Tema)</label>
-                <div className="color-picker-wrapper">
-                  <input
-                    type="color"
-                    value={config.theme_color}
-                    onChange={(e) =>
-                      setConfig({ ...config, theme_color: e.target.value })
-                    }
-                  />
+            {/* Coluna esquerda – campos de identidade visual */}
+            <div
+              style={{
+                display: 'flex',
+                gap: '18px',
+                alignItems: 'flex-start',
+                flexWrap: 'wrap',
+              }}
+            >
+              <div style={{ flex: 1, minWidth: '220px' }}>
+                <div className="form-group">
+                  <label>Nome do Aplicativo</label>
                   <input
                     type="text"
-                    value={config.theme_color}
+                    value={config.app_name}
                     onChange={(e) =>
-                      setConfig({ ...config, theme_color: e.target.value })
+                      setConfig({ ...config, app_name: e.target.value })
                     }
-                    className="color-text"
+                    placeholder="Ex: Minha Loja Oficial"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Cor Principal (Tema)</label>
+                  <div className="color-picker-wrapper">
+                    <input
+                      type="color"
+                      value={config.theme_color}
+                      onChange={(e) =>
+                        setConfig({ ...config, theme_color: e.target.value })
+                      }
+                    />
+                    <input
+                      type="text"
+                      value={config.theme_color}
+                      onChange={(e) =>
+                        setConfig({ ...config, theme_color: e.target.value })
+                      }
+                      className="color-text"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Logo URL (Link da Imagem)</label>
+                  <input
+                    type="text"
+                    value={config.logo_url}
+                    onChange={(e) =>
+                      setConfig({ ...config, logo_url: e.target.value })
+                    }
+                    placeholder={
+                      config.default_logo_url
+                        ? `Padrão: ${config.default_logo_url}`
+                        : 'https://...'
+                    }
                   />
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>Logo URL (Link da Imagem)</label>
-                <input
-                  type="text"
-                  value={config.logo_url}
-                  onChange={(e) =>
-                    setConfig({ ...config, logo_url: e.target.value })
-                  }
-                  placeholder={
-                    config.default_logo_url
-                      ? `Padrão: ${config.default_logo_url}`
-                      : 'https://...'
-                  }
-                />
+              {/* MINI PREVIEW DE ÍCONE */}
+              <div
+                style={{
+                  width: '120px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+              >
+                <div
+                  style={{
+                    width: '72px',
+                    height: '72px',
+                    borderRadius: '16px',
+                    background: config.theme_color,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                    boxShadow: '0 6px 12px rgba(0,0,0,0.15)',
+                  }}
+                >
+                  {logoToUse ? (
+                    <img
+                      src={logoToUse}
+                      alt="Logo preview"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  ) : (
+                    <span
+                      style={{
+                        color: '#fff',
+                        fontWeight: '700',
+                        fontSize: '28px',
+                      }}
+                    >
+                      {appInitial}
+                    </span>
+                  )}
+                </div>
+                <span
+                  style={{
+                    fontSize: '11px',
+                    color: '#6B7280',
+                    textAlign: 'center',
+                  }}
+                >
+                  Prévia do ícone
+                </span>
               </div>
             </div>
 
-            {/* MINI PREVIEW DE ÍCONE */}
-            <div
-              style={{
-                width: '120px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '8px',
-              }}
-            >
-              <div
+            {/* Coluna direita – preview só da identidade (splash) */}
+            <div>
+              <h4
                 style={{
-                  width: '72px',
-                  height: '72px',
-                  borderRadius: '16px',
-                  background: config.theme_color,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  overflow: 'hidden',
-                  boxShadow: '0 6px 12px rgba(0,0,0,0.15)',
-                }}
-              >
-                {logoToUse ? (
-                  <img
-                    src={logoToUse}
-                    alt="Logo preview"
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                    }}
-                  />
-                ) : (
-                  <span
-                    style={{
-                      color: '#fff',
-                      fontWeight: '700',
-                      fontSize: '28px',
-                    }}
-                  >
-                    {appInitial}
-                  </span>
-                )}
-              </div>
-              <span
-                style={{
-                  fontSize: '11px',
-                  color: '#6B7280',
+                  margin: '0 0 10px 0',
+                  fontSize: '14px',
                   textAlign: 'center',
                 }}
               >
-                Prévia do ícone
-              </span>
+                Como fica a tela de abertura
+              </h4>
+              <PhonePreview
+                appName={config.app_name}
+                themeColor={config.theme_color}
+                logoUrl={logoToUse}
+                fabEnabled={false}
+                storeUrl={storeUrl}
+                bottomBarBg={undefined}
+                bottomBarIconColor={undefined}
+                mode="splash"
+              />
             </div>
           </div>
         </div>
 
-        {/* Widgets de Conversão + Preview ao lado */}
-        <div
-          className="config-card"
-          onMouseEnter={() => setPreviewMode('app')}
-        >
+        {/* --- WIDGETS DE CONVERSÃO + PREVIEW LOCAL (só app) --- */}
+        <div className="config-card">
           <div className="card-header">
             <h3 style={{ margin: 0 }}>🚀 Widgets de Conversão</h3>
           </div>
@@ -280,7 +305,7 @@ export default function TabConfig({
               alignItems: 'flex-start',
             }}
           >
-            {/* Coluna esquerda – configurações */}
+            {/* Coluna esquerda – apenas configs de widgets */}
             <div>
               {/* Toggle FAB */}
               <div
@@ -573,10 +598,16 @@ export default function TabConfig({
               </div>
             </div>
 
-            {/* Coluna direita – preview do celular ao lado do card */}
+            {/* Coluna direita – preview só dos widgets (app) */}
             <div>
-              <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', textAlign: 'center' }}>
-                Preview ao vivo
+              <h4
+                style={{
+                  margin: '0 0 10px 0',
+                  fontSize: '14px',
+                  textAlign: 'center',
+                }}
+              >
+                Como fica dentro do app
               </h4>
               <PhonePreview
                 appName={config.app_name}
@@ -589,7 +620,7 @@ export default function TabConfig({
                 storeUrl={storeUrl}
                 bottomBarBg={config.bottom_bar_bg}
                 bottomBarIconColor={config.bottom_bar_icon_color}
-                mode={previewMode}
+                mode="app"
               />
             </div>
           </div>
