@@ -1,16 +1,15 @@
 :root {
-  --primary: #4F46E5; /* Indigo 600 */
+  --primary: #4F46E5;
   --primary-hover: #4338ca;
-  --bg-page: #F3F4F6; /* Cool Gray 100 */
+  --bg-page: #F3F4F6;
   --bg-card: #FFFFFF;
   --text-main: #111827;
   --text-secondary: #6B7280;
   --border: #E5E7EB;
-  --radius: 16px; /* Aumentei levemente para ficar mais moderno */
+  --radius: 16px;
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-/* Reset Básico */
 * { box-sizing: border-box; }
 
 body {
@@ -19,29 +18,28 @@ body {
   background-color: var(--bg-page);
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
-  font-size: 15px; /* antes padrão (~14px) */
+  font-size: 15px;
 }
 
-/* --- HEADER NOVO (INTEGRADO) --- */
+/* HEADER */
 .dashboard-header {
   background: var(--bg-card);
   border-bottom: 1px solid var(--border);
-  padding: 0 2rem; /* Ajustado padding lateral */
-  height: 70px; /* Altura fixa para alinhar menu */
+  padding: 0 2rem;
+  height: 70px;
   position: sticky;
   top: 0;
   z-index: 100;
-  display: flex; /* Flexbox para alinhar esquerda/direita */
+  display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 10px rgba(0,0,0,0.03);
 }
 
-/* Lado Esquerdo do Header (Logo + Menu) */
 .header-left {
   display: flex;
   align-items: center;
-  gap: 40px; /* Espaço entre logo e menu */
+  gap: 40px;
 }
 
 .logo-area {
@@ -51,7 +49,7 @@ body {
 }
 
 .logo-area h1 {
-  font-size: 1.35rem; /* ligeiramente maior */
+  font-size: 1.35rem;
   font-weight: 800;
   color: #111;
   margin: 0;
@@ -69,7 +67,6 @@ body {
   border: 1px solid #c7d2fe;
 }
 
-/* Menu de Navegação (Novo) */
 .header-nav {
   display: flex;
   gap: 8px;
@@ -79,7 +76,7 @@ body {
   background: none;
   border: none;
   padding: 8px 16px;
-  font-size: 0.95rem; /* antes 14px */
+  font-size: 0.95rem;
   color: #4B5563;
   cursor: pointer;
   border-radius: 6px;
@@ -88,7 +85,7 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  text-decoration: none; /* Caso use tag <a> */
+  text-decoration: none;
 }
 
 .nav-link:hover {
@@ -97,12 +94,11 @@ body {
 }
 
 .nav-link.active {
-  background: #eef2ff; /* Fundo azulzinho claro */
-  color: #4f46e5; /* Texto azul forte */
+  background: #eef2ff;
+  color: #4f46e5;
   font-weight: 600;
 }
 
-/* Lado Direito do Header (Status + Avatar) */
 .header-right {
   display: flex;
   align-items: center;
@@ -141,14 +137,13 @@ body {
   font-size: 14px;
 }
 
-/* --- MAIN CONTENT --- */
+/* MAIN CONTENT */
 .dashboard-content {
   max-width: 1200px;
   margin: 2.5rem auto;
   padding: 0 1.5rem;
 }
 
-/* Animação suave entre abas */
 .animate-fade-in {
   animation: fadeIn 0.4s ease-out;
 }
@@ -158,7 +153,7 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* --- STATS GRID --- */
+/* STATS GRID */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -176,7 +171,7 @@ body {
   gap: 1rem;
   border: 1px solid var(--border);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  font-size: 0.95rem; /* base um pouco maior para textos internos */
+  font-size: 0.95rem;
 }
 
 .stat-card:hover {
@@ -204,7 +199,7 @@ body {
 
 .stat-info h3 {
   margin: 0;
-  font-size: 1rem; /* antes 0.95 / 0.85 */
+  font-size: 1rem;
   color: var(--text-secondary);
   font-weight: 600;
   text-transform: uppercase;
@@ -213,27 +208,27 @@ body {
 
 .stat-info p {
   margin: 6px 0;
-  font-size: 1.7rem; /* número principal maior */
+  font-size: 1.7rem;
   font-weight: 800;
   color: var(--text-main);
 }
 
 .stat-growth {
-  font-size: 0.9rem; /* antes 0.85rem */
+  font-size: 0.9rem;
   color: #10B981;
   font-weight: 600;
   display: block;
   margin-top: 2px;
 }
 
-/* --- BARRAS DE CONVERSÃO --- */
+/* BARRAS DE CONVERSÃO */
 .conversion-bar {
   margin-top: 12px;
   width: 100%;
 }
 
 .bar-label {
-  font-size: 0.85rem; /* antes 0.8rem */
+  font-size: 0.85rem;
   color: var(--text-secondary);
   display: flex;
   justify-content: space-between;
@@ -255,10 +250,10 @@ body {
   transition: width 0.5s ease-out;
 }
 
-/* --- EDITOR GRID --- */
+/* EDITOR GRID */
 .editor-grid {
   display: grid;
-  grid-template-columns: 1fr 380px; 
+  grid-template-columns: 1fr 380px;
   gap: 2.5rem;
   align-items: start;
 }
@@ -267,14 +262,13 @@ body {
   .editor-grid { grid-template-columns: 1fr; }
   .sticky-wrapper { position: relative; top: 0; }
   
-  /* Ajuste Mobile para o Header */
   .dashboard-header { flex-direction: column; height: auto; padding: 15px; gap: 15px; }
   .header-left { flex-direction: column; gap: 15px; width: 100%; }
   .header-nav { width: 100%; overflow-x: auto; padding-bottom: 5px; justify-content: center; }
-  .header-right { display: none; } /* Esconde avatar no mobile pra simplificar */
+  .header-right { display: none; }
 }
 
-/* --- CARDS DE CONFIGURAÇÃO --- */
+/* CARDS DE CONFIGURAÇÃO */
 .config-card {
   background: var(--bg-card);
   border-radius: var(--radius);
@@ -347,9 +341,9 @@ body {
 .save-button:hover { background: #000; transform: translateY(-1px); }
 .save-button:disabled { background: #9CA3AF; cursor: not-allowed; transform: none; }
 
-/* --- PHONE MOCKUP --- */
+/* PHONE MOCKUP */
 .preview-section { display: flex; justify-content: center; width: 100%; }
-.sticky-wrapper { position: sticky; top: 100px; width: 100%; display: flex; flex-direction: column; align-items: center; }
+.sticky-wrapper { position: sticky; top: 80px; width: 100%; display: flex; flex-direction: column; align-items: center; }
 
 .phone-mockup {
   width: 320px;
@@ -386,7 +380,6 @@ body {
 
 .home-bar { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 120px; height: 5px; background: #000; border-radius: 10px; opacity: 0.2; }
 
-/* Error Screen */
 .error-screen {
   height: 100vh;
   display: flex;
@@ -398,7 +391,6 @@ body {
   background: #FEF2F2;
 }
 
-/* Card de Planos (Novo) */
 .plan-card {
   transition: transform 0.2s ease;
   background: #fff;
