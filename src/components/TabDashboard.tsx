@@ -185,17 +185,92 @@ export default function TabDashboard({ stats }: Props) {
             <h3>Top páginas do App</h3>
             <ul
               style={{
-                marginTop: '6px',
-                paddingLeft: '16px',
+                marginTop: '8px',
+                paddingLeft: 0,
+                listStyle: 'none',
                 fontSize: '11px',
                 color: '#374151',
               }}
             >
-              {stats.visualizacoes.top_paginas_pwa.slice(0, 5).map((pagina, idx) => (
-                <li key={pagina + idx}>
-                  {idx + 1}. <span>{pagina || '/'}</span>
-                </li>
-              ))}
+              {stats.visualizacoes.top_paginas_pwa
+                .filter(pagina => pagina !== 'install') // nunca mostra "install"
+                .slice(0, 5)
+                .map((pagina, idx) => {
+                  let label = pagina || '/';
+                  let badge: string | null = null;
+
+                  if (label === '/') {
+                    label = 'Página inicial';
+                    badge = 'HOME';
+                  }
+
+                  const display =
+                    label.length > 50 ? label.slice(0, 47) + '...' : label;
+
+                  return (
+                    <li
+                      key={pagina + idx}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          flex: 1,
+                          minWidth: 0,
+                        }}
+                      >
+                        <span
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: 16,
+                            height: 16,
+                            borderRadius: '999px',
+                            background: '#E5E7EB',
+                            fontSize: '10px',
+                            color: '#374151',
+                            flexShrink: 0,
+                          }}
+                        >
+                          {idx + 1}
+                        </span>
+                        <span
+                          title={label}
+                          style={{
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}
+                        >
+                          {display}
+                        </span>
+                      </div>
+                      {badge && (
+                        <span
+                          style={{
+                            marginLeft: '6px',
+                            fontSize: '9px',
+                            padding: '2px 6px',
+                            borderRadius: '999px',
+                            background: '#E0F2FE',
+                            color: '#0369A1',
+                            flexShrink: 0,
+                          }}
+                        >
+                          {badge}
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
             </ul>
           </div>
         </div>
