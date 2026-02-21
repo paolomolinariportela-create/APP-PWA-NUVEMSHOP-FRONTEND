@@ -36,6 +36,7 @@ interface AppConfig {
   fab_icon?: string;
   fab_delay?: number;
   fab_size?: number;
+  fab_color?: string;
 
   bottom_bar_enabled?: boolean;
   bottom_bar_bg?: string;
@@ -78,6 +79,7 @@ export default function AdminPanel() {
     fab_icon: "📲",
     fab_delay: 0,
     fab_size: 1,
+    fab_color: "#000000",
     bottom_bar_enabled: true,
     bottom_bar_bg: "#FFFFFF",
     bottom_bar_icon_color: "#6B7280",
@@ -140,6 +142,7 @@ export default function AdminPanel() {
           fab_icon: dataConfig.fab_icon ?? "📲",
           fab_delay: dataConfig.fab_delay ?? 0,
           fab_size: dataConfig.fab_size ?? 1,
+          fab_color: dataConfig.fab_color ?? (dataConfig.theme_color ?? "#000000"),
           bottom_bar_enabled: dataConfig.bottom_bar_enabled ?? true,
           bottom_bar_bg: dataConfig.bottom_bar_bg ?? "#FFFFFF",
           bottom_bar_icon_color: dataConfig.bottom_bar_icon_color ?? "#6B7280",
