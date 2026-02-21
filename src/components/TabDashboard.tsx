@@ -8,7 +8,7 @@ interface DashboardStats {
   crescimento_instalacoes_7d: number;
   carrinhos_abandonados: { valor: number; qtd: number };
   taxa_conversao: { app: number; site: number };
-  visualizacoes: { pageviews: number; tempo_medio: string; top_paginas: string[] };
+  visualizacoes: { pageviews: number; tempo_medio: string; top_paginas: string[]; top_paginas_pwa?: string[] };
   funil: { visitas: number; carrinho: number; checkout: number };
   recorrencia: { clientes_2x: number; taxa_recompra: number };
   ticket_medio: { app: number; site: number };
@@ -101,7 +101,7 @@ export default function TabDashboard({ stats }: Props) {
           <p>{stats.instalacoes}</p>
           <span className="stat-growth">Base de clientes fiéis</span>
 
-          {/* NOVO: visitas App x Site usando extra_pwa, sem quebrar nada */}
+          {/* Visitas App x Site usando extra_pwa */}
           {stats.extra_pwa && (
             <div
               style={{
@@ -174,6 +174,32 @@ export default function TabDashboard({ stats }: Props) {
           </div>
         </div>
       </div>
+
+      {/* Top páginas do App (PWA) */}
+      {stats.visualizacoes.top_paginas_pwa && stats.visualizacoes.top_paginas_pwa.length > 0 && (
+        <div className="stat-card">
+          <div className="stat-icon" style={{ background: '#EEF2FF', color: '#4F46E5' }}>
+            📌
+          </div>
+          <div className="stat-info">
+            <h3>Top páginas do App</h3>
+            <ul
+              style={{
+                marginTop: '6px',
+                paddingLeft: '16px',
+                fontSize: '11px',
+                color: '#374151',
+              }}
+            >
+              {stats.visualizacoes.top_paginas_pwa.slice(0, 5).map((pagina, idx) => (
+                <li key={pagina + idx}>
+                  {idx + 1}. <span>{pagina || '/'}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
 
       <div className="stat-card" style={{ gridRow: 'span 2' }}>
         <div className="stat-info" style={{ width: '100%' }}>
