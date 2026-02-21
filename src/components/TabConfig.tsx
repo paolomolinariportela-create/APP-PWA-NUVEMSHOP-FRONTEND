@@ -1,5 +1,31 @@
-import React from 'react';
-import PhonePreview from '../pages/PhonePreview';
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import "../styles/AdminPanel.css";
+
+import TabDashboard from "../components/TabDashboard";
+import TabConfig from "../components/TabConfig";
+import TabCampaigns from "../components/TabCampaigns";
+
+// Interfaces mantidas...
+interface DashboardStats {
+  receita: number;
+  vendas: number;
+  instalacoes: number;
+  carrinhos_abandonados: { valor: number; qtd: number };
+  taxa_conversao: { app: number; site: number };
+  economia_ads: number;
+  top_produtos: Array<{ nome: string; vendas: number }>;
+  visualizacoes: { pageviews: number; tempo_medio: string; top_paginas: string[] };
+  funil: { visitas: number; carrinho: number; checkout: number };
+  recorrencia: { clientes_2x: number; taxa_recompra: number };
+  ticket_medio: { app: number; site: number };
+  extra_pwa?: {
+    visitas_pwa: number;
+    visitas_site: number;
+    vendas_pwa: number;
+    vendas_site: number;
+  };
+}
 
 interface AppConfig {
   app_name: string;
@@ -11,367 +37,255 @@ interface AppConfig {
   fab_position?: string;
   fab_icon?: string;
   fab_delay?: number;
-
-  bottom_bar_bg?: string;
-  bottom_bar_icon_color?: string;
 }
 
-interface Props {
-  config: AppConfig;
-  setConfig: (c: AppConfig) => void;
-  handleSave: () => void;
-  saving: boolean;
-  loading: boolean;
-  storeUrl: string;
+interface PushCampaign {
+  title: string;
+  message: string;
+  url: string;
 }
 
-export default function TabConfig({ config, setConfig, handleSave, saving, loading, storeUrl }: Props) {
-  const copyLink = () => { 
-    navigator.clipboard.writeText(`${storeUrl}/pages/app`); 
-    alert("Link copiado!"); 
+export default function AdminPanel() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tokenFromUrl = searchParams.get("token");
+
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [sendingPush, setSendingPush] = useState(false);
+  const [token, setToken] = useState<string | null>(
+    localStorage.getItem("app_token")
+  );
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [storeUrl, setStoreUrl] = useState("");
+
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+  const [config, setConfig] = useState<AppConfig>({
+    app_name: "Minha Loja",
+    theme_color: "#000000",
+    logo_url: "",
+    whatsapp_number: "",
+    fab_enabled: false,
+    fab_text: "Baixar App",
+    fab_position: "right",
+    fab_icon: "📲",
+    fab_delay: 0,
+  });
+
+  const [pushForm, setPushForm] = useState<PushCampaign>({
+    title: "",
+    message: "",
+    url: "/",
+  });
+
+  const [stats, setStats] = useState<DashboardStats>({
+    receita: 0,
+    vendas: 0,
+    instalacoes: 0,
+    carrinhos_abandonados: { valor: 0, qtd: 0 },
+    taxa_conversao: { app: 0, site: 0 },
+    economia_ads: 0,
+    top_produtos: [],
+    visualizacoes: { pageviews: 0, tempo_medio: "--", top_paginas: [] },
+    funil: { visitas: 0, carrinho: 0, checkout: 0 },
+    recorrencia: { clientes_2x: 0, taxa_recompra: 0 },
+    ticket_medio: { app: 0, site: 0 },
+  });
+
+  useEffect(() => {
+    if (tokenFromUrl) {
+      localStorage.setItem("app_token", tokenFromUrl);
+      setToken(tokenFromUrl);
+      setSearchParams({});
+    }
+  }, [tokenFromUrl, setSearchParams]);
+
+  useEffect(() => {
+    if (!token) return;
+    setLoading(true);
+
+    const authFetch = (endpoint: string) =>
+      fetch(`${API_URL}${endpoint}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+    Promise.all([
+      authFetch("/admin/config").then((r) => r.json()),
+      authFetch("/analytics/dashboard").then((r) => r.json()),
+      authFetch("/admin/store-info").then((r) => r.json()),
+    ])
+      .then(([dataConfig, dataStats, dataUrl]) => {
+        setConfig({
+          app_name: dataConfig.app_name ?? "Minha Loja",
+          theme_color: dataConfig.theme_color ?? "#000000",
+          logo_url: dataConfig.logo_url ?? "",
+          whatsapp_number: dataConfig.whatsapp_number ?? "",
+          fab_enabled: dataConfig.fab_enabled ?? false,
+          fab_text: dataConfig.fab_text ?? "Baixar App",
+          fab_position: dataConfig.fab_position ?? "right",
+          fab_icon: dataConfig.fab_icon ?? "📲",
+          fab_delay: dataConfig.fab_delay ?? 0,
+        });
+        setStats(dataStats);
+        setStoreUrl(dataUrl.url);
+      })
+      .catch((err) => {
+        console.error(err);
+        if ((err as any).status === 401) {
+          localStorage.removeItem("app_token");
+          setToken(null);
+        }
+      })
+      .finally(() => setLoading(false));
+  }, [token, API_URL]);
+
+  const handleSave = async () => {
+    if (!token) return;
+    setSaving(true);
+    try {
+      await fetch(`${API_URL}/admin/config`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(config),
+      });
+      alert("✨ Salvo!");
+    } catch (error) {
+      alert("Erro ao salvar.");
+    } finally {
+      setSaving(false);
+    }
   };
-  
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(storeUrl + "/pages/app")}&color=${config.theme_color.replace("#", "")}`;
+
+  const handleSendPush = async () => {
+    if (!token) return;
+    if (!pushForm.title || !pushForm.message) {
+      alert("Preencha tudo!");
+      return;
+    }
+    if (!confirm("Enviar notificação?")) return;
+
+    setSendingPush(true);
+    try {
+      const res = await fetch(`${API_URL}/push/send`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(pushForm),
+      });
+      const data = await res.json();
+      if (data.status === "success") {
+        alert(`✅ Enviado para ${data.sent} pessoas.`);
+        setPushForm({ title: "", message: "", url: "/" });
+      } else {
+        alert(`⚠️ Erro: ${data.message}`);
+      }
+    } catch (e) {
+      alert("Erro de conexão.");
+    } finally {
+      setSendingPush(false);
+    }
+  };
+
+  if (!token) return <div className="error-screen">🔒 Login necessário.</div>;
 
   return (
-    <div className="editor-grid animate-fade-in" style={{ marginTop: '20px' }}>
-      <div className="config-section">
-        <h2 style={{ marginBottom:'20px' }}>Personalizar Aplicativo</h2>
-        
-        {/* Link e QR Code */}
-        <div className="config-card" style={{ background: '#f5f3ff', border: '1px solid #ddd6fe' }}>
-          <div className="card-header">
-            <h3 style={{ color: '#7C3AED', margin:0 }}>🔗 Link de Download</h3>
-            <p style={{ margin:'5px 0' }}>Divulgue este link no Instagram.</p>
+    <div className="dashboard-container">
+      <header className="dashboard-header">
+        <div className="header-left">
+          <div className="logo-area">
+            <h1>App Builder</h1>
+            <span className="badge-pro">PRO</span>
           </div>
-          <div className="form-group">
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <input
-                type="text"
-                readOnly
-                value={storeUrl ? `${storeUrl}/pages/app` : "Carregando..."}
-                style={{ backgroundColor: 'white', color: '#555', flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid #ccc' }}
-              />
-              <button
-                onClick={copyLink}
-                style={{ background: '#8B5CF6', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', padding: '0 20px', fontWeight: 'bold' }}
-              >
-                Copiar
-              </button>
-            </div>
-          </div>
-        </div>
-        
-        <div className="config-card" style={{ flexDirection: 'row', alignItems: 'center', gap: '20px', display: 'flex' }}>
-          <img
-            src={qrCodeUrl}
-            alt="QR Code"
-            style={{ width: '80px', height: '80px', borderRadius: '8px', border: '1px solid #eee' }}
-          />
-          <div>
-            <h3 style={{ fontSize: '16px', margin: '0 0 5px 0' }}>QR Code de Balcão</h3>
-            <a
-              href={qrCodeUrl}
-              download="qrcode.png"
-              target="_blank"
-              rel="noreferrer"
-              style={{ color: config.theme_color, textDecoration: 'none', fontWeight: 'bold', fontSize: '14px' }}
+          <nav className="header-nav">
+            <button
+              className={
+                activeTab === "dashboard" ? "nav-link active" : "nav-link"
+              }
+              onClick={() => setActiveTab("dashboard")}
             >
-              ⬇️ Baixar Imagem
-            </a>
-          </div>
-        </div>
-
-        {/* Identidade Visual */}
-        <div className="config-card">
-          <div className="card-header">
-            <h3 style={{ margin:0 }}>🎨 Identidade Visual</h3>
-          </div>
-          
-          <div className="form-group">
-            <label>Nome do Aplicativo</label>
-            <input
-              type="text"
-              value={config.app_name}
-              onChange={(e) => setConfig({ ...config, app_name: e.target.value })}
-              placeholder="Ex: Minha Loja Oficial"
-            />
-          </div>
-          
-          <div className="form-group">
-            <label>Cor Principal (Tema)</label>
-            <div className="color-picker-wrapper">
-              <input
-                type="color"
-                value={config.theme_color}
-                onChange={(e) => setConfig({ ...config, theme_color: e.target.value })}
-              />
-              <input
-                type="text"
-                value={config.theme_color}
-                onChange={(e) => setConfig({ ...config, theme_color: e.target.value })}
-                className="color-text"
-              />
-            </div>
-          </div>
-          
-          <div className="form-group">
-            <label>Logo URL (Link da Imagem)</label>
-            <input
-              type="text"
-              value={config.logo_url}
-              onChange={(e) => setConfig({ ...config, logo_url: e.target.value })}
-              placeholder="https://..."
-            />
-          </div>
-        </div>
-
-        {/* Widgets de Conversão */}
-        <div className="config-card">
-          <div className="card-header">
-            <h3 style={{ margin:0 }}>🚀 Widgets de Conversão</h3>
-          </div>
-          
-          {/* Toggle FAB */}
-          <div
-            style={{
-              display:'flex',
-              justifyContent:'space-between',
-              alignItems:'center',
-              marginBottom:'15px',
-              padding:'12px',
-              background:'#f9fafb',
-              borderRadius:'8px',
-              border:'1px solid #eee'
-            }}
-          >
-            <div>
-              <h4 style={{ margin:0, fontSize:'14px' }}>📲 Botão Flutuante (FAB)</h4>
-              <small style={{ color:'#666', fontSize:'11px' }}>Ícone de download fixo no canto da tela.</small>
-            </div>
-            <label style={{ position:'relative', display:'inline-block', width:'46px', height:'24px' }}>
-              <input
-                type="checkbox"
-                checked={config.fab_enabled ?? false}
-                onChange={(e) => setConfig({ ...config, fab_enabled: e.target.checked })}
-                style={{ opacity:0, width:0, height:0 }}
-              />
-              <span
-                style={{
-                  position:'absolute',
-                  cursor:'pointer',
-                  top:0,
-                  left:0,
-                  right:0,
-                  bottom:0,
-                  backgroundColor: (config.fab_enabled ?? false) ? '#10B981' : '#E5E7EB',
-                  transition:'.3s',
-                  borderRadius:'34px'
-                }}
-              />
-              <span
-                style={{
-                  position:'absolute',
-                  height:'18px',
-                  width:'18px',
-                  left:'3px',
-                  bottom:'3px',
-                  backgroundColor:'white',
-                  transition:'.3s',
-                  borderRadius:'50%',
-                  transform: (config.fab_enabled ?? false) ? 'translateX(22px)' : 'translateX(0px)',
-                  boxShadow:'0 2px 4px rgba(0,0,0,0.2)'
-                }}
-              />
-            </label>
-          </div>
-
-          {/* Opções Expandidas do FAB */}
-          {config.fab_enabled && (
-            <div
-              className="animate-fade-in"
-              style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '15px', marginBottom:'20px' }}
+              📊 Dashboard
+            </button>
+            <button
+              className={
+                activeTab === "campanhas" ? "nav-link active" : "nav-link"
+              }
+              onClick={() => setActiveTab("campanhas")}
             >
-              <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
-                <div style={{ flex: 1 }}>
-                  <label
-                    style={{
-                      fontSize:'12px',
-                      fontWeight:'bold',
-                      color:'#374151',
-                      display:'block',
-                      marginBottom:'5px'
-                    }}
-                  >
-                    Texto do Botão
-                  </label>
-                  <input
-                    type="text"
-                    value={config.fab_text ?? "Baixar App"}
-                    onChange={(e) => setConfig({ ...config, fab_text: e.target.value })}
-                    placeholder="Ex: Instalar Agora"
-                    style={{ width:'100%', padding:'8px', border:'1px solid #d1d5db', borderRadius:'6px' }}
-                  />
-                </div>
-                <div style={{ width: '80px' }}>
-                  <label
-                    style={{
-                      fontSize:'12px',
-                      fontWeight:'bold',
-                      color:'#374151',
-                      display:'block',
-                      marginBottom:'5px'
-                    }}
-                  >
-                    Ícone
-                  </label>
-                  <input
-                    type="text"
-                    value={config.fab_icon ?? "📲"}
-                    onChange={(e) => setConfig({ ...config, fab_icon: e.target.value })}
-                    style={{
-                      width:'100%',
-                      padding:'8px',
-                      border:'1px solid #d1d5db',
-                      borderRadius:'6px',
-                      textAlign:'center'
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '15px' }}>
-                <div style={{ flex: 1 }}>
-                  <label
-                    style={{
-                      fontSize:'12px',
-                      fontWeight:'bold',
-                      color:'#374151',
-                      display:'block',
-                      marginBottom:'5px'
-                    }}
-                  >
-                    Posição na Tela
-                  </label>
-                  <select
-                    value={config.fab_position ?? "right"}
-                    onChange={(e) => setConfig({ ...config, fab_position: e.target.value })}
-                    style={{
-                      width:'100%',
-                      padding:'8px',
-                      border:'1px solid #d1d5db',
-                      borderRadius:'6px',
-                      background:'white'
-                    }}
-                  >
-                    <option value="right">Direita (Padrão)</option>
-                    <option value="left">Esquerda</option>
-                  </select>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label
-                    style={{
-                      fontSize:'12px',
-                      fontWeight:'bold',
-                      color:'#374151',
-                      display:'block',
-                      marginBottom:'5px'
-                    }}
-                  >
-                    Atraso: {config.fab_delay ?? 0} segundos
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="10"
-                    step="1"
-                    value={config.fab_delay ?? 0}
-                    onChange={(e) => setConfig({ ...config, fab_delay: parseInt(e.target.value) })}
-                    style={{ width:'100%', cursor:'pointer', accentColor: config.theme_color }}
-                  />
-                  <small style={{ fontSize:'10px', color:'#666' }}>
-                    Tempo para aparecer após abrir o site.
-                  </small>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Bottom bar do app */}
-          <div
-            className="animate-fade-in"
-            style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '15px' }}
-          >
-            <h4 style={{ margin: '0 0 10px 0', fontSize:'14px' }}>📱 Barra inferior do App</h4>
-            <small style={{ color:'#666', fontSize:'11px', display:'block', marginBottom:'12px' }}>
-              Personalize a barra de navegação que aparece quando o cliente usa o app instalado.
-            </small>
-
-            <div className="form-group">
-              <label>Cor de fundo da barra</label>
-              <div className="color-picker-wrapper">
-                <input
-                  type="color"
-                  value={config.bottom_bar_bg || "#FFFFFF"}
-                  onChange={(e) => setConfig({ ...config, bottom_bar_bg: e.target.value })}
-                />
-                <input
-                  type="text"
-                  className="color-text"
-                  value={config.bottom_bar_bg || "#FFFFFF"}
-                  onChange={(e) => setConfig({ ...config, bottom_bar_bg: e.target.value })}
-                />
-              </div>
-              <small>Exemplo: #FFFFFF para branco.</small>
-            </div>
-
-            <div className="form-group">
-              <label>Cor dos ícones e textos</label>
-              <div className="color-picker-wrapper">
-                <input
-                  type="color"
-                  value={config.bottom_bar_icon_color || "#6B7280"}
-                  onChange={(e) => setConfig({ ...config, bottom_bar_icon_color: e.target.value })}
-                />
-                <input
-                  type="text"
-                  className="color-text"
-                  value={config.bottom_bar_icon_color || "#6B7280"}
-                  onChange={(e) => setConfig({ ...config, bottom_bar_icon_color: e.target.value })}
-                />
-              </div>
-              <small>Exemplo: #4F46E5 para roxo do App.</small>
-            </div>
+              🔔 Campanhas
+            </button>
+            <button
+              className={
+                activeTab === "config" ? "nav-link active" : "nav-link"
+              }
+              onClick={() => setActiveTab("config")}
+            >
+              ⚙️ Configurações
+            </button>
+            <button
+              className={
+                activeTab === "planos" ? "nav-link active" : "nav-link"
+              }
+              onClick={() => setActiveTab("planos")}
+            >
+              💎 Planos
+            </button>
+            <button
+              className="nav-link"
+              onClick={() => window.open(storeUrl, "_blank")}
+            >
+              🛍️ Ver Loja
+            </button>
+          </nav>
+        </div>
+        <div className="header-right">
+          <div className="status-indicator">
+            <span className="dot online"></span>
+            <span>Online</span>
           </div>
         </div>
+      </header>
 
-        <button
-          className="save-button"
-          onClick={handleSave}
-          disabled={saving || loading}
-        >
-          {saving ? "Salvando..." : "Salvar Alterações"}
-        </button>
-      </div>
+      <main className="dashboard-content">
+        {activeTab === "dashboard" && <TabDashboard stats={stats} />}
 
-      {/* PREVIEW DO CELULAR */}
-      <div className="preview-section">
-        <div className="sticky-wrapper">
-          <h3 style={{ textAlign: 'center', marginBottom: '10px' }}>Preview ao Vivo</h3>
-          <PhonePreview
-            appName={config.app_name}
-            themeColor={config.theme_color}
-            logoUrl={config.logo_url}
-            fabEnabled={config.fab_enabled}
-            fabText={config.fab_text}
-            fabPosition={config.fab_position}
-            fabIcon={config.fab_icon}
+        {activeTab === "config" && (
+          <TabConfig
+            config={config}
+            setConfig={setConfig}
+            handleSave={handleSave}
+            saving={saving}
+            loading={loading}
             storeUrl={storeUrl}
-            bottomBarBg={config.bottom_bar_bg}
-            bottomBarIconColor={config.bottom_bar_icon_color}
           />
-        </div>
-      </div>
+        )}
+
+        {activeTab === "campanhas" && (
+          <TabCampaigns
+            stats={stats}
+            pushForm={pushForm}
+            setPushForm={setPushForm}
+            handleSendPush={handleSendPush}
+            sendingPush={sendingPush}
+            token={token}
+            API_URL={API_URL}
+          />
+        )}
+
+        {activeTab === "planos" && (
+          <div
+            className="plans-container"
+            style={{ textAlign: "center", padding: "40px" }}
+          >
+            <h2>Planos</h2>
+            <p>Em breve...</p>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
