@@ -13,8 +13,6 @@ interface PhonePreviewProps {
   storeUrl?: string;
   bottomBarBg?: string;
   bottomBarIconColor?: string;
-
-  // novo: controle externo de modo
   mode?: PhonePreviewMode;
 }
 
@@ -151,7 +149,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                 </>
               )}
 
-              {/* BOTÃO FLUTUANTE (só aparece em mode="app") */}
+              {/* BOTÃO FLUTUANTE */}
               {fabEnabled && (
                 <div
                   style={{
@@ -221,7 +219,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
         {/* INDICADOR HOME */}
         <div className="home-bar" style={styles.homeBar}></div>
 
-        {/* SPLASH (aparece quando mode === 'splash') */}
+        {/* SPLASH */}
         {isSplash && (
           <div
             style={{
