@@ -49,7 +49,6 @@ export default function TabConfig({
 
   return (
     <div className="editor-grid animate-fade-in" style={{ marginTop: '20px' }}>
-      {/* usamos a grid só para largura, tudo em uma coluna visual */}
       <div className="config-section" style={{ gridColumn: '1 / -1' }}>
         <h2 style={{ marginBottom: '20px' }}>Personalizar Aplicativo</h2>
 
@@ -135,7 +134,7 @@ export default function TabConfig({
           </div>
         </div>
 
-        {/* --- IDENTIDADE VISUAL + PREVIEW LOCAL (só splash) --- */}
+        {/* --- IDENTIDADE VISUAL + PREVIEW (splash) --- */}
         <div className="config-card">
           <div className="card-header" style={{ marginBottom: '1rem' }}>
             <h3 style={{ margin: 0 }}>🎨 Identidade Visual</h3>
@@ -149,7 +148,7 @@ export default function TabConfig({
               alignItems: 'flex-start',
             }}
           >
-            {/* Coluna esquerda – campos de identidade visual */}
+            {/* Coluna esquerda – campos */}
             <div
               style={{
                 display: 'flex',
@@ -266,7 +265,7 @@ export default function TabConfig({
               </div>
             </div>
 
-            {/* Coluna direita – preview só da identidade (splash) */}
+            {/* Coluna direita – preview splash */}
             <div>
               <h4
                 style={{
@@ -283,15 +282,13 @@ export default function TabConfig({
                 logoUrl={logoToUse}
                 fabEnabled={false}
                 storeUrl={storeUrl}
-                bottomBarBg={undefined}
-                bottomBarIconColor={undefined}
                 mode="splash"
               />
             </div>
           </div>
         </div>
 
-        {/* --- WIDGETS DE CONVERSÃO + PREVIEW LOCAL (só app) --- */}
+        {/* --- WIDGETS DE CONVERSÃO (só FAB) + PREVIEW --- */}
         <div className="config-card">
           <div className="card-header">
             <h3 style={{ margin: 0 }}>🚀 Widgets de Conversão</h3>
@@ -305,9 +302,8 @@ export default function TabConfig({
               alignItems: 'flex-start',
             }}
           >
-            {/* Coluna esquerda – apenas configs de widgets */}
+            {/* Coluna esquerda – Botão Flutuante */}
             <div>
-              {/* Toggle FAB */}
               <div
                 style={{
                   display: 'flex',
@@ -378,7 +374,6 @@ export default function TabConfig({
                 </label>
               </div>
 
-              {/* Opções Expandidas do FAB */}
               {config.fab_enabled && (
                 <div
                   className="animate-fade-in"
@@ -520,85 +515,9 @@ export default function TabConfig({
                   </div>
                 </div>
               )}
-
-              {/* Bottom bar do app */}
-              <div
-                className="animate-fade-in"
-                style={{
-                  background: '#fff',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  padding: '15px',
-                }}
-              >
-                <h4 style={{ margin: '0 0 10px 0', fontSize: '14px' }}>
-                  📱 Barra inferior do App
-                </h4>
-                <small
-                  style={{
-                    color: '#666',
-                    fontSize: '11px',
-                    display: 'block',
-                    marginBottom: '12px',
-                  }}
-                >
-                  Personalize a barra de navegação que aparece quando o cliente
-                  usa o app instalado.
-                </small>
-
-                <div className="form-group">
-                  <label>Cor de fundo da barra</label>
-                  <div className="color-picker-wrapper">
-                    <input
-                      type="color"
-                      value={config.bottom_bar_bg || '#FFFFFF'}
-                      onChange={(e) =>
-                        setConfig({ ...config, bottom_bar_bg: e.target.value })
-                      }
-                    />
-                    <input
-                      type="text"
-                      className="color-text"
-                      value={config.bottom_bar_bg || '#FFFFFF'}
-                      onChange={(e) =>
-                        setConfig({ ...config, bottom_bar_bg: e.target.value })
-                      }
-                    />
-                  </div>
-                  <small>Exemplo: #FFFFFF para branco.</small>
-                </div>
-
-                <div className="form-group">
-                  <label>Cor dos ícones e textos</label>
-                  <div className="color-picker-wrapper">
-                    <input
-                      type="color"
-                      value={config.bottom_bar_icon_color || '#6B7280'}
-                      onChange={(e) =>
-                        setConfig({
-                          ...config,
-                          bottom_bar_icon_color: e.target.value,
-                        })
-                      }
-                    />
-                    <input
-                      type="text"
-                      className="color-text"
-                      value={config.bottom_bar_icon_color || '#6B7280'}
-                      onChange={(e) =>
-                        setConfig({
-                          ...config,
-                          bottom_bar_icon_color: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <small>Exemplo: #4F46E5 para roxo do App.</small>
-                </div>
-              </div>
             </div>
 
-            {/* Coluna direita – preview só dos widgets (app) */}
+            {/* Coluna direita – preview do FAB dentro do app */}
             <div>
               <h4
                 style={{
@@ -607,7 +526,7 @@ export default function TabConfig({
                   textAlign: 'center',
                 }}
               >
-                Como fica dentro do app
+                Botão flutuante dentro do app
               </h4>
               <PhonePreview
                 appName={config.app_name}
@@ -617,6 +536,99 @@ export default function TabConfig({
                 fabText={config.fab_text}
                 fabPosition={config.fab_position}
                 fabIcon={config.fab_icon}
+                storeUrl={storeUrl}
+                mode="app"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* --- NOVO CARD: Configurações após instalação (barra inferior) --- */}
+        <div className="config-card">
+          <div className="card-header">
+            <h3 style={{ margin: 0 }}>⚙️ Configurações após instalação</h3>
+            <p style={{ margin: '5px 0', fontSize: '0.9rem', color: '#6B7280' }}>
+              Personalize a barra inferior do app instalado.
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1.4fr)',
+              gap: '24px',
+              alignItems: 'flex-start',
+            }}
+          >
+            {/* Coluna esquerda – barra inferior */}
+            <div>
+              <div className="form-group">
+                <label>Cor de fundo da barra</label>
+                <div className="color-picker-wrapper">
+                  <input
+                    type="color"
+                    value={config.bottom_bar_bg || '#FFFFFF'}
+                    onChange={(e) =>
+                      setConfig({ ...config, bottom_bar_bg: e.target.value })
+                    }
+                  />
+                  <input
+                    type="text"
+                    className="color-text"
+                    value={config.bottom_bar_bg || '#FFFFFF'}
+                    onChange={(e) =>
+                      setConfig({ ...config, bottom_bar_bg: e.target.value })
+                    }
+                  />
+                </div>
+                <small>Exemplo: #FFFFFF para branco.</small>
+              </div>
+
+              <div className="form-group">
+                <label>Cor dos ícones e textos</label>
+                <div className="color-picker-wrapper">
+                  <input
+                    type="color"
+                    value={config.bottom_bar_icon_color || '#6B7280'}
+                    onChange={(e) =>
+                      setConfig({
+                        ...config,
+                        bottom_bar_icon_color: e.target.value,
+                      })
+                    }
+                  />
+                  <input
+                    type="text"
+                    className="color-text"
+                    value={config.bottom_bar_icon_color || '#6B7280'}
+                    onChange={(e) =>
+                      setConfig({
+                        ...config,
+                        bottom_bar_icon_color: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <small>Exemplo: #4F46E5 para roxo do App.</small>
+              </div>
+            </div>
+
+            {/* Coluna direita – preview focado na barra inferior */}
+            <div>
+              <h4
+                style={{
+                  margin: '0 0 10px 0',
+                  fontSize: '14px',
+                  textAlign: 'center',
+                }}
+              >
+                Barra inferior dentro do app
+              </h4>
+              <PhonePreview
+                appName={config.app_name}
+                themeColor={config.theme_color}
+                logoUrl={logoToUse}
+                fabEnabled={false}
                 storeUrl={storeUrl}
                 bottomBarBg={config.bottom_bar_bg}
                 bottomBarIconColor={config.bottom_bar_icon_color}
