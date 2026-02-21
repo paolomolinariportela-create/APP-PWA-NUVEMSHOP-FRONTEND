@@ -135,7 +135,7 @@ export default function TabConfig({
           </div>
         </div>
 
-        {/* --- IDENTIDADE VISUAL + PREVIEW (splash) --- */}
+        {/* IDENTIDADE VISUAL + PREVIEW (splash) */}
         <div className="config-card">
           <div className="card-header" style={{ marginBottom: '1rem' }}>
             <h3 style={{ margin: 0 }}>🎨 Identidade Visual</h3>
@@ -149,7 +149,6 @@ export default function TabConfig({
               alignItems: 'flex-start',
             }}
           >
-            {/* Coluna esquerda – campos */}
             <div
               style={{
                 display: 'flex',
@@ -209,7 +208,6 @@ export default function TabConfig({
                 </div>
               </div>
 
-              {/* MINI PREVIEW DE ÍCONE */}
               <div
                 style={{
                   width: '120px',
@@ -266,7 +264,6 @@ export default function TabConfig({
               </div>
             </div>
 
-            {/* Coluna direita – preview splash */}
             <div>
               <h4
                 style={{
@@ -289,7 +286,7 @@ export default function TabConfig({
           </div>
         </div>
 
-        {/* --- WIDGETS DE CONVERSÃO (FAB) + PREVIEW --- */}
+        {/* WIDGETS DE CONVERSÃO (FAB) + PREVIEW */}
         <div className="config-card">
           <div className="card-header">
             <h3 style={{ margin: 0 }}>🚀 Widgets de Conversão</h3>
@@ -303,7 +300,6 @@ export default function TabConfig({
               alignItems: 'flex-start',
             }}
           >
-            {/* Coluna esquerda – FAB */}
             <div>
               <div
                 style={{
@@ -470,7 +466,7 @@ export default function TabConfig({
                         style={{
                           width: '100%',
                           padding: '8px',
-                          border: '1px solid '#d1d5db',
+                          border: '1px solid #d1d5db',
                           borderRadius: '6px',
                           background: 'white',
                         }}
@@ -518,7 +514,6 @@ export default function TabConfig({
               )}
             </div>
 
-            {/* Coluna direita – preview FAB */}
             <div>
               <h4
                 style={{
@@ -544,7 +539,7 @@ export default function TabConfig({
           </div>
         </div>
 
-        {/* --- CONFIGURAÇÕES APÓS INSTALAÇÃO (barra inferior) + toggle --- */}
+        {/* CONFIGURAÇÕES APÓS INSTALAÇÃO (barra inferior) + toggle */}
         <div className="config-card">
           <div className="card-header">
             <h3 style={{ margin: 0 }}>⚙️ Configurações após instalação</h3>
@@ -561,9 +556,7 @@ export default function TabConfig({
               alignItems: 'flex-start',
             }}
           >
-            {/* Coluna esquerda – toggle + campos */}
             <div>
-              {/* Toggle barra inferior (mesma lógica/visual do FAB) */}
               <div
                 style={{
                   display: 'flex',
@@ -698,7 +691,6 @@ export default function TabConfig({
               )}
             </div>
 
-            {/* Coluna direita – preview barra inferior (só se ligada) */}
             <div>
               <h4
                 style={{
