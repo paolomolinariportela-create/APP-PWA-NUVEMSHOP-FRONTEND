@@ -13,6 +13,7 @@ interface AppConfig {
   fab_icon?: string;
   fab_delay?: number;
   fab_size?: number;
+  fab_color?: string;
 
   bottom_bar_enabled?: boolean;
   bottom_bar_bg?: string;
@@ -49,6 +50,8 @@ export default function TabConfig({
 
   const appInitial = (config.app_name || 'App').trim().charAt(0).toUpperCase();
   const logoToUse = config.logo_url || config.default_logo_url || '';
+
+  const fabColor = config.fab_color || config.theme_color;
 
   return (
     <div className="editor-grid animate-fade-in" style={{ marginTop: '20px' }}>
@@ -448,6 +451,29 @@ export default function TabConfig({
                     </div>
                   </div>
 
+                  {/* Cor do botão (independente do tema) */}
+                  <div className="form-group">
+                    <label>Cor do botão "Baixar App"</label>
+                    <div className="color-picker-wrapper">
+                      <input
+                        type="color"
+                        value={fabColor}
+                        onChange={(e) =>
+                          setConfig({ ...config, fab_color: e.target.value })
+                        }
+                      />
+                      <input
+                        type="text"
+                        className="color-text"
+                        value={fabColor}
+                        onChange={(e) =>
+                          setConfig({ ...config, fab_color: e.target.value })
+                        }
+                      />
+                    </div>
+                    <small>Use uma cor chamativa diferente do tema, se quiser.</small>
+                  </div>
+
                   {/* Tamanho do botão */}
                   <div style={{ marginBottom: '15px' }}>
                     <label
@@ -572,6 +598,7 @@ export default function TabConfig({
                 fabPosition={config.fab_position}
                 fabIcon={config.fab_icon}
                 fab_size={config.fab_size}
+                fab_color={fabColor}
                 storeUrl={storeUrl}
                 mode="app"
               />
