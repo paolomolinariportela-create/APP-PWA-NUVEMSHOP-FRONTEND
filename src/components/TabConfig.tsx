@@ -14,6 +14,9 @@ interface AppConfig {
 
   bottom_bar_bg?: string;
   bottom_bar_icon_color?: string;
+
+  // fallback visual vindo da API (/admin/store-info)
+  default_logo_url?: string;
 }
 
 interface Props {
@@ -44,6 +47,10 @@ export default function TabConfig({
 
   // inicial do app para usar no placeholder
   const appInitial = (config.app_name || 'App').trim().charAt(0).toUpperCase();
+
+  // logo que será exibida: prioridade para o que o usuário digitou,
+  // senão usa a logo padrão da loja vinda do backend
+  const logoToUse = config.logo_url || config.default_logo_url || '';
 
   return (
     <div className="editor-grid animate-fade-in" style={{ marginTop: '20px' }}>
@@ -189,7 +196,11 @@ export default function TabConfig({
                   onChange={(e) =>
                     setConfig({ ...config, logo_url: e.target.value })
                   }
-                  placeholder="https://..."
+                  placeholder={
+                    config.default_logo_url
+                      ? `Padrão: ${config.default_logo_url}`
+                      : 'https://...'
+                  }
                 />
               </div>
             </div>
@@ -217,18 +228,14 @@ export default function TabConfig({
                   boxShadow: '0 6px 12px rgba(0,0,0,0.15)',
                 }}
               >
-                {config.logo_url ? (
+                {logoToUse ? (
                   <img
-                    src={config.logo_url}
+                    src={logoToUse}
                     alt="Logo preview"
                     style={{
                       width: '100%',
                       height: '100%',
                       objectFit: 'cover',
-                    }}
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).style.display =
-                        'none';
                     }}
                   />
                 ) : (
@@ -339,7 +346,7 @@ export default function TabConfig({
               className="animate-fade-in"
               style={{
                 background: '#fff',
-                border: '1px solid #e5e7eb',
+                border: '1px solid '#e5e7eb',
                 borderRadius: '8px',
                 padding: '15px',
                 marginBottom: '20px',
@@ -571,7 +578,7 @@ export default function TabConfig({
           <PhonePreview
             appName={config.app_name}
             themeColor={config.theme_color}
-            logoUrl={config.logo_url}
+            logoUrl={logoToUse}
             fabEnabled={config.fab_enabled}
             fabText={config.fab_text}
             fabPosition={config.fab_position}
