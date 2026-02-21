@@ -41,9 +41,10 @@ export default function TabConfig({
     alert('Link copiado!');
   };
 
+  // QR code com cor fixa (preto), para não depender do theme_color
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
     storeUrl + '/pages/app'
-  )}&color=${config.theme_color.replace('#', '')}`;
+  )}&color=000000`;
 
   // inicial do app para usar no placeholder
   const appInitial = (config.app_name || 'App').trim().charAt(0).toUpperCase();
@@ -128,7 +129,7 @@ export default function TabConfig({
               target="_blank"
               rel="noreferrer"
               style={{
-                color: config.theme_color,
+                color: '#7C3AED', // cor fixa, não depende do theme_color
                 textDecoration: 'none',
                 fontWeight: 'bold',
                 fontSize: '14px',
@@ -381,7 +382,7 @@ export default function TabConfig({
                     style={{
                       width: '100%',
                       padding: '8px',
-                      border: '1px solid #d1d5db',
+                      border: '1px solid '#d1d5db',
                       borderRadius: '6px',
                     }}
                   />
@@ -407,7 +408,7 @@ export default function TabConfig({
                     style={{
                       width: '100%',
                       padding: '8px',
-                      border: '1px solid #d1d5db',
+                      border: '1px solid '#d1d5db',
                       borderRadius: '6px',
                       textAlign: 'center',
                     }}
@@ -436,7 +437,7 @@ export default function TabConfig({
                     style={{
                       width: '100%',
                       padding: '8px',
-                      border: '1px solid #d1d5db',
+                      border: '1px solid '#d1d5db',
                       borderRadius: '6px',
                       background: 'white',
                     }}
@@ -488,7 +489,7 @@ export default function TabConfig({
             className="animate-fade-in"
             style={{
               background: '#fff',
-              border: '1px solid #e5e7eb',
+              border: '1px solid '#e5e7eb',
               borderRadius: '8px',
               padding: '15px',
             }}
