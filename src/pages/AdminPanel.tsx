@@ -94,7 +94,7 @@ export default function AdminPanel() {
 
     Promise.all([
         authFetch("/admin/config").then(r => r.json()),
-        authFetch("/analytics/dashboard").then(r => r.json()), // <--- ROTA NOVA
+        authFetch("/stats/dashboard").then(r => r.json()),    // <--- ROTA CERTA
         authFetch("/admin/store-info").then(r => r.json())
     ]).then(([dataConfig, dataStats, dataUrl]) => {
         setConfig({
