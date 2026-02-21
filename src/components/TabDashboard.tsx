@@ -13,6 +13,12 @@ interface DashboardStats {
   recorrencia: { clientes_2x: number; taxa_recompra: number };
   ticket_medio: { app: number; site: number };
   visitas?: { app: number; site: number; total: number };
+  extra_pwa?: {
+    visitas_pwa: number;
+    visitas_site: number;
+    vendas_pwa: number;
+    vendas_site: number;
+  };
 }
 
 interface Props {
@@ -94,6 +100,21 @@ export default function TabDashboard({ stats }: Props) {
           <h3>Instalações Ativas</h3>
           <p>{stats.instalacoes}</p>
           <span className="stat-growth">Base de clientes fiéis</span>
+
+          {/* NOVO: visitas App x Site usando extra_pwa, sem quebrar nada */}
+          {stats.extra_pwa && (
+            <div
+              style={{
+                marginTop: '4px',
+                fontSize: '11px',
+                color: '#555',
+              }}
+            >
+              App: <strong>{stats.extra_pwa.visitas_pwa}</strong> visitas •{' '}
+              Site: <strong>{stats.extra_pwa.visitas_site}</strong> visitas
+            </div>
+          )}
+
           <div
             style={{
               marginTop: '6px',
