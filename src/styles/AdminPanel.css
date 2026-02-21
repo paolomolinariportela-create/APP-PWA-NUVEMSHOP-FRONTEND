@@ -175,6 +175,7 @@ body {
   gap: 1rem;
   border: 1px solid var(--border);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-size: 0.9rem; /* base um pouco maior para textos internos */
 }
 
 .stat-card:hover {
@@ -199,23 +200,46 @@ body {
 .stat-icon.red { background: #FEE2E2; color: #DC2626; }
 
 .stat-info { width: 100%; }
-.stat-info h3 { margin: 0; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-.stat-info p { margin: 6px 0; font-size: 1.6rem; font-weight: 800; color: var(--text-main); }
-.stat-growth { font-size: 0.8rem; color: #10B981; font-weight: 600; display: block; margin-top: 2px;}
+
+.stat-info h3 {
+  margin: 0;
+  font-size: 0.95rem; /* antes 0.85rem */
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-info p {
+  margin: 6px 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.stat-growth {
+  font-size: 0.85rem; /* antes 0.8rem */
+  color: #10B981;
+  font-weight: 600;
+  display: block;
+  margin-top: 2px;
+}
 
 /* --- BARRAS DE CONVERSÃO --- */
 .conversion-bar {
   margin-top: 12px;
   width: 100%;
 }
+
 .bar-label {
-  font-size: 0.75rem;
+  font-size: 0.8rem; /* antes 0.75rem */
   color: var(--text-secondary);
   display: flex;
   justify-content: space-between;
   margin-bottom: 6px;
   font-weight: 500;
 }
+
 .bar-track {
   height: 8px;
   background: #F3F4F6;
@@ -223,6 +247,7 @@ body {
   overflow: hidden;
   margin-bottom: 10px;
 }
+
 .bar-fill {
   height: 100%;
   border-radius: 4px;
