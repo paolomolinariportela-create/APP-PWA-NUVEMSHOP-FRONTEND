@@ -11,7 +11,7 @@ interface PhonePreviewProps {
   fabText?: string;
   fabPosition?: string;
   fabIcon?: string;
-  fab_size?: number;
+  fab_size?: 'xs' | 'small' | 'medium' | 'large' | 'xl';
   fab_color?: string;
 
   topbar_enabled?: boolean;
@@ -38,7 +38,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
   fabText,
   fabPosition,
   fabIcon,
-  fab_size = 1,
+  fab_size = 'medium',
   fab_color,
 
   topbar_enabled,
@@ -71,9 +71,26 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
 
   const fabBgColor = fab_color || themeColor;
 
-  const bannerBg = topbar_color || '#111827'; // quase preto
+  // mapeia xs/small/medium/large/xl para um fator numérico de preview
+  const fabSizeFactor = (() => {
+    switch (fab_size) {
+      case 'xs':
+        return 0.7;
+      case 'small':
+        return 0.85;
+      case 'large':
+        return 1.2;
+      case 'xl':
+        return 1.35;
+      default:
+        return 1.0;
+    }
+  })();
+
+  const bannerBg = topbar_color || '#111827';
   const bannerTextColor = topbar_text_color || '#FFFFFF';
-  const bannerMessage = topbar_text || 'Instale o app e ganhe 10% OFF na primeira compra';
+  const bannerMessage =
+    topbar_text || 'Instale o app e ganhe 10% OFF na primeira compra';
   const bannerButtonText = topbar_button_text || 'Instalar agora';
 
   const showTopbar = !isSplash && topbar_enabled;
@@ -131,7 +148,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
           </div>
         )}
 
-        {/* CONTEÚDO PRINCIPAL (mode="app") */}
+        {/* CONTEÚDO PRINCIPAL */}
         {!isSplash && (
           <>
             <div className="app-content" style={styles.appContent}>
@@ -228,9 +245,9 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                     [fabPosition === 'left' ? 'left' : 'right']: '20px',
                     background: fabBgColor,
                     color: 'white',
-                    padding: `${8 * fab_size}px ${16 * fab_size}px`,
+                    padding: `${8 * fabSizeFactor}px ${16 * fabSizeFactor}px`,
                     borderRadius: '30px',
-                    fontSize: `${12 * fab_size}px`,
+                    fontSize: `${12 * fabSizeFactor}px`,
                     fontWeight: 'bold',
                     boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
                     display: 'flex',
@@ -240,7 +257,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                     cursor: 'pointer',
                   }}
                 >
-                  <span style={{ fontSize: `${14 * fab_size}px` }}>
+                  <span style={{ fontSize: `${14 * fabSizeFactor}px` }}>
                     {fabIcon || '📲'}
                   </span>
                   {fabText || 'Baixar App'}
