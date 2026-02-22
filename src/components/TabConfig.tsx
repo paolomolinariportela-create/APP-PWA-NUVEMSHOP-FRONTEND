@@ -73,47 +73,7 @@ export default function TabConfig({
       <div className="config-section" style={{ gridColumn: '1 / -1' }}>
         <h2 style={{ marginBottom: '20px' }}>Personalizar Aplicativo</h2>
 
-        {/* Link e QR Code */}
-        <div
-          className="config-card"
-          style={{ background: '#f5f3ff', border: '1px solid #ddd6fe' }}
-        >
-          <div className="card-header">
-            <h3 style={{ color: '#7C3AED', margin: 0 }}>🔗 Link de Download</h3>
-            <p style={{ margin: '5px 0' }}>Divulgue este link no Instagram.</p>
-          </div>
-          <div className="form-group">
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <input
-                type="text"
-                readOnly
-                value={storeUrl ? `${storeUrl}/pages/app` : 'Carregando...'}
-                style={{
-                  backgroundColor: 'white',
-                  color: '#555',
-                  flex: 1,
-                  padding: '10px',
-                  borderRadius: '6px',
-                  border: '1px solid #ccc',
-                }}
-              />
-              <button
-                onClick={copyLink}
-                style={{
-                  background: '#8B5CF6',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  padding: '0 20px',
-                  fontWeight: 'bold',
-                }}
-              >
-                Copiar
-              </button>
-            </div>
-          </div>
-        </div>
+        
 
         <div
           className="config-card"
