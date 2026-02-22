@@ -23,6 +23,8 @@ interface AppConfig {
   topbar_color?: string;
   topbar_text_color?: string;
   topbar_size?: number;
+  topbar_button_bg_color?: string;      // NOVO
+  topbar_button_text_color?: string;    // NOVO
 
   bottom_bar_enabled?: boolean;
   bottom_bar_bg?: string;
@@ -63,6 +65,8 @@ export default function TabConfig({
   const fabColor = config.fab_color || config.theme_color;
   const topbarColor = config.topbar_color || '#111827';
   const topbarTextColor = config.topbar_text_color || '#FFFFFF';
+  const topbarButtonBgColor = config.topbar_button_bg_color || '#FBBF24';    // NOVO
+  const topbarButtonTextColor = config.topbar_button_text_color || '#111827'; // NOVO
 
   return (
     <div className="editor-grid animate-fade-in" style={{ marginTop: '20px' }}>
@@ -487,50 +491,50 @@ export default function TabConfig({
                     <small>Use uma cor chamativa diferente do tema, se quiser.</small>
                   </div>
 
-                {/* Tamanho do botão */}
-                <div style={{ marginBottom: "15px" }}>
-                  <label
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "bold",
-                      color: "#374151",
-                      display: "block",
-                      marginBottom: "5px",
-                    }}
-                  >
-                    Tamanho do botão
-                  </label>
-                  <select
-                    value={config.fab_size ?? "medium"}
-                    onChange={(e) =>
-                      setConfig({
-                        ...config,
-                        fab_size: e.target.value as
-                          | "xs"
-                          | "small"
-                          | "medium"
-                          | "large"
-                          | "xl",
-                      })
-                    }
-                    style={{
-                      width: "100%",
-                      padding: "8px",
-                      border: "1px solid #d1d5db",
-                      borderRadius: "6px",
-                      background: "white",
-                    }}
-                  >
-                    <option value="xs">Muito pequeno</option>
-                    <option value="small">Pequeno</option>
-                    <option value="medium">Médio</option>
-                    <option value="large">Grande</option>
-                    <option value="xl">Muito grande</option>
-                  </select>
-                  <small style={{ fontSize: "10px", color: "#666" }}>
-                    Escolha entre 5 tamanhos pré-definidos.
-                  </small>
-                </div>
+                  {/* Tamanho do botão */}
+                  <div style={{ marginBottom: '15px' }}>
+                    <label
+                      style={{
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        color: '#374151',
+                        display: 'block',
+                        marginBottom: '5px',
+                      }}
+                    >
+                      Tamanho do botão
+                    </label>
+                    <select
+                      value={config.fab_size ?? 'medium'}
+                      onChange={(e) =>
+                        setConfig({
+                          ...config,
+                          fab_size: e.target.value as
+                            | 'xs'
+                            | 'small'
+                            | 'medium'
+                            | 'large'
+                            | 'xl',
+                        })
+                      }
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '6px',
+                        background: 'white',
+                      }}
+                    >
+                      <option value="xs">Muito pequeno</option>
+                      <option value="small">Pequeno</option>
+                      <option value="medium">Médio</option>
+                      <option value="large">Grande</option>
+                      <option value="xl">Muito grande</option>
+                    </select>
+                    <small style={{ fontSize: '10px', color: '#666' }}>
+                      Escolha entre 5 tamanhos pré-definidos.
+                    </small>
+                  </div>
 
                   <div style={{ display: 'flex', gap: '15px' }}>
                     <div style={{ flex: 1 }}>
@@ -781,7 +785,7 @@ export default function TabConfig({
                         style={{
                           width: '100%',
                           padding: '8px',
-                          border: '1px solid #d1d5db',
+                          border: '1px solid '#d1d5db',
                           borderRadius: '6px',
                           textAlign: 'center',
                         }}
@@ -815,9 +819,7 @@ export default function TabConfig({
                         onChange={(e) =>
                           setConfig({
                             ...config,
-                            topbar_position: e.target.value as
-                              | 'top'
-                              | 'bottom',
+                            topbar_position: e.target.value as 'top' | 'bottom',
                           })
                         }
                         style={{
@@ -868,7 +870,7 @@ export default function TabConfig({
                     </div>
                   </div>
 
-                  {/* Cores */}
+                  {/* Cores da barra */}
                   <div
                     style={{
                       display: 'flex',
@@ -948,11 +950,95 @@ export default function TabConfig({
                       </div>
                     </div>
                   </div>
+
+                  {/* Cores do botão da barra */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '15px',
+                      marginTop: '15px',
+                    }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <label
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          color: '#374151',
+                          display: 'block',
+                          marginBottom: '5px',
+                        }}
+                      >
+                        Cor do botão
+                      </label>
+                      <div className="color-picker-wrapper">
+                        <input
+                          type="color"
+                          value={topbarButtonBgColor}
+                          onChange={(e) =>
+                            setConfig({
+                              ...config,
+                              topbar_button_bg_color: e.target.value,
+                            })
+                          }
+                        />
+                        <input
+                          type="text"
+                          className="color-text"
+                          value={topbarButtonBgColor}
+                          onChange={(e) =>
+                            setConfig({
+                              ...config,
+                              topbar_button_bg_color: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          color: '#374151',
+                          display: 'block',
+                          marginBottom: '5px',
+                        }}
+                      >
+                        Cor do texto do botão
+                      </label>
+                      <div className="color-picker-wrapper">
+                        <input
+                          type="color"
+                          value={topbarButtonTextColor}
+                          onChange={(e) =>
+                            setConfig({
+                              ...config,
+                              topbar_button_text_color: e.target.value,
+                            })
+                          }
+                        />
+                        <input
+                          type="text"
+                          className="color-text"
+                          value={topbarButtonTextColor}
+                          onChange={(e) =>
+                            setConfig({
+                              ...config,
+                              topbar_button_text_color: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
 
             {/* Coluna direita – preview */}
+
+
             <div>
               <h4
                 style={{
