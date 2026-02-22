@@ -14,6 +14,7 @@ interface AppConfig {
   fab_delay?: number;
   fab_size?: 'xs' | 'small' | 'medium' | 'large' | 'xl';
   fab_color?: string;
+  fab_background_image_url?: string;            // NOVO
 
   topbar_enabled?: boolean;
   topbar_text?: string;
@@ -22,9 +23,10 @@ interface AppConfig {
   topbar_position?: 'top' | 'bottom';
   topbar_color?: string;
   topbar_text_color?: string;
-  topbar_size?: number;
-  topbar_button_bg_color?: string;      // NOVO
-  topbar_button_text_color?: string;    // NOVO
+  topbar_size?: 'xs' | 'small' | 'medium' | 'large' | 'xl';
+  topbar_button_bg_color?: string;
+  topbar_button_text_color?: string;
+  topbar_background_image_url?: string;         // NOVO
 
   bottom_bar_enabled?: boolean;
   bottom_bar_bg?: string;
@@ -50,23 +52,14 @@ export default function TabConfig({
   loading,
   storeUrl,
 }: Props) {
-  const copyLink = () => {
-    navigator.clipboard.writeText(`${storeUrl}/pages/app`);
-    alert('Link copiado!');
-  };
-
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
-    storeUrl + '/pages/app'
-  )}&color=000000`;
-
   const appInitial = (config.app_name || 'App').trim().charAt(0).toUpperCase();
   const logoToUse = config.logo_url || config.default_logo_url || '';
 
   const fabColor = config.fab_color || config.theme_color;
   const topbarColor = config.topbar_color || '#111827';
   const topbarTextColor = config.topbar_text_color || '#FFFFFF';
-  const topbarButtonBgColor = config.topbar_button_bg_color || '#FBBF24';    // NOVO
-  const topbarButtonTextColor = config.topbar_button_text_color || '#111827'; // NOVO
+  const topbarButtonBgColor = config.topbar_button_bg_color || '#FBBF24';
+  const topbarButtonTextColor = config.topbar_button_text_color || '#111827';
 
   return (
     <div className="editor-grid animate-fade-in" style={{ marginTop: '20px' }}>
@@ -224,7 +217,7 @@ export default function TabConfig({
           </div>
         </div>
 
-                {/* WIDGETS DE CONVERSÃO (FAB + Barra fixa) + PREVIEW */}
+        {/* WIDGETS DE CONVERSÃO (FAB + Barra fixa) + PREVIEW */}
         <div className="config-card">
           <div className="card-header">
             <h3 style={{ margin: 0 }}>🚀 Widgets de Conversão</h3>
@@ -411,8 +404,34 @@ export default function TabConfig({
                     </small>
                   </div>
 
+                  {/* URL da imagem de fundo do FAB */}
+                  <div className="form-group" style={{ marginTop: '15px' }}>
+                    <label>Imagem do botão (URL opcional)</label>
+                    <input
+                      type="text"
+                      value={config.fab_background_image_url || ''}
+                      onChange={(e) =>
+                        setConfig({
+                          ...config,
+                          fab_background_image_url: e.target.value,
+                        })
+                      }
+                      placeholder="https://... (banner do botão flutuante)"
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '6px',
+                      }}
+                    />
+                    <small style={{ fontSize: '10px', color: '#666' }}>
+                      Se preencher, o botão flutuante pode usar essa imagem
+                      como fundo.
+                    </small>
+                  </div>
+
                   {/* Tamanho do botão */}
-                  <div style={{ marginBottom: '15px' }}>
+                  <div style={{ marginTop: '15px', marginBottom: '15px' }}>
                     <label
                       style={{
                         fontSize: '12px',
@@ -961,14 +980,37 @@ export default function TabConfig({
                       </div>
                     </div>
                   </div>
+
+                  {/* URL da imagem da barra fixa */}
+                  <div className="form-group" style={{ marginTop: '15px' }}>
+                    <label>Imagem da barra (URL opcional)</label>
+                    <input
+                      type="text"
+                      value={config.topbar_background_image_url || ''}
+                      onChange={(e) =>
+                        setConfig({
+                          ...config,
+                          topbar_background_image_url: e.target.value,
+                        })
+                      }
+                      placeholder="https://... (banner da barra fixa)"
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '6px',
+                      }}
+                    />
+                    <small style={{ fontSize: '10px', color: '#666' }}>
+                      Se preencher, a barra fixa pode usar essa imagem como
+                      fundo.
+                    </small>
+                  </div>
                 </div>
               )}
             </div>
 
-           
-            {/* Coluna direita – preview */}
-
-
+            {/* Coluna direita - preview */}
             <div>
               <h4
                 style={{
@@ -987,16 +1029,20 @@ export default function TabConfig({
                 fabText={config.fab_text}
                 fabPosition={config.fab_position}
                 fabIcon={config.fab_icon}
-                fab_size={config.fab_size}
-                fab_color={fabColor}
-                topbar_enabled={config.topbar_enabled}
-                topbar_text={config.topbar_text}
-                topbar_button_text={config.topbar_button_text}
-                topbar_icon={config.topbar_icon}
-                topbar_position={config.topbar_position}
-                topbar_color={topbarColor}
-                topbar_text_color={topbarTextColor}
-                topbar_size={config.topbar_size}
+                fabSize={config.fab_size}
+                fabColor={fabColor}
+                fabBackgroundImageUrl={config.fab_background_image_url}
+                topbarEnabled={config.topbar_enabled}
+                topbarText={config.topbar_text}
+                topbarButtonText={config.topbar_button_text}
+                topbarIcon={config.topbar_icon}
+                topbarPosition={config.topbar_position}
+                topbarColor={topbarColor}
+                topbarTextColor={topbarTextColor}
+                topbarSize={config.topbar_size}
+                topbarButtonBgColor={topbarButtonBgColor}
+                topbarButtonTextColor={topbarButtonTextColor}
+                topbarBackgroundImageUrl={config.topbar_background_image_url}
                 storeUrl={storeUrl}
                 mode="app"
               />
