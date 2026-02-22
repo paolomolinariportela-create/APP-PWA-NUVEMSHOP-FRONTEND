@@ -332,7 +332,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                     10 * topbarSizeFactor
                   }px`,
                   fontSize: `${10 * topbarSizeFactor}px`,
-                  borderTop: '1px solid rgba(0,0,0,0.1)`,
+                  borderTop: '1px solid rgba(0,0,0,0.1)',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
