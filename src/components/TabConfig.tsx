@@ -459,7 +459,7 @@ export default function TabConfig({
                       style={{
                         width: '100%',
                         padding: '8px',
-                        border: '1px solid '#d1d5db',
+                        border: '1px solid #d1d5db',
                         borderRadius: '6px',
                         background: 'white',
                       }}
@@ -496,7 +496,7 @@ export default function TabConfig({
                         style={{
                           width: '100%',
                           padding: '8px',
-                          border: '1px solid '#d1d5db',
+                          border: '1px solid #d1d5db',
                           borderRadius: '6px',
                           background: 'white',
                         }}
@@ -656,7 +656,7 @@ export default function TabConfig({
                         style={{
                           width: '100%',
                           padding: '8px',
-                          border: '1px solid '#d1d5db',
+                          border: '1px solid #d1d5db',
                           borderRadius: '6px',
                         }}
                       />
@@ -695,7 +695,7 @@ export default function TabConfig({
                         style={{
                           width: '100%',
                           padding: '8px',
-                          border: '1px solid '#d1d5db',
+                          border: '1px solid #d1d5db',
                           borderRadius: '6px',
                         }}
                       />
@@ -724,7 +724,7 @@ export default function TabConfig({
                         style={{
                           width: '100%',
                           padding: '8px',
-                          border: '1px solid '#d1d5db',
+                          border: '1px solid #d1d5db',
                           borderRadius: '6px',
                           textAlign: 'center',
                         }}
@@ -763,7 +763,7 @@ export default function TabConfig({
                         style={{
                           width: '100%',
                           padding: '8px',
-                          border: '1px solid '#d1d5db',
+                          border: '1px solid #d1d5db',
                           borderRadius: '6px',
                           background: 'white',
                         }}
@@ -800,7 +800,7 @@ export default function TabConfig({
                         style={{
                           width: '100%',
                           padding: '8px',
-                          border: '1px solid '#d1d5db',
+                          border: '1px solid #d1d5db',
                           borderRadius: '6px',
                           background: 'white',
                         }}
@@ -993,7 +993,7 @@ export default function TabConfig({
                       style={{
                         width: '100%',
                         padding: '8px',
-                        border: '1px solid '#d1d5db',
+                        border: '1px solid #d1d5db',
                         borderRadius: '6px',
                       }}
                     />
@@ -1102,7 +1102,7 @@ export default function TabConfig({
                       style={{
                         width: '100%',
                         padding: '8px',
-                        border: '1px solid '#d1d5db',
+                        border: '1px solid #d1d5db',
                         borderRadius: '6px',
                       }}
                     />
