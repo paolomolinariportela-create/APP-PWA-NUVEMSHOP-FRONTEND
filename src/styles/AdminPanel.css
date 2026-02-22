@@ -194,7 +194,7 @@ body {
 
 .stat-icon.purple { background: #F3E8FF; color: #7e22ce; }
 .stat-icon.blue   { background: #EFF6FF; color: #2563eb; }
-.stat-icon.green  { background: #DCFCE7; color: #15803D; }
+stat-icon.green  { background: #DCFCE7; color: #15803D; }
 .stat-icon.red    { background: #FEE2E2; color: #DC2626; }
 
 .stat-info { width: 100%; }
@@ -305,7 +305,7 @@ body {
 .card-header h2,
 .card-header h3 {
   margin: 0;
-  font-size: 1.15rem;   /* título dos cards maior */
+  font-size: 1.2rem;   /* título dos cards maior */
   font-weight: 600;
   letter-spacing: 0.01em;
 }
@@ -541,4 +541,44 @@ plan-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.12),
     0 10px 10px -5px rgba(15, 23, 42, 0.06);
+}
+
+/* TIPOGRAFIA EXTRA PARA DENTRO DOS CARDS (APP/Site, Próxima meta, etc.) */
+
+.stat-meta-text,
+.next-goal-text,
+.card-row-text {
+  font-size: 0.95rem;        /* ~15px */
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.stat-label,
+.kpi-label,
+.badge-label {
+  font-size: 0.9rem;         /* ~14px */
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.stat-subvalue {
+  font-size: 1.05rem;        /* ~17px */
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.badge,
+.chip {
+  font-size: 0.85rem;        /* ~13–14px */
+  font-weight: 500;
+}
+
+.card-list-item {
+  font-size: 0.95rem;        /* ~15px */
+  color: var(--text-main);
+}
+
+.card-muted {
+  font-size: 0.85rem;
+  color: #6B7280;
 }
