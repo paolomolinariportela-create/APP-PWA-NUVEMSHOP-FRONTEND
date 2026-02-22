@@ -35,7 +35,7 @@ interface AppConfig {
   fab_position?: string;
   fab_icon?: string;
   fab_delay?: number;
-  fab_size?: "small" | "medium" | "large";
+  fab_size?: "xs" | "small" | "medium" | "large" | "xl";
   fab_color?: string;
 
   topbar_enabled?: boolean;
@@ -160,7 +160,13 @@ export default function AdminPanel() {
           fab_position: dataConfig.fab_position ?? "right",
           fab_icon: dataConfig.fab_icon ?? "📲",
           fab_delay: dataConfig.fab_delay ?? 0,
-          fab_size: (dataConfig.fab_size as "small" | "medium" | "large") ?? "medium",
+          fab_size:
+            (dataConfig.fab_size as
+              | "xs"
+              | "small"
+              | "medium"
+              | "large"
+              | "xl") ?? "medium",
           fab_color:
             dataConfig.fab_color ??
             (dataConfig.theme_color ?? "#000000"),
