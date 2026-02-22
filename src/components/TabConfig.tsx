@@ -306,7 +306,7 @@ export default function TabConfig({
           </div>
         </div>
 
-        {/* WIDGETS DE CONVERSÃO (FAB + Barra fixa) + PREVIEW */}
+                {/* WIDGETS DE CONVERSÃO (FAB + Barra fixa) + PREVIEW */}
         <div className="config-card">
           <div className="card-header">
             <h3 style={{ margin: 0 }}>🚀 Widgets de Conversão</h3>
@@ -488,7 +488,9 @@ export default function TabConfig({
                         }
                       />
                     </div>
-                    <small>Use uma cor chamativa diferente do tema, se quiser.</small>
+                    <small>
+                      Use uma cor chamativa diferente do tema, se quiser.
+                    </small>
                   </div>
 
                   {/* Tamanho do botão */}
@@ -520,7 +522,7 @@ export default function TabConfig({
                       style={{
                         width: '100%',
                         padding: '8px',
-                        border: '1px solid #d1d5db',
+                        border: '1px solid '#d1d5db',
                         borderRadius: '6px',
                         background: 'white',
                       }}
@@ -844,28 +846,37 @@ export default function TabConfig({
                           marginBottom: '5px',
                         }}
                       >
-                        Altura / tamanho
+                        Tamanho da barra
                       </label>
-                      <input
-                        type="range"
-                        min="0.8"
-                        max="1.4"
-                        step="0.1"
-                        value={config.topbar_size ?? 1}
+                      <select
+                        value={config.topbar_size ?? 'medium'}
                         onChange={(e) =>
                           setConfig({
                             ...config,
-                            topbar_size: parseFloat(e.target.value),
+                            topbar_size: e.target.value as
+                              | 'xs'
+                              | 'small'
+                              | 'medium'
+                              | 'large'
+                              | 'xl',
                           })
                         }
                         style={{
                           width: '100%',
-                          cursor: 'pointer',
-                          accentColor: config.theme_color,
+                          padding: '8px',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '6px',
+                          background: 'white',
                         }}
-                      />
+                      >
+                        <option value="xs">Pequeno</option>
+                        <option value="small">Médio</option>
+                        <option value="medium">Grande</option>
+                        <option value="large">Extra grande</option>
+                        <option value="xl">Maior</option>
+                      </select>
                       <small style={{ fontSize: '10px', color: '#666' }}>
-                        Ajuste o tamanho visual da barra.
+                        Escolha entre 5 tamanhos pré-definidos.
                       </small>
                     </div>
                   </div>
@@ -1036,6 +1047,7 @@ export default function TabConfig({
               )}
             </div>
 
+           
             {/* Coluna direita – preview */}
 
 
