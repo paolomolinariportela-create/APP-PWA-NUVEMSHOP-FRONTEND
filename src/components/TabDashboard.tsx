@@ -74,59 +74,75 @@ export default function TabDashboard({ stats }: Props) {
   }
 
   return (
-    <section className="stats-grid animate-fade-in">
-      {/* RECEITA APP */}
-      <div className="stat-card" style={{ borderLeft: '4px solid #10B981' }}>
-        <div className="stat-icon green">💰</div>
-        <div className="stat-info">
-          <h3>Receita App</h3>
-          <p>
-            {new Intl.NumberFormat('pt-BR', {
-              style: 'currency',
-              currency: 'BRL',
-            }).format(stats.receita)}
-          </p>
-          <span className="stat-growth">
-            🔥 {stats.vendas} pedidos realizados
-          </span>
+  <section className="stats-grid animate-fade-in">
+    {/* RECEITA APP */}
+    <div className="stat-card" style={{ borderLeft: '4px solid #10B981' }}>
+      <div className="stat-icon green">💰</div>
+      <div className="stat-info">
+        <h3>Receita App</h3>
+        <p>
+          {new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+          }).format(stats.receita)}
+        </p>
+        <span className="stat-growth">
+          🔥 {stats.vendas} pedidos realizados
+        </span>
 
-          <div
-            style={{
-              marginTop: '6px',
-              fontSize: '11px',
-              color: '#555',
-            }}
-          >
-            🎯 Próxima meta:{' '}
-            {new Intl.NumberFormat('pt-BR', {
-              style: 'currency',
-              currency: 'BRL',
-            }).format(metaReceita)}
-          </div>
+        <div
+          style={{
+            marginTop: '6px',
+            fontSize: '11px',
+            color: '#555',
+          }}
+        >
+          🎯 Próxima meta:{' '}
+          {new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+          }).format(metaReceita)}
         </div>
       </div>
+    </div>
 
-      {/* TICKET MÉDIO APP x SITE */}
-      <div className="stat-card">
-        <div
-          className="stat-icon"
-          style={{ background: '#F0F9FF', color: '#0369A1' }}
-        >
-          💳
+    {/* TICKET MÉDIO APP x SITE */}
+    <div className="stat-card">
+      <div
+        className="stat-icon"
+        style={{ background: '#F0F9FF', color: '#0369A1' }}
+      >
+        💳
+      </div>
+      <div className="stat-info">
+        <h3>Ticket Médio</h3>
+
+        {/* APP – informação principal, com número grande */}
+        <div className="ticket-main-row">
+          <span
+            className="ticket-main-label"
+            style={{ color: '#10B981', fontWeight: 'bold' }}
+          >
+            APP
+          </span>
+          <span className="ticket-main-value">
+            {new Intl.NumberFormat('pt-BR', {
+              style: 'currency',
+              currency: 'BRL',
+            }).format(stats.ticket_medio.app)}
+          </span>
         </div>
-        <div className="stat-info">
-          <h3>Ticket Médio</h3>
 
-          {/* APP – informação principal, com número grande */}
-          <div className="ticket-main-row">
-            <span className="ticket-main-label">APP</span>
-            <span className="ticket-main-value">
-              {new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL',
-              }).format(stats.ticket_medio.app)}
-            </span>
-          </div>
+        {/* Site – secundário */}
+        <div className="ticket-row">
+          <span className="ticket-label">Site</span>
+          <span className="ticket-value">
+            {new Intl.NumberFormat('pt-BR', {
+              style: 'currency',
+              currency: 'BRL',
+            }).format(stats.ticket_medio.site)}
+          </span>
+        </div>
 
           {/* Site – secundário, menor mas legível */}
           <div className="ticket-row">
