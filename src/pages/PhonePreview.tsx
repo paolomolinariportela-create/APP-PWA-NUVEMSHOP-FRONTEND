@@ -331,7 +331,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                   padding: `${6 * topbarSizeFactor}px ${
                     10 * topbarSizeFactor
                   }px`,
-                  fontSize: `${10 * topbarSizeFactor}px`,
+                  fontSize: `${10 * topbarSizeFactor}px`, 
                   borderTop: '1px solid rgba(0,0,0,0.1)',
                 }}
               >
