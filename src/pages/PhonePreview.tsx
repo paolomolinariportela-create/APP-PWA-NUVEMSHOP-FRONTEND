@@ -305,7 +305,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                     borderRadius: '30px',
                     fontSize: `${12 * fabSizeFactor}px`,
                     fontWeight: 'bold',
-                    boxShadow: '0 4px 10px rgba(0,0,0,0.3)`,
+                    boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '5px',
