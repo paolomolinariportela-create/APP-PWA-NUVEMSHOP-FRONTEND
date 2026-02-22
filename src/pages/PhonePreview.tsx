@@ -24,6 +24,10 @@ interface PhonePreviewProps {
   // agora string, igual backend
   topbar_size?: 'xs' | 'small' | 'medium' | 'large' | 'xl';
 
+  // NOVO: popup
+  popup_enabled?: boolean;
+  popup_image_url?: string;
+
   storeUrl?: string;
   bottomBarBg?: string;
   bottomBarIconColor?: string;
@@ -52,6 +56,10 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
   topbar_color,
   topbar_text_color,
   topbar_size = 'medium',
+
+  // NOVO popup
+  popup_enabled,
+  popup_image_url,
 
   bottomBarBg,
   bottomBarIconColor,
@@ -106,6 +114,8 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
   const bannerButtonText = topbar_button_text || 'Instalar agora';
 
   const showTopbar = !isSplash && topbar_enabled;
+
+  const showPopup = !isSplash && popup_enabled && popup_image_url;
 
   return (
     <div className="phone-mockup" style={styles.phoneMockup}>
@@ -295,7 +305,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                     borderRadius: '30px',
                     fontSize: `${12 * fabSizeFactor}px`,
                     fontWeight: 'bold',
-                    boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+                    boxShadow: '0 4px 10px rgba(0,0,0,0.3)`,
                     display: 'flex',
                     alignItems: 'center',
                     gap: '5px',
@@ -322,7 +332,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                     10 * topbarSizeFactor
                   }px`,
                   fontSize: `${10 * topbarSizeFactor}px`,
-                  borderTop: '1px solid rgba(0,0,0,0.1)',
+                  borderTop: '1px solid rgba(0,0,0,0.1)`,
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -394,6 +404,80 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
           </>
         )}
 
+        {/* POPUP DE INSTALAÇÃO – PREVIEW */}
+        {showPopup && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'rgba(0,0,0,0.55)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 200,
+            }}
+          >
+            <div
+              style={{
+                width: '80%',
+                maxWidth: 220,
+                borderRadius: 16,
+                overflow: 'hidden',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                background: '#000',
+                position: 'relative',
+              }}
+            >
+              <div
+                style={{
+                  width: '100%',
+                  paddingTop: '177%',
+                  backgroundImage: `url(${popup_image_url})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: 10,
+                  left: 0,
+                  right: 0,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  gap: 8,
+                }}
+              >
+                <button
+                  style={{
+                    background: '#10B981',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 999,
+                    padding: '6px 12px',
+                    fontSize: 11,
+                    fontWeight: 600,
+                  }}
+                >
+                  Instalar app
+                </button>
+                <button
+                  style={{
+                    background: 'rgba(0,0,0,0.6)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 999,
+                    padding: '6px 10px',
+                    fontSize: 10,
+                  }}
+                >
+                  Fechar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* INDICADOR HOME */}
         <div className="home-bar" style={styles.homeBar}></div>
 
@@ -428,7 +512,11 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                 <img
                   src={logoUrl}
                   alt="App icon"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                  }}
                 />
               ) : (
                 <span
