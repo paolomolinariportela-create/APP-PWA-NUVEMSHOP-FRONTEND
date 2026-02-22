@@ -971,7 +971,7 @@ export default function TabConfig({
                 fabText={config.fab_text}
                 fabPosition={config.fab_position}
                 fabIcon={config.fab_icon}
-                fab_size={config.fab_size}
+                fabsize={mapSizeToPreview(config.fab_size)}
                 fab_color={fabColor}
                 topbar_enabled={config.topbar_enabled}
                 topbar_text={config.topbar_text}
