@@ -302,7 +302,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                   color: bannerTextColor,
                   padding: `${6 * topbar_size}px ${10 * topbar_size}px`,
                   fontSize: `${10 * topbar_size}px`,
-                  borderTop: '1px solid rgba(0,0,0,0.1)`,
+                  borderTop: '1px solid rgba(0,0,0,0.1)',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
