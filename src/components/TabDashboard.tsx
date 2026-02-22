@@ -8,7 +8,12 @@ interface DashboardStats {
   crescimento_instalacoes_7d: number;
   carrinhos_abandonados: { valor: number; qtd: number };
   taxa_conversao: { app: number; site: number };
-  visualizacoes: { pageviews: number; tempo_medio: string; top_paginas: string[]; top_paginas_pwa?: string[] };
+  visualizacoes: {
+    pageviews: number;
+    tempo_medio: string;
+    top_paginas: string[];
+    top_paginas_pwa?: string[];
+  };
   funil: { visitas: number; carrinho: number; checkout: number };
   recorrencia: { clientes_2x: number; taxa_recompra: number };
   ticket_medio: { app: number; site: number };
@@ -81,7 +86,9 @@ export default function TabDashboard({ stats }: Props) {
               currency: 'BRL',
             }).format(stats.receita)}
           </p>
-          <span className="stat-growth">🔥 {stats.vendas} pedidos realizados</span>
+          <span className="stat-growth">
+            🔥 {stats.vendas} pedidos realizados
+          </span>
 
           <div
             style={{
@@ -101,47 +108,41 @@ export default function TabDashboard({ stats }: Props) {
 
       {/* TICKET MÉDIO APP x SITE */}
       <div className="stat-card">
-        <div className="stat-icon" style={{ background: '#F0F9FF', color: '#0369A1' }}>
+        <div
+          className="stat-icon"
+          style={{ background: '#F0F9FF', color: '#0369A1' }}
+        >
           💳
         </div>
         <div className="stat-info">
           <h3>Ticket Médio</h3>
-          <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <span style={{ color: '#10B981', fontWeight: 'bold', fontSize: '12px' }}>
-                APP
-              </span>
-              <span>
-                {new Intl.NumberFormat('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL',
-                }).format(stats.ticket_medio.app)}
-              </span>
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                fontSize: '12px',
-                color: '#4B5563',
-              }}
-            >
-              <span>Site</span>
-              <span>
-                {new Intl.NumberFormat('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL',
-                }).format(stats.ticket_medio.site)}
-              </span>
-            </div>
+
+          {/* APP – informação principal, com número grande */}
+          <div className="ticket-main-row">
+            <span className="ticket-main-label">APP</span>
+            <span className="ticket-main-value">
+              {new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+              }).format(stats.ticket_medio.app)}
+            </span>
           </div>
+
+          {/* Site – secundário, menor mas legível */}
+          <div className="ticket-row">
+            <span className="ticket-label">Site</span>
+            <span className="ticket-value">
+              {new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+              }).format(stats.ticket_medio.site)}
+            </span>
+          </div>
+
+          {/* Texto de meta / contexto, se quiser usar */}
+          {/* <p className="next-goal-text">
+            Próxima meta: <strong>10 clientes</strong> com ticket acima de R$ 300
+          </p> */}
         </div>
       </div>
 
@@ -180,7 +181,10 @@ export default function TabDashboard({ stats }: Props) {
 
       {/* Crescimento do App */}
       <div className="stat-card">
-        <div className="stat-icon" style={{ background: '#ECFEFF', color: '#0891B2' }}>
+        <div
+          className="stat-icon"
+          style={{ background: '#ECFEFF', color: '#0891B2' }}
+        >
           📈
         </div>
         <div className="stat-info">
@@ -203,7 +207,8 @@ export default function TabDashboard({ stats }: Props) {
               marginTop: '4px',
             }}
           >
-            Taxa de Recompra: <strong>{stats.recorrencia.taxa_recompra}%</strong>
+            Taxa de Recompra:{' '}
+            <strong>{stats.recorrencia.taxa_recompra}%</strong>
           </div>
           <div
             style={{
@@ -219,7 +224,10 @@ export default function TabDashboard({ stats }: Props) {
 
       {/* Páginas visualizadas */}
       <div className="stat-card">
-        <div className="stat-icon" style={{ background: '#FFF7ED', color: '#C2410C' }}>
+        <div
+          className="stat-icon"
+          style={{ background: '#FFF7ED', color: '#C2410C' }}
+        >
           👀
         </div>
         <div className="stat-info">
@@ -232,111 +240,116 @@ export default function TabDashboard({ stats }: Props) {
               color: '#555',
             }}
           >
-            ⏱️ Tempo médio: <strong>{stats.visualizacoes.tempo_medio}</strong>
+            ⏱️ Tempo médio:{' '}
+            <strong>{stats.visualizacoes.tempo_medio}</strong>
           </div>
         </div>
       </div>
 
       {/* Top páginas do App (PWA) */}
-      {stats.visualizacoes.top_paginas_pwa && stats.visualizacoes.top_paginas_pwa.length > 0 && (
-        <div className="stat-card">
-          <div className="stat-icon" style={{ background: '#EEF2FF', color: '#4F46E5' }}>
-            📌
-          </div>
-          <div className="stat-info">
-            <h3>Top páginas do App</h3>
-            <ul
-              style={{
-                marginTop: '8px',
-                paddingLeft: 0,
-                listStyle: 'none',
-                fontSize: '11px',
-                color: '#374151',
-              }}
+      {stats.visualizacoes.top_paginas_pwa &&
+        stats.visualizacoes.top_paginas_pwa.length > 0 && (
+          <div className="stat-card">
+            <div
+              className="stat-icon"
+              style={{ background: '#EEF2FF', color: '#4F46E5' }}
             >
-              {stats.visualizacoes.top_paginas_pwa
-                .filter(pagina => pagina !== 'install')
-                .slice(0, 5)
-                .map((pagina, idx) => {
-                  let label = pagina || '/';
-                  let badge: string | null = null;
+              📌
+            </div>
+            <div className="stat-info">
+              <h3>Top páginas do App</h3>
+              <ul
+                style={{
+                  marginTop: '8px',
+                  paddingLeft: 0,
+                  listStyle: 'none',
+                  fontSize: '11px',
+                  color: '#374151',
+                }}
+              >
+                {stats.visualizacoes.top_paginas_pwa
+                  .filter((pagina) => pagina !== 'install')
+                  .slice(0, 5)
+                  .map((pagina, idx) => {
+                    let label = pagina || '/';
+                    let badge: string | null = null;
 
-                  if (label === '/') {
-                    label = 'Página inicial';
-                    badge = 'HOME';
-                  }
+                    if (label === '/') {
+                      label = 'Página inicial';
+                      badge = 'HOME';
+                    }
 
-                  const display =
-                    label.length > 50 ? label.slice(0, 47) + '...' : label;
+                    const display =
+                      label.length > 50 ? label.slice(0, 47) + '...' : label;
 
-                  return (
-                    <li
-                      key={pagina + idx}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        marginBottom: '4px',
-                      }}
-                    >
-                      <div
+                    return (
+                      <li
+                        key={pagina + idx}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '6px',
-                          flex: 1,
-                          minWidth: 0,
+                          justifyContent: 'space-between',
+                          marginBottom: '4px',
                         }}
                       >
-                        <span
+                        <div
                           style={{
-                            display: 'inline-flex',
+                            display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
-                            width: 16,
-                            height: 16,
-                            borderRadius: '999px',
-                            background: '#E5E7EB',
-                            fontSize: '10px',
-                            color: '#374151',
-                            flexShrink: 0,
+                            gap: '6px',
+                            flex: 1,
+                            minWidth: 0,
                           }}
                         >
-                          {idx + 1}
-                        </span>
-                        <span
-                          title={label}
-                          style={{
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                          }}
-                        >
-                          {display}
-                        </span>
-                      </div>
-                      {badge && (
-                        <span
-                          style={{
-                            marginLeft: '6px',
-                            fontSize: '9px',
-                            padding: '2px 6px',
-                            borderRadius: '999px',
-                            background: '#E0F2FE',
-                            color: '#0369A1',
-                            flexShrink: 0,
-                          }}
-                        >
-                          {badge}
-                        </span>
-                      )}
-                    </li>
-                  );
-                })}
-            </ul>
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: 16,
+                              height: 16,
+                              borderRadius: '999px',
+                              background: '#E5E7EB',
+                              fontSize: '10px',
+                              color: '#374151',
+                              flexShrink: 0,
+                            }}
+                          >
+                            {idx + 1}
+                          </span>
+                          <span
+                            title={label}
+                            style={{
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                            }}
+                          >
+                            {display}
+                          </span>
+                        </div>
+                        {badge && (
+                          <span
+                            style={{
+                              marginLeft: '6px',
+                              fontSize: '9px',
+                              padding: '2px 6px',
+                              borderRadius: '999px',
+                              background: '#E0F2FE',
+                              color: '#0369A1',
+                              flexShrink: 0,
+                            }}
+                          >
+                            {badge}
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })}
+              </ul>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Funil de vendas */}
       <div className="stat-card" style={{ gridRow: 'span 2' }}>
@@ -365,7 +378,11 @@ export default function TabDashboard({ stats }: Props) {
                 <div
                   className="bar-fill"
                   style={{
-                    width: `${(stats.funil.carrinho / Math.max(stats.funil.visitas, 1)) * 100}%`,
+                    width: `${
+                      (stats.funil.carrinho /
+                        Math.max(stats.funil.visitas, 1)) *
+                      100
+                    }%`,
                     background: '#60A5FA',
                   }}
                 ></div>
@@ -381,7 +398,11 @@ export default function TabDashboard({ stats }: Props) {
                 <div
                   className="bar-fill"
                   style={{
-                    width: `${(stats.funil.checkout / Math.max(stats.funil.visitas, 1)) * 100}%`,
+                    width: `${
+                      (stats.funil.checkout /
+                        Math.max(stats.funil.visitas, 1)) *
+                      100
+                    }%`,
                     background: '#10B981',
                   }}
                 ></div>
