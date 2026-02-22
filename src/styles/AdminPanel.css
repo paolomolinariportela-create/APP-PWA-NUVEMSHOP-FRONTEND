@@ -194,7 +194,7 @@ body {
 
 .stat-icon.purple { background: #F3E8FF; color: #7e22ce; }
 .stat-icon.blue   { background: #EFF6FF; color: #2563eb; }
-stat-icon.green  { background: #DCFCE7; color: #15803D; }
+.stat-icon.green  { background: #DCFCE7; color: #15803D; }
 .stat-icon.red    { background: #FEE2E2; color: #DC2626; }
 
 .stat-info { width: 100%; }
@@ -581,4 +581,50 @@ plan-card:hover {
 .card-muted {
   font-size: 0.85rem;
   color: #6B7280;
+}
+
+/* TICKET MÉDIO – APP número grande e Site menor */
+.ticket-main-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 6px;
+}
+
+.ticket-main-label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.ticket-main-value {
+  font-size: 1.8rem;     /* igual ao número grande do card */
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.ticket-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 4px;
+}
+
+.ticket-label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.ticket-value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.next-goal-text {
+  margin-top: 8px;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
