@@ -73,48 +73,6 @@ export default function TabConfig({
       <div className="config-section" style={{ gridColumn: '1 / -1' }}>
         <h2 style={{ marginBottom: '20px' }}>Personalizar Aplicativo</h2>
 
-        
-
-        <div
-          className="config-card"
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: '20px',
-            display: 'flex',
-          }}
-        >
-          <img
-            src={qrCodeUrl}
-            alt="QR Code"
-            style={{
-              width: '80px',
-              height: '80px',
-              borderRadius: '8px',
-              border: '1px solid #eee',
-            }}
-          />
-          <div>
-            <h3 style={{ fontSize: '16px', margin: '0 0 5px 0' }}>
-              QR Code de Balcão
-            </h3>
-            <a
-              href={qrCodeUrl}
-              download="qrcode.png"
-              target="_blank"
-              rel="noreferrer"
-              style={{
-                color: '#7C3AED',
-                textDecoration: 'none',
-                fontWeight: 'bold',
-                fontSize: '14px',
-              }}
-            >
-              ⬇️ Baixar Imagem
-            </a>
-          </div>
-        </div>
-
         {/* IDENTIDADE VISUAL + PREVIEW (splash) */}
         <div className="config-card">
           <div className="card-header" style={{ marginBottom: '1rem' }}>
