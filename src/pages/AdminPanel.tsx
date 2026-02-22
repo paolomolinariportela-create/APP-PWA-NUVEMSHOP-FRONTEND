@@ -37,6 +37,7 @@ interface AppConfig {
   fab_delay?: number;
   fab_size?: "xs" | "small" | "medium" | "large" | "xl";
   fab_color?: string;
+  fab_background_image_url?: string;
 
   topbar_enabled?: boolean;
   topbar_text?: string;
@@ -45,13 +46,18 @@ interface AppConfig {
   topbar_position?: "top" | "bottom";
   topbar_color?: string;
   topbar_text_color?: string;
-  topbar_size?: number;
+  topbar_size?: "xs" | "small" | "medium" | "large" | "xl";
+  topbar_button_bg_color?: string;
+  topbar_button_text_color?: string;
+  topbar_background_image_url?: string;
+
+  popup_enabled?: boolean;
+  popup_image_url?: string;
 
   bottom_bar_enabled?: boolean;
   bottom_bar_bg?: string;
   bottom_bar_icon_color?: string;
 
-  // fallback visual: logo padrão da loja vinda da API
   default_logo_url?: string;
 }
 
@@ -82,6 +88,7 @@ export default function AdminPanel() {
     theme_color: "#000000",
     logo_url: "",
     whatsapp_number: "",
+
     fab_enabled: false,
     fab_text: "Baixar App",
     fab_position: "right",
@@ -89,6 +96,7 @@ export default function AdminPanel() {
     fab_delay: 0,
     fab_size: "medium",
     fab_color: "#000000",
+    fab_background_image_url: "",
 
     topbar_enabled: false,
     topbar_text: "Instale o app e ganhe 10% OFF na primeira compra",
@@ -97,11 +105,18 @@ export default function AdminPanel() {
     topbar_position: "top",
     topbar_color: "#111827",
     topbar_text_color: "#FFFFFF",
-    topbar_size: 1,
+    topbar_size: "medium",
+    topbar_button_bg_color: "#FBBF24",
+    topbar_button_text_color: "#111827",
+    topbar_background_image_url: "",
+
+    popup_enabled: false,
+    popup_image_url: "",
 
     bottom_bar_enabled: true,
     bottom_bar_bg: "#FFFFFF",
     bottom_bar_icon_color: "#6B7280",
+
     default_logo_url: "",
   });
 
@@ -154,7 +169,9 @@ export default function AdminPanel() {
           app_name: dataConfig.app_name ?? "Minha Loja",
           theme_color: dataConfig.theme_color ?? "#000000",
           logo_url: dataConfig.logo_url ?? "",
-          whatsapp_number: dataConfig.whatsapp_number ?? "",
+          // backend devolve "whatsapp"
+          whatsapp_number: dataConfig.whatsapp ?? "",
+
           fab_enabled: dataConfig.fab_enabled ?? false,
           fab_text: dataConfig.fab_text ?? "Baixar App",
           fab_position: dataConfig.fab_position ?? "right",
@@ -168,8 +185,9 @@ export default function AdminPanel() {
               | "large"
               | "xl") ?? "medium",
           fab_color:
-            dataConfig.fab_color ??
-            (dataConfig.theme_color ?? "#000000"),
+            dataConfig.fab_color ?? dataConfig.theme_color ?? "#000000",
+          fab_background_image_url:
+            dataConfig.fab_background_image_url ?? "",
 
           topbar_enabled: dataConfig.topbar_enabled ?? false,
           topbar_text:
@@ -180,12 +198,28 @@ export default function AdminPanel() {
           topbar_position: dataConfig.topbar_position ?? "top",
           topbar_color: dataConfig.topbar_color ?? "#111827",
           topbar_text_color: dataConfig.topbar_text_color ?? "#FFFFFF",
-          topbar_size: dataConfig.topbar_size ?? 1,
+          topbar_size:
+            (dataConfig.topbar_size as
+              | "xs"
+              | "small"
+              | "medium"
+              | "large"
+              | "xl") ?? "medium",
+          topbar_button_bg_color:
+            dataConfig.topbar_button_bg_color ?? "#FBBF24",
+          topbar_button_text_color:
+            dataConfig.topbar_button_text_color ?? "#111827",
+          topbar_background_image_url:
+            dataConfig.topbar_background_image_url ?? "",
+
+          popup_enabled: dataConfig.popup_enabled ?? false,
+          popup_image_url: dataConfig.popup_image_url ?? "",
 
           bottom_bar_enabled: dataConfig.bottom_bar_enabled ?? true,
           bottom_bar_bg: dataConfig.bottom_bar_bg ?? "#FFFFFF",
           bottom_bar_icon_color:
             dataConfig.bottom_bar_icon_color ?? "#6B7280",
+
           default_logo_url: lojaLogo,
         });
 
