@@ -14,7 +14,7 @@ interface AppConfig {
   fab_delay?: number;
   fab_size?: 'xs' | 'small' | 'medium' | 'large' | 'xl';
   fab_color?: string;
-  fab_background_image_url?: string;            // NOVO
+  fab_background_image_url?: string;
 
   topbar_enabled?: boolean;
   topbar_text?: string;
@@ -26,7 +26,10 @@ interface AppConfig {
   topbar_size?: 'xs' | 'small' | 'medium' | 'large' | 'xl';
   topbar_button_bg_color?: string;
   topbar_button_text_color?: string;
-  topbar_background_image_url?: string;         // NOVO
+  topbar_background_image_url?: string;
+
+  popup_enabled?: boolean;
+  popup_image_url?: string;
 
   bottom_bar_enabled?: boolean;
   bottom_bar_bg?: string;
@@ -217,7 +220,7 @@ export default function TabConfig({
           </div>
         </div>
 
-        {/* WIDGETS DE CONVERSÃO (FAB + Barra fixa) + PREVIEW */}
+        {/* WIDGETS DE CONVERSÃO (FAB + Barra fixa + Popup) + PREVIEW */}
         <div className="config-card">
           <div className="card-header">
             <h3 style={{ margin: 0 }}>🚀 Widgets de Conversão</h3>
@@ -344,7 +347,7 @@ export default function TabConfig({
                         style={{
                           width: '100%',
                           padding: '8px',
-                          border: '1px solid #d1d5db',
+                          border: '1px solid '#d1d5db',
                           borderRadius: '6px',
                         }}
                       />
@@ -370,7 +373,7 @@ export default function TabConfig({
                         style={{
                           width: '100%',
                           padding: '8px',
-                          border: '1px solid #d1d5db',
+                          border: '1px solid '#d1d5db',
                           borderRadius: '6px',
                           textAlign: 'center',
                         }}
@@ -379,7 +382,6 @@ export default function TabConfig({
                     </div>
                   </div>
 
-                  {/* Cor do botão */}
                   <div className="form-group">
                     <label>Cor do botão "Baixar App"</label>
                     <div className="color-picker-wrapper">
@@ -404,7 +406,6 @@ export default function TabConfig({
                     </small>
                   </div>
 
-                  {/* URL da imagem de fundo do FAB */}
                   <div className="form-group" style={{ marginTop: '15px' }}>
                     <label>Imagem do botão (URL opcional)</label>
                     <input
@@ -420,7 +421,7 @@ export default function TabConfig({
                       style={{
                         width: '100%',
                         padding: '8px',
-                        border: '1px solid #d1d5db',
+                        border: '1px solid '#d1d5db',
                         borderRadius: '6px',
                       }}
                     />
@@ -430,7 +431,6 @@ export default function TabConfig({
                     </small>
                   </div>
 
-                  {/* Tamanho do botão */}
                   <div style={{ marginTop: '15px', marginBottom: '15px' }}>
                     <label
                       style={{
@@ -459,7 +459,7 @@ export default function TabConfig({
                       style={{
                         width: '100%',
                         padding: '8px',
-                        border: '1px solid #d1d5db',
+                        border: '1px solid '#d1d5db',
                         borderRadius: '6px',
                         background: 'white',
                       }}
@@ -496,7 +496,7 @@ export default function TabConfig({
                         style={{
                           width: '100%',
                           padding: '8px',
-                          border: '1px solid #d1d5db',
+                          border: '1px solid '#d1d5db',
                           borderRadius: '6px',
                           background: 'white',
                         }}
@@ -553,7 +553,7 @@ export default function TabConfig({
                   padding: '12px',
                   background: '#f9fafb',
                   borderRadius: '8px',
-                  border: '1px solid #eee',
+                  border: '1px solid '#eee',
                 }}
               >
                 <div>
@@ -656,7 +656,7 @@ export default function TabConfig({
                         style={{
                           width: '100%',
                           padding: '8px',
-                          border: '1px solid #d1d5db',
+                          border: '1px solid '#d1d5db',
                           borderRadius: '6px',
                         }}
                       />
@@ -695,7 +695,7 @@ export default function TabConfig({
                         style={{
                           width: '100%',
                           padding: '8px',
-                          border: '1px solid #d1d5db',
+                          border: '1px solid '#d1d5db',
                           borderRadius: '6px',
                         }}
                       />
@@ -724,7 +724,7 @@ export default function TabConfig({
                         style={{
                           width: '100%',
                           padding: '8px',
-                          border: '1px solid #d1d5db',
+                          border: '1px solid '#d1d5db',
                           borderRadius: '6px',
                           textAlign: 'center',
                         }}
@@ -733,7 +733,6 @@ export default function TabConfig({
                     </div>
                   </div>
 
-                  {/* Posição + tamanho */}
                   <div
                     style={{
                       display: 'flex',
@@ -764,7 +763,7 @@ export default function TabConfig({
                         style={{
                           width: '100%',
                           padding: '8px',
-                          border: '1px solid #d1d5db',
+                          border: '1px solid '#d1d5db',
                           borderRadius: '6px',
                           background: 'white',
                         }}
@@ -801,7 +800,7 @@ export default function TabConfig({
                         style={{
                           width: '100%',
                           padding: '8px',
-                          border: '1px solid #d1d5db',
+                          border: '1px solid '#d1d5db',
                           borderRadius: '6px',
                           background: 'white',
                         }}
@@ -818,7 +817,6 @@ export default function TabConfig({
                     </div>
                   </div>
 
-                  {/* Cores da barra */}
                   <div
                     style={{
                       display: 'flex',
@@ -899,7 +897,6 @@ export default function TabConfig({
                     </div>
                   </div>
 
-                  {/* Cores do botão da barra */}
                   <div
                     style={{
                       display: 'flex',
@@ -981,7 +978,6 @@ export default function TabConfig({
                     </div>
                   </div>
 
-                  {/* URL da imagem da barra fixa */}
                   <div className="form-group" style={{ marginTop: '15px' }}>
                     <label>Imagem da barra (URL opcional)</label>
                     <input
@@ -997,13 +993,121 @@ export default function TabConfig({
                       style={{
                         width: '100%',
                         padding: '8px',
-                        border: '1px solid #d1d5db',
+                        border: '1px solid '#d1d5db',
                         borderRadius: '6px',
                       }}
                     />
                     <small style={{ fontSize: '10px', color: '#666' }}>
                       Se preencher, a barra fixa pode usar essa imagem como
                       fundo.
+                    </small>
+                  </div>
+                </div>
+              )}
+
+              {/* POPUP DE INSTALAÇÃO */}
+              <div
+                style={{
+                  marginTop: '20px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '12px',
+                  background: '#f9fafb',
+                  borderRadius: '8px',
+                  border: '1px solid '#eee',
+                }}
+              >
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '14px' }}>
+                    🖼 Popup de Instalação
+                  </h4>
+                  <small style={{ color: '#666', fontSize: '11px' }}>
+                    Mostra um popup com sua própria imagem para instalar o app.
+                  </small>
+                </div>
+                <label
+                  style={{
+                    position: 'relative',
+                    display: 'inline-block',
+                    width: '46px',
+                    height: '24px',
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={config.popup_enabled ?? false}
+                    onChange={(e) =>
+                      setConfig({ ...config, popup_enabled: e.target.checked })
+                    }
+                    style={{ opacity: 0, width: 0, height: 0 }}
+                  />
+                  <span
+                    style={{
+                      position: 'absolute',
+                      cursor: 'pointer',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      backgroundColor: (config.popup_enabled ?? false)
+                        ? '#10B981'
+                        : '#E5E7EB',
+                      transition: '.3s',
+                      borderRadius: '34px',
+                    }}
+                  />
+                  <span
+                    style={{
+                      position: 'absolute',
+                      height: '18px',
+                      width: '18px',
+                      left: '3px',
+                      bottom: '3px',
+                      backgroundColor: 'white',
+                      transition: '.3s',
+                      borderRadius: '50%',
+                      transform: (config.popup_enabled ?? false)
+                        ? 'translateX(22px)'
+                        : 'translateX(0px)',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                    }}
+                  />
+                </label>
+              </div>
+
+              {config.popup_enabled && (
+                <div
+                  className="animate-fade-in"
+                  style={{
+                    marginTop: '10px',
+                    background: '#fff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    padding: '15px',
+                  }}
+                >
+                  <div className="form-group">
+                    <label>Imagem do popup (URL)</label>
+                    <input
+                      type="text"
+                      value={config.popup_image_url || ''}
+                      onChange={(e) =>
+                        setConfig({
+                          ...config,
+                          popup_image_url: e.target.value,
+                        })
+                      }
+                      placeholder="https://... (imagem em tela cheia)"
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        border: '1px solid '#d1d5db',
+                        borderRadius: '6px',
+                      }}
+                    />
+                    <small style={{ fontSize: '10px', color: '#666' }}>
+                      Essa imagem será usada como fundo do popup no celular.
                     </small>
                   </div>
                 </div>
@@ -1043,6 +1147,8 @@ export default function TabConfig({
                 topbarButtonBgColor={topbarButtonBgColor}
                 topbarButtonTextColor={topbarButtonTextColor}
                 topbarBackgroundImageUrl={config.topbar_background_image_url}
+                popupEnabled={config.popup_enabled}
+                popupImageUrl={config.popup_image_url}
                 storeUrl={storeUrl}
                 mode="app"
               />
@@ -1050,11 +1156,17 @@ export default function TabConfig({
           </div>
         </div>
 
-        {/* CONFIGURAÇÕES APÓS INSTALAÇÃO (barra inferior) + toggle */}
+        {/* CONFIGURAÇÕES APÓS INSTALAÇÃO (barra inferior) */}
         <div className="config-card">
           <div className="card-header">
             <h3 style={{ margin: 0 }}>⚙️ Configurações após instalação</h3>
-            <p style={{ margin: '5px 0', fontSize: '0.9rem', color: '#6B7280' }}>
+            <p
+              style={{
+                margin: '5px 0',
+                fontSize: '0.9rem',
+                color: '#6B7280',
+              }}
+            >
               Personalize a barra inferior do app instalado.
             </p>
           </div>
@@ -1077,7 +1189,7 @@ export default function TabConfig({
                   padding: '12px',
                   background: '#f9fafb',
                   borderRadius: '8px',
-                  border: '1px solid #eee',
+                  border: '1px solid '#eee',
                 }}
               >
                 <div>
