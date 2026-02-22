@@ -144,16 +144,7 @@ export default function TabDashboard({ stats }: Props) {
           </span>
         </div>
 
-          {/* Site – secundário, menor mas legível */}
-          <div className="ticket-row">
-            <span className="ticket-label">Site</span>
-            <span className="ticket-value">
-              {new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL',
-              }).format(stats.ticket_medio.site)}
-            </span>
-          </div>
+          
 
           {/* Texto de meta / contexto, se quiser usar */}
           {/* <p className="next-goal-text">
