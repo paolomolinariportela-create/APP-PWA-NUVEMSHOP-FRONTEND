@@ -12,7 +12,7 @@ interface AppConfig {
   fab_position?: string;
   fab_icon?: string;
   fab_delay?: number;
-  fab_size?: number;
+  fab_size?: 'xs' | 'small' | 'medium' | 'large' | 'xl';
   fab_color?: string;
 
   topbar_enabled?: boolean;
@@ -487,41 +487,50 @@ export default function TabConfig({
                     <small>Use uma cor chamativa diferente do tema, se quiser.</small>
                   </div>
 
-                  {/* Tamanho do botão */}
-                  <div style={{ marginBottom: '15px' }}>
-                    <label
-                      style={{
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        color: '#374151',
-                        display: 'block',
-                        marginBottom: '5px',
-                      }}
-                    >
-                      Tamanho do botão
-                    </label>
-                    <input
-                      type="range"
-                      min="0.7"
-                      max="1.5"
-                      step="0.1"
-                      value={config.fab_size ?? 1}
-                      onChange={(e) =>
-                        setConfig({
-                          ...config,
-                          fab_size: parseFloat(e.target.value),
-                        })
-                      }
-                      style={{
-                        width: '100%',
-                        cursor: 'pointer',
-                        accentColor: config.theme_color,
-                      }}
-                    />
-                    <small style={{ fontSize: '10px', color: '#666' }}>
-                      Ajuste o tamanho do botão no app (pequeno → grande).
-                    </small>
-                  </div>
+                {/* Tamanho do botão */}
+                <div style={{ marginBottom: "15px" }}>
+                  <label
+                    style={{
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                      color: "#374151",
+                      display: "block",
+                      marginBottom: "5px",
+                    }}
+                  >
+                    Tamanho do botão
+                  </label>
+                  <select
+                    value={config.fab_size ?? "medium"}
+                    onChange={(e) =>
+                      setConfig({
+                        ...config,
+                        fab_size: e.target.value as
+                          | "xs"
+                          | "small"
+                          | "medium"
+                          | "large"
+                          | "xl",
+                      })
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "8px",
+                      border: "1px solid #d1d5db",
+                      borderRadius: "6px",
+                      background: "white",
+                    }}
+                  >
+                    <option value="xs">Muito pequeno</option>
+                    <option value="small">Pequeno</option>
+                    <option value="medium">Médio</option>
+                    <option value="large">Grande</option>
+                    <option value="xl">Muito grande</option>
+                  </select>
+                  <small style={{ fontSize: "10px", color: "#666" }}>
+                    Escolha entre 5 tamanhos pré-definidos.
+                  </small>
+                </div>
 
                   <div style={{ display: 'flex', gap: '15px' }}>
                     <div style={{ flex: 1 }}>
