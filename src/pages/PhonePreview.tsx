@@ -21,13 +21,14 @@ interface PhonePreviewProps {
   topbar_position?: 'top' | 'bottom';
   topbar_color?: string;
   topbar_text_color?: string;
-  topbar_size?: number;
+  // agora string, igual backend
+  topbar_size?: 'xs' | 'small' | 'medium' | 'large' | 'xl';
 
   storeUrl?: string;
   bottomBarBg?: string;
   bottomBarIconColor?: string;
   mode?: PhonePreviewMode;
-  // NOVO: controlar se mostra a barra inferior no preview
+  // controlar se mostra a barra inferior no preview
   showBottomBar?: boolean;
 }
 
@@ -50,14 +51,14 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
   topbar_position = 'top',
   topbar_color,
   topbar_text_color,
-  topbar_size = 1,
+  topbar_size = 'medium',
 
   bottomBarBg,
   bottomBarIconColor,
   mode = 'app',
-  showBottomBar = true, // por padrão mostra, mas você pode passar false no preview de widgets
+  showBottomBar = true,
 }) => {
-  const [/* iframeError */, setIframeError] = useState(false); // mantido só para compatibilidade, mas não usado
+  const [/* iframeError */, setIframeError] = useState(false);
 
   const barBg = bottomBarBg || '#FFFFFF';
   const iconColor = bottomBarIconColor || '#6B7280';
@@ -77,6 +78,22 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
         return 1.2;
       case 'xl':
         return 1.35;
+      default:
+        return 1.0;
+    }
+  })();
+
+  // fator visual para a topbar baseado no tamanho string
+  const topbarSizeFactor = (() => {
+    switch (topbar_size) {
+      case 'xs':
+        return 0.8;
+      case 'small':
+        return 0.9;
+      case 'large':
+        return 1.15;
+      case 'xl':
+        return 1.3;
       default:
         return 1.0;
     }
@@ -108,31 +125,33 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
           <div style={{ color: 'white', fontSize: '10px' }}>📶 🔋</div>
         </div>
 
-        {/* BANNER FIXO NO TOPO (se posição = top) */}
+        {/* BANNER FIXO NO TOPO */}
         {!isSplash && showTopbar && topbar_position === 'top' && (
           <div
             style={{
               ...styles.topbar,
               background: bannerBg,
               color: bannerTextColor,
-              padding: `${6 * topbar_size}px ${10 * topbar_size}px`,
-              fontSize: `${10 * topbar_size}px`,
+              padding: `${6 * topbarSizeFactor}px ${10 * topbarSizeFactor}px`,
+              fontSize: `${10 * topbarSizeFactor}px`,
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               {topbar_icon && (
-                <span style={{ fontSize: `${12 * topbar_size}px` }}>
+                <span style={{ fontSize: `${12 * topbarSizeFactor}px` }}>
                   {topbar_icon}
                 </span>
               )}
               <span style={{ flex: 1 }}>{bannerMessage}</span>
               <button
                 style={{
-                  background: '#FBBF24', // aqui você pode depois plugar a cor do botão se quiser
+                  background: '#FBBF24',
                   border: 'none',
                   borderRadius: 999,
-                  padding: `${4 * topbar_size}px ${10 * topbar_size}px`,
-                  fontSize: `${10 * topbar_size}px`,
+                  padding: `${4 * topbarSizeFactor}px ${
+                    10 * topbarSizeFactor
+                  }px`,
+                  fontSize: `${10 * topbarSizeFactor}px`,
                   fontWeight: 600,
                   cursor: 'pointer',
                 }}
@@ -147,7 +166,6 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
         {!isSplash && (
           <>
             <div className="app-content" style={styles.appContent}>
-              {/* Conteúdo estático de loja fake */}
               {/* Cabeçalho do App */}
               <div
                 className="app-header"
@@ -293,21 +311,23 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
               )}
             </div>
 
-            {/* BANNER FIXO EMBAIXO (se posição = bottom) */}
+            {/* BANNER FIXO EMBAIXO */}
             {!isSplash && showTopbar && topbar_position === 'bottom' && (
               <div
                 style={{
                   ...styles.topbar,
                   background: bannerBg,
                   color: bannerTextColor,
-                  padding: `${6 * topbar_size}px ${10 * topbar_size}px`,
-                  fontSize: `${10 * topbar_size}px`,
+                  padding: `${6 * topbarSizeFactor}px ${
+                    10 * topbarSizeFactor
+                  }px`,
+                  fontSize: `${10 * topbarSizeFactor}px`,
                   borderTop: '1px solid rgba(0,0,0,0.1)',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   {topbar_icon && (
-                    <span style={{ fontSize: `${12 * topbar_size}px` }}>
+                    <span style={{ fontSize: `${12 * topbarSizeFactor}px` }}>
                       {topbar_icon}
                     </span>
                   )}
@@ -317,8 +337,10 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                       background: '#FBBF24',
                       border: 'none',
                       borderRadius: 999,
-                      padding: `${4 * topbar_size}px ${10 * topbar_size}px`,
-                      fontSize: `${10 * topbar_size}px`,
+                      padding: `${4 * topbarSizeFactor}px ${
+                        10 * topbarSizeFactor
+                      }px`,
+                      fontSize: `${10 * topbarSizeFactor}px`,
                       fontWeight: 600,
                       cursor: 'pointer',
                     }}
