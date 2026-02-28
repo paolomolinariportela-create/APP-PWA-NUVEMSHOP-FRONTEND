@@ -154,7 +154,7 @@ export default function TabDashboard({ stats }: Props) {
           <p>{stats.recorrencia.clientes_2x}</p>
           <div
             style={{
-              fontSize: "0.95rem", // maior
+              fontSize: "0.95rem",
               color: "#111827",
               marginTop: "6px",
               fontWeight: 500,
@@ -178,7 +178,7 @@ export default function TabDashboard({ stats }: Props) {
           <div
             style={{
               marginTop: "10px",
-              fontSize: "0.95rem", // maior
+              fontSize: "0.95rem",
               color: "#111827",
               fontWeight: 500,
             }}
