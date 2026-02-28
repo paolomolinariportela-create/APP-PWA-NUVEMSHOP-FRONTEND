@@ -76,7 +76,15 @@ export default function TabDashboard({ stats }: Props) {
     <section className="stats-grid animate-fade-in">
       {/* RECEITA APP */}
       <div className="stat-card" style={{ borderLeft: "4px solid #10B981" }}>
-        <div className="stat-icon green">💰</div>
+        <div className="stat-icon green">
+          {/* ícone dinheiro */}
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zm0 2v8h16V8H4zm8 7a3 3 0 0 1-3-3h2a1 1 0 1 0 1-1 3 3 0 1 1 3-3h-2a1 1 0 1 0-1 1 3 3 0 0 1 0 6z"
+            />
+          </svg>
+        </div>
         <div className="stat-info">
           <h3>Receita App</h3>
           <p>
@@ -101,7 +109,15 @@ export default function TabDashboard({ stats }: Props) {
 
       {/* TICKET MÉDIO – apenas APP */}
       <div className="stat-card">
-        <div className="stat-icon">💳</div>
+        <div className="stat-icon">
+          {/* cartão / ticket */}
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M4 5h16a2 2 0 0 1 2 2v3h-2a2 2 0 1 0 0 4h2v3a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-3h2a2 2 0 1 0 0-4H2V7a2 2 0 0 1 2-2zm0 2v2h2a4 4 0 0 1 0 8H4v2h16v-2h-2a4 4 0 0 1 0-8h2V7H4z"
+            />
+          </svg>
+        </div>
         <div className="stat-info">
           <h3>Ticket Médio</h3>
 
@@ -124,7 +140,15 @@ export default function TabDashboard({ stats }: Props) {
 
       {/* Instalações + Meta (sem detalhar visitas app/site) */}
       <div className="stat-card">
-        <div className="stat-icon purple">📱</div>
+        <div className="stat-icon purple">
+          {/* smartphone */}
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 2v14h10V4H7zm5 15a1.25 1.25 0 1 1 0 2.5A1.25 1.25 0 0 1 12 19z"
+            />
+          </svg>
+        </div>
         <div className="stat-info">
           <h3>Instalações Ativas</h3>
           <p>{stats.instalacoes}</p>
@@ -138,7 +162,15 @@ export default function TabDashboard({ stats }: Props) {
 
       {/* Crescimento do App */}
       <div className="stat-card">
-        <div className="stat-icon">📈</div>
+        <div className="stat-icon">
+          {/* gráfico de linha */}
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M3 17v2h18v-2H3zm0-4 4-4 4 4 6-6 4 4v-3.5L17 4l-6 6-4-4-4 4V13z"
+            />
+          </svg>
+        </div>
         <div className="stat-info">
           <h3>Crescimento do App</h3>
           <p>+{stats.crescimento_instalacoes_7d}%</p>
@@ -148,7 +180,15 @@ export default function TabDashboard({ stats }: Props) {
 
       {/* Clientes recorrentes + meta */}
       <div className="stat-card">
-        <div className="stat-icon blue">🔁</div>
+        <div className="stat-icon blue">
+          {/* loop / recorrência */}
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M7 7h11V4l4 4-4 4V9H8a3 3 0 0 0 0 6h3v2H8a5 5 0 0 1 0-10zm10 10H6v3l-4-4 4-4v3h11a3 3 0 0 0 0-6h-3V7h3a5 5 0 0 1 0 10z"
+            />
+          </svg>
+        </div>
         <div className="stat-info">
           <h3>Clientes Recorrentes</h3>
           <p>{stats.recorrencia.clientes_2x}</p>
@@ -171,7 +211,15 @@ export default function TabDashboard({ stats }: Props) {
 
       {/* Páginas visualizadas */}
       <div className="stat-card">
-        <div className="stat-icon">👀</div>
+        <div className="stat-icon">
+          {/* olho/visualizações */}
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M12 5C7 5 3.73 8.11 2 12c1.73 3.89 5 7 10 7s8.27-3.11 10-7c-1.73-3.89-5-7-10-7zm0 2c3.04 0 5.64 1.96 7.19 5-1.55 3.04-4.15 5-7.19 5S6.36 15.04 4.81 12C6.36 8.96 8.96 7 12 7zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"
+            />
+          </svg>
+        </div>
         <div className="stat-info">
           <h3>Páginas Visualizadas</h3>
           <p>{stats.visualizacoes.pageviews.toLocaleString()}</p>
@@ -193,7 +241,15 @@ export default function TabDashboard({ stats }: Props) {
       {stats.visualizacoes.top_paginas_pwa &&
         stats.visualizacoes.top_paginas_pwa.length > 0 && (
           <div className="stat-card">
-            <div className="stat-icon">📌</div>
+            <div className="stat-icon">
+              {/* pin / destaque */}
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M16 3 8 11l3 3-5 5 1.5 1.5 5-5 3 3 8-8z"
+                />
+              </svg>
+            </div>
             <div className="stat-info">
               <h3>Top páginas do App</h3>
               <ul
@@ -363,7 +419,15 @@ export default function TabDashboard({ stats }: Props) {
 
       {/* Carrinhos abandonados */}
       <div className="stat-card" style={{ borderLeft: "4px solid #ef4444" }}>
-        <div className="stat-icon red">💸</div>
+        <div className="stat-icon red">
+          {/* carrinho com X */}
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm10 2a2 2 0 1 0-4.001.001A2 2 0 0 0 17 20zM6.2 4l-.4-2H2v2h2l3.6 7.59-1.35 2.44A1 1 0 0 0 7.1 15H19v-2H8.42l.93-1.68L18.55 11a1 1 0 0 0 .92-.63L22 3h-2.09l-2.13 5H8.53L6.2 4z"
+            />
+          </svg>
+        </div>
         <div className="stat-info">
           <h3>Carrinhos Abandonados</h3>
           <p>
