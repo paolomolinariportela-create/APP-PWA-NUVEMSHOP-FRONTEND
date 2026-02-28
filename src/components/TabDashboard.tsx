@@ -1,5 +1,5 @@
 import React from "react";
- 
+
 interface DashboardStats {
   receita: number;
   vendas: number;
@@ -89,13 +89,7 @@ export default function TabDashboard({ stats }: Props) {
             🔥 {stats.vendas} pedidos realizados
           </span>
 
-          <div
-            style={{
-              marginTop: "6px",
-              fontSize: "11px",
-              color: "#555",
-            }}
-          >
+          <div className="card-meta-text">
             🎯 Próxima meta:{" "}
             {new Intl.NumberFormat("pt-BR", {
               style: "currency",
@@ -107,12 +101,7 @@ export default function TabDashboard({ stats }: Props) {
 
       {/* TICKET MÉDIO – apenas APP */}
       <div className="stat-card">
-        <div
-          className="stat-icon"
-          style={{ background: "#F0F9FF", color: "#0369A1" }}
-        >
-          💳
-        </div>
+        <div className="stat-icon">💳</div>
         <div className="stat-info">
           <h3>Ticket Médio</h3>
 
@@ -141,13 +130,7 @@ export default function TabDashboard({ stats }: Props) {
           <p>{stats.instalacoes}</p>
           <span className="stat-growth">Base de clientes fiéis</span>
 
-          <div
-            style={{
-              marginTop: "6px",
-              fontSize: "11px",
-              color: "#555",
-            }}
-          >
+          <div className="card-meta-text">
             🎯 Meta de Instalações: {stats.instalacoes} / {metaInstalacoes}
           </div>
         </div>
@@ -155,12 +138,7 @@ export default function TabDashboard({ stats }: Props) {
 
       {/* Crescimento do App */}
       <div className="stat-card">
-        <div
-          className="stat-icon"
-          style={{ background: "#ECFEFF", color: "#0891B2" }}
-        >
-          📈
-        </div>
+        <div className="stat-icon">📈</div>
         <div className="stat-info">
           <h3>Crescimento do App</h3>
           <p>+{stats.crescimento_instalacoes_7d}%</p>
@@ -184,13 +162,7 @@ export default function TabDashboard({ stats }: Props) {
             Taxa de Recompra:{" "}
             <strong>{stats.recorrencia.taxa_recompra}%</strong>
           </div>
-          <div
-            style={{
-              marginTop: "6px",
-              fontSize: "11px",
-              color: "#555",
-            }}
-          >
+          <div className="card-meta-text">
             🎯 Próxima meta: {metaRecorrentes} clientes
           </div>
         </div>
@@ -198,12 +170,7 @@ export default function TabDashboard({ stats }: Props) {
 
       {/* Páginas visualizadas */}
       <div className="stat-card">
-        <div
-          className="stat-icon"
-          style={{ background: "#FFF7ED", color: "#C2410C" }}
-        >
-          👀
-        </div>
+        <div className="stat-icon">👀</div>
         <div className="stat-info">
           <h3>Páginas Visualizadas</h3>
           <p>{stats.visualizacoes.pageviews.toLocaleString()}</p>
@@ -224,12 +191,7 @@ export default function TabDashboard({ stats }: Props) {
       {stats.visualizacoes.top_paginas_pwa &&
         stats.visualizacoes.top_paginas_pwa.length > 0 && (
           <div className="stat-card">
-            <div
-              className="stat-icon"
-              style={{ background: "#EEF2FF", color: "#4F46E5" }}
-            >
-              📌
-            </div>
+            <div className="stat-icon">📌</div>
             <div className="stat-info">
               <h3>Top páginas do App</h3>
               <ul
