@@ -154,9 +154,10 @@ export default function TabDashboard({ stats }: Props) {
           <p>{stats.recorrencia.clientes_2x}</p>
           <div
             style={{
-              fontSize: "11px",
-              color: "#666",
-              marginTop: "4px",
+              fontSize: "0.95rem", // maior
+              color: "#111827",
+              marginTop: "6px",
+              fontWeight: 500,
             }}
           >
             Taxa de Recompra:{" "}
@@ -176,9 +177,10 @@ export default function TabDashboard({ stats }: Props) {
           <p>{stats.visualizacoes.pageviews.toLocaleString()}</p>
           <div
             style={{
-              marginTop: "8px",
-              fontSize: "11px",
-              color: "#555",
+              marginTop: "10px",
+              fontSize: "0.95rem", // maior
+              color: "#111827",
+              fontWeight: 500,
             }}
           >
             ⏱️ Tempo médio:{" "}
