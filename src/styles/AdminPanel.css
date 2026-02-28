@@ -91,12 +91,12 @@ body {
 }
 
 .nav-link:hover {
-  background: #e5e7eb;
+  background: #f7f7f7;
   color: #111827;
 }
 
 .nav-link.active {
-  background: #111827;
+  background: #f7f7f7;
   color: #f9fafb;
   font-weight: 500;
 }
