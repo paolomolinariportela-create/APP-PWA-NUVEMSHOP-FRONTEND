@@ -30,8 +30,32 @@ interface Props {
 }
 
 export default function TabDashboard({ stats }: Props) {
+  // valores seguros com fallback
+  const receita = stats?.receita ?? 0;
+  const vendas = stats?.vendas ?? 0;
+  const instalacoes = stats?.instalacoes ?? 0;
+  const crescimento7d = stats?.crescimento_instalacoes_7d ?? 0;
+
+  const carrinhosValor = stats?.carrinhos_abandonados?.valor ?? 0;
+  const carrinhosQtd = stats?.carrinhos_abandonados?.qtd ?? 0;
+
+  const ticketApp = stats?.ticket_medio?.app ?? 0;
+
+  const taxaConvApp = stats?.taxa_conversao?.app ?? 0;
+
+  const clientesRec = stats?.recorrencia?.clientes_2x ?? 0;
+  const taxaRecompra = stats?.recorrencia?.taxa_recompra ?? 0;
+
+  const pageviews = stats?.visualizacoes?.pageviews ?? 0;
+  const tempoMedio = stats?.visualizacoes?.tempo_medio ?? "--";
+  const topPaginasPwa = stats?.visualizacoes?.top_paginas_pwa ?? [];
+
+  const funilVisitas = stats?.funil?.visitas ?? 0;
+  const funilCarrinho = stats?.funil?.carrinho ?? 0;
+  const funilCheckout = stats?.funil?.checkout ?? 0;
+
   // meta dinâmica de instalações
-  const currentInstalls = stats.instalacoes;
+  const currentInstalls = instalacoes;
   let metaInstalacoes: number;
 
   if (currentInstalls < 100) {
@@ -45,7 +69,6 @@ export default function TabDashboard({ stats }: Props) {
   }
 
   // meta dinâmica de receita
-  const receita = stats.receita;
   let metaReceita: number;
 
   if (receita < 500) {
@@ -59,7 +82,6 @@ export default function TabDashboard({ stats }: Props) {
   }
 
   // meta dinâmica de clientes recorrentes
-  const clientesRec = stats.recorrencia.clientes_2x;
   let metaRecorrentes: number;
 
   if (clientesRec < 10) {
@@ -77,7 +99,6 @@ export default function TabDashboard({ stats }: Props) {
       {/* RECEITA APP */}
       <div className="stat-card" style={{ borderLeft: "4px solid #10B981" }}>
         <div className="stat-icon green">
-          {/* ícone dinheiro */}
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
               fill="currentColor"
@@ -91,10 +112,10 @@ export default function TabDashboard({ stats }: Props) {
             {new Intl.NumberFormat("pt-BR", {
               style: "currency",
               currency: "BRL",
-            }).format(stats.receita)}
+            }).format(receita)}
           </p>
           <span className="stat-growth">
-            🔥 {stats.vendas} pedidos realizados
+            🔥 {vendas} pedidos realizados
           </span>
 
           <div className="card-meta-text">
@@ -110,7 +131,6 @@ export default function TabDashboard({ stats }: Props) {
       {/* TICKET MÉDIO – apenas APP */}
       <div className="stat-card">
         <div className="stat-icon">
-          {/* cartão / ticket */}
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
               fill="currentColor"
@@ -132,16 +152,15 @@ export default function TabDashboard({ stats }: Props) {
               {new Intl.NumberFormat("pt-BR", {
                 style: "currency",
                 currency: "BRL",
-              }).format(stats.ticket_medio.app)}
+              }).format(ticketApp)}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Instalações + Meta (sem detalhar visitas app/site) */}
+      {/* Instalações + Meta */}
       <div className="stat-card">
         <div className="stat-icon purple">
-          {/* smartphone */}
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
               fill="currentColor"
@@ -151,11 +170,11 @@ export default function TabDashboard({ stats }: Props) {
         </div>
         <div className="stat-info">
           <h3>Instalações Ativas</h3>
-          <p>{stats.instalacoes}</p>
+          <p>{instalacoes}</p>
           <span className="stat-growth">Base de clientes fiéis</span>
 
           <div className="card-meta-text">
-            🎯 Meta de Instalações: {stats.instalacoes} / {metaInstalacoes}
+            🎯 Meta de Instalações: {instalacoes} / {metaInstalacoes}
           </div>
         </div>
       </div>
@@ -163,7 +182,6 @@ export default function TabDashboard({ stats }: Props) {
       {/* Crescimento do App */}
       <div className="stat-card">
         <div className="stat-icon">
-          {/* gráfico de linha */}
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
               fill="currentColor"
@@ -173,7 +191,7 @@ export default function TabDashboard({ stats }: Props) {
         </div>
         <div className="stat-info">
           <h3>Crescimento do App</h3>
-          <p>+{stats.crescimento_instalacoes_7d}%</p>
+          <p>+{crescimento7d}%</p>
           <span className="stat-growth">vs últimos 7 dias</span>
         </div>
       </div>
@@ -181,7 +199,6 @@ export default function TabDashboard({ stats }: Props) {
       {/* Clientes recorrentes + meta */}
       <div className="stat-card">
         <div className="stat-icon blue">
-          {/* loop / recorrência */}
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
               fill="currentColor"
@@ -191,7 +208,7 @@ export default function TabDashboard({ stats }: Props) {
         </div>
         <div className="stat-info">
           <h3>Clientes Recorrentes</h3>
-          <p>{stats.recorrencia.clientes_2x}</p>
+          <p>{clientesRec}</p>
           <div
             style={{
               fontSize: "0.95rem",
@@ -200,8 +217,7 @@ export default function TabDashboard({ stats }: Props) {
               fontWeight: 500,
             }}
           >
-            Taxa de Recompra:{" "}
-            <strong>{stats.recorrencia.taxa_recompra}%</strong>
+            Taxa de Recompra: <strong>{taxaRecompra}%</strong>
           </div>
           <div className="card-meta-text">
             🎯 Próxima meta: {metaRecorrentes} clientes
@@ -212,7 +228,6 @@ export default function TabDashboard({ stats }: Props) {
       {/* Páginas visualizadas */}
       <div className="stat-card">
         <div className="stat-icon">
-          {/* olho/visualizações */}
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
               fill="currentColor"
@@ -222,7 +237,7 @@ export default function TabDashboard({ stats }: Props) {
         </div>
         <div className="stat-info">
           <h3>Páginas Visualizadas</h3>
-          <p>{stats.visualizacoes.pageviews.toLocaleString()}</p>
+          <p>{pageviews.toLocaleString()}</p>
           <div
             style={{
               marginTop: "10px",
@@ -231,119 +246,116 @@ export default function TabDashboard({ stats }: Props) {
               fontWeight: 500,
             }}
           >
-            ⏱️ Tempo médio:{" "}
-            <strong>{stats.visualizacoes.tempo_medio}</strong>
+            ⏱️ Tempo médio: <strong>{tempoMedio}</strong>
           </div>
         </div>
       </div>
 
       {/* Top páginas do App (PWA) */}
-      {stats.visualizacoes.top_paginas_pwa &&
-        stats.visualizacoes.top_paginas_pwa.length > 0 && (
-          <div className="stat-card">
-            <div className="stat-icon">
-              {/* pin / destaque */}
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  fill="currentColor"
-                  d="M16 3 8 11l3 3-5 5 1.5 1.5 5-5 3 3 8-8z"
-                />
-              </svg>
-            </div>
-            <div className="stat-info">
-              <h3>Top páginas do App</h3>
-              <ul
-                style={{
-                  marginTop: "8px",
-                  paddingLeft: 0,
-                  listStyle: "none",
-                  fontSize: "11px",
-                  color: "#374151",
-                }}
-              >
-                {stats.visualizacoes.top_paginas_pwa
-                  .filter((pagina) => pagina !== "install")
-                  .slice(0, 5)
-                  .map((pagina, idx) => {
-                    let label = pagina || "/";
-                    let badge: string | null = null;
+      {topPaginasPwa.length > 0 && (
+        <div className="stat-card">
+          <div className="stat-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M16 3 8 11l3 3-5 5 1.5 1.5 5-5 3 3 8-8z"
+              />
+            </svg>
+          </div>
+          <div className="stat-info">
+            <h3>Top páginas do App</h3>
+            <ul
+              style={{
+                marginTop: "8px",
+                paddingLeft: 0,
+                listStyle: "none",
+                fontSize: "11px",
+                color: "#374151",
+              }}
+            >
+              {topPaginasPwa
+                .filter((pagina) => pagina !== "install")
+                .slice(0, 5)
+                .map((pagina, idx) => {
+                  let label = pagina || "/";
+                  let badge: string | null = null;
 
-                    if (label === "/") {
-                      label = "Página inicial";
-                      badge = "HOME";
-                    }
+                  if (label === "/") {
+                    label = "Página inicial";
+                    badge = "HOME";
+                  }
 
-                    const display =
-                      label.length > 50 ? label.slice(0, 47) + "..." : label;
+                  const display =
+                    label.length > 50 ? label.slice(0, 47) + "..." : label;
 
-                    return (
-                      <li
-                        key={pagina + idx}
+                  return (
+                    <li
+                      key={pagina + idx}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      <div
                         style={{
                           display: "flex",
                           alignItems: "center",
-                          justifyContent: "space-between",
-                          marginBottom: "4px",
+                          gap: "6px",
+                          flex: 1,
+                          minWidth: 0,
                         }}
                       >
-                        <div
+                        <span
                           style={{
-                            display: "flex",
+                            display: "inline-flex",
                             alignItems: "center",
-                            gap: "6px",
-                            flex: 1,
-                            minWidth: 0,
+                            justifyContent: "center",
+                            width: 16,
+                            height: 16,
+                            borderRadius: "999px",
+                            background: "#E5E7EB",
+                            fontSize: "10px",
+                            color: "#374151",
+                            flexShrink: 0,
                           }}
                         >
-                          <span
-                            style={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              width: 16,
-                              height: 16,
-                              borderRadius: "999px",
-                              background: "#E5E7EB",
-                              fontSize: "10px",
-                              color: "#374151",
-                              flexShrink: 0,
-                            }}
-                          >
-                            {idx + 1}
-                          </span>
-                          <span
-                            title={label}
-                            style={{
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                            }}
-                          >
-                            {display}
-                          </span>
-                        </div>
-                        {badge && (
-                          <span
-                            style={{
-                              marginLeft: "6px",
-                              fontSize: "9px",
-                              padding: "2px 6px",
-                              borderRadius: "999px",
-                              background: "#E0F2FE",
-                              color: "#0369A1",
-                              flexShrink: 0,
-                            }}
-                          >
-                            {badge}
-                          </span>
-                        )}
-                      </li>
-                    );
-                  })}
-              </ul>
-            </div>
+                          {idx + 1}
+                        </span>
+                        <span
+                          title={label}
+                          style={{
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {display}
+                        </span>
+                      </div>
+                      {badge && (
+                        <span
+                          style={{
+                            marginLeft: "6px",
+                            fontSize: "9px",
+                            padding: "2px 6px",
+                            borderRadius: "999px",
+                            background: "#E0F2FE",
+                            color: "#0369A1",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {badge}
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
+            </ul>
           </div>
-        )}
+        </div>
+      )}
 
       {/* Funil de vendas */}
       <div className="stat-card" style={{ gridRow: "span 2" }}>
@@ -353,7 +365,7 @@ export default function TabDashboard({ stats }: Props) {
             <div className="conversion-bar">
               <div className="bar-label">
                 <span>1. Visitas Únicas</span>{" "}
-                <strong>{stats.funil.visitas}</strong>
+                <strong>{funilVisitas}</strong>
               </div>
               <div className="bar-track">
                 <div
@@ -366,16 +378,14 @@ export default function TabDashboard({ stats }: Props) {
             <div className="conversion-bar">
               <div className="bar-label">
                 <span>2. Carrinho</span>{" "}
-                <strong>{stats.funil.carrinho}</strong>
+                <strong>{funilCarrinho}</strong>
               </div>
               <div className="bar-track">
                 <div
                   className="bar-fill"
                   style={{
                     width: `${
-                      (stats.funil.carrinho /
-                        Math.max(stats.funil.visitas, 1)) *
-                      100
+                      (funilCarrinho / Math.max(funilVisitas, 1)) * 100
                     }%`,
                     background: "#60A5FA",
                   }}
@@ -386,16 +396,14 @@ export default function TabDashboard({ stats }: Props) {
             <div className="conversion-bar">
               <div className="bar-label">
                 <span>3. Checkout</span>{" "}
-                <strong>{stats.funil.checkout}</strong>
+                <strong>{funilCheckout}</strong>
               </div>
               <div className="bar-track">
                 <div
                   className="bar-fill"
                   style={{
                     width: `${
-                      (stats.funil.checkout /
-                        Math.max(stats.funil.visitas, 1)) *
-                      100
+                      (funilCheckout / Math.max(funilVisitas, 1)) * 100
                     }%`,
                     background: "#10B981",
                   }}
@@ -411,7 +419,7 @@ export default function TabDashboard({ stats }: Props) {
                 fontSize: "10px",
               }}
             >
-              {stats.taxa_conversao.app}% de conversão global do APP
+              {taxaConvApp}% de conversão global do APP
             </small>
           </div>
         </div>
@@ -420,7 +428,6 @@ export default function TabDashboard({ stats }: Props) {
       {/* Carrinhos abandonados */}
       <div className="stat-card" style={{ borderLeft: "4px solid #ef4444" }}>
         <div className="stat-icon red">
-          {/* carrinho com X */}
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
               fill="currentColor"
@@ -434,7 +441,7 @@ export default function TabDashboard({ stats }: Props) {
             {new Intl.NumberFormat("pt-BR", {
               style: "currency",
               currency: "BRL",
-            }).format(stats.carrinhos_abandonados.valor)}
+            }).format(carrinhosValor)}
           </p>
 
           <div
@@ -444,9 +451,9 @@ export default function TabDashboard({ stats }: Props) {
               color: "#555",
             }}
           >
-            {stats.carrinhos_abandonados.qtd} carrinho
-            {stats.carrinhos_abandonados.qtd === 1 ? "" : "s"} abandonado
-            {stats.carrinhos_abandonados.qtd === 1 ? "" : "s"}
+            {carrinhosQtd} carrinho
+            {carrinhosQtd === 1 ? "" : "s"} abandonado
+            {carrinhosQtd === 1 ? "" : "s"}
           </div>
 
           <button
@@ -474,14 +481,13 @@ export default function TabDashboard({ stats }: Props) {
 
           <div className="conversion-bar" style={{ marginBottom: "6px" }}>
             <div className="bar-label">
-              <span>APP</span>{" "}
-              <strong>{stats.taxa_conversao.app}%</strong>
+              <span>APP</span> <strong>{taxaConvApp}%</strong>
             </div>
             <div className="bar-track">
               <div
                 className="bar-fill"
                 style={{
-                  width: `${Math.min(stats.taxa_conversao.app, 100)}%`,
+                  width: `${Math.min(taxaConvApp, 100)}%`,
                   background: "#10B981",
                 }}
               ></div>
