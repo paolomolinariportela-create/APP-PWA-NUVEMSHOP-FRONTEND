@@ -33,7 +33,7 @@ interface PhonePreviewProps {
   showBottomBar?: boolean;
 }
 
-// se estiver usando OneSignal global via script
+// OneSignal global via script/init
 declare global {
   interface Window {
     OneSignal?: any;
@@ -121,21 +121,17 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
   // SOFT ASK → chama fluxo de permissão do OneSignal
   const requestPushPermission = async () => {
     try {
-      if (!window.OneSignal) {
+      const OneSignal = window.OneSignal;
+      if (!OneSignal) {
         console.warn('OneSignal não carregado ainda');
         return;
       }
 
-      // Ajuste esse bloco conforme a versão do SDK que você está usando:
-
-      // Exemplo para Web SDK novo (v16+):
-      // await window.OneSignal.Notifications.requestPermission();
-
-      // Exemplo usando o slidedown do OneSignal:
-      if (window.OneSignal.Slidedown?.promptPush) {
-        await window.OneSignal.Slidedown.promptPush();
-      } else if (window.OneSignal.Notifications?.requestPermission) {
-        await window.OneSignal.Notifications.requestPermission();
+      // v16: tenta usar Slidedown, se não tiver cai para Notifications
+      if (OneSignal.Slidedown?.promptPush) {
+        await OneSignal.Slidedown.promptPush();
+      } else if (OneSignal.Notifications?.requestPermission) {
+        await OneSignal.Notifications.requestPermission();
       } else {
         console.warn('Nenhum método de prompt de push disponível no OneSignal');
       }
@@ -336,7 +332,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                     borderRadius: '30px',
                     fontSize: `${12 * fabSizeFactor}px`,
                     fontWeight: 'bold',
-                    boxShadow: '0 4px 10px rgba(0,0,0,0.3)`,
+                    boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '5px',
