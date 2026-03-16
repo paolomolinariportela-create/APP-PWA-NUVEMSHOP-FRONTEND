@@ -21,10 +21,8 @@ interface PhonePreviewProps {
   topbar_position?: 'top' | 'bottom';
   topbar_color?: string;
   topbar_text_color?: string;
-  // agora string, igual backend
   topbar_size?: 'xs' | 'small' | 'medium' | 'large' | 'xl';
 
-  // NOVO: popup
   popup_enabled?: boolean;
   popup_image_url?: string;
 
@@ -32,8 +30,14 @@ interface PhonePreviewProps {
   bottomBarBg?: string;
   bottomBarIconColor?: string;
   mode?: PhonePreviewMode;
-  // controlar se mostra a barra inferior no preview
   showBottomBar?: boolean;
+}
+
+// se estiver usando OneSignal global via script
+declare global {
+  interface Window {
+    OneSignal?: any;
+  }
 }
 
 const PhonePreview: React.FC<PhonePreviewProps> = ({
@@ -57,7 +61,6 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
   topbar_text_color,
   topbar_size = 'medium',
 
-  // NOVO popup
   popup_enabled,
   popup_image_url,
 
@@ -91,7 +94,6 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
     }
   })();
 
-  // fator visual para a topbar baseado no tamanho string
   const topbarSizeFactor = (() => {
     switch (topbar_size) {
       case 'xs':
@@ -114,8 +116,33 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
   const bannerButtonText = topbar_button_text || 'Instalar agora';
 
   const showTopbar = !isSplash && topbar_enabled;
-
   const showPopup = !isSplash && popup_enabled && popup_image_url;
+
+  // SOFT ASK → chama fluxo de permissão do OneSignal
+  const requestPushPermission = async () => {
+    try {
+      if (!window.OneSignal) {
+        console.warn('OneSignal não carregado ainda');
+        return;
+      }
+
+      // Ajuste esse bloco conforme a versão do SDK que você está usando:
+
+      // Exemplo para Web SDK novo (v16+):
+      // await window.OneSignal.Notifications.requestPermission();
+
+      // Exemplo usando o slidedown do OneSignal:
+      if (window.OneSignal.Slidedown?.promptPush) {
+        await window.OneSignal.Slidedown.promptPush();
+      } else if (window.OneSignal.Notifications?.requestPermission) {
+        await window.OneSignal.Notifications.requestPermission();
+      } else {
+        console.warn('Nenhum método de prompt de push disponível no OneSignal');
+      }
+    } catch (err) {
+      console.error('Erro ao pedir permissão de push', err);
+    }
+  };
 
   return (
     <div className="phone-mockup" style={styles.phoneMockup}>
@@ -154,6 +181,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
               )}
               <span style={{ flex: 1 }}>{bannerMessage}</span>
               <button
+                onClick={requestPushPermission}
                 style={{
                   background: '#FBBF24',
                   border: 'none',
@@ -295,17 +323,20 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
               {/* BOTÃO FLUTUANTE */}
               {fabEnabled && (
                 <div
+                  onClick={requestPushPermission}
                   style={{
                     position: 'absolute',
                     bottom: '80px',
                     [fabPosition === 'left' ? 'left' : 'right']: '20px',
                     background: fabBgColor,
                     color: 'white',
-                    padding: `${8 * fabSizeFactor}px ${16 * fabSizeFactor}px`,
+                    padding: `${8 * fabSizeFactor}px ${
+                      16 * fabSizeFactor
+                    }px`,
                     borderRadius: '30px',
                     fontSize: `${12 * fabSizeFactor}px`,
                     fontWeight: 'bold',
-                    boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+                    boxShadow: '0 4px 10px rgba(0,0,0,0.3)`,
                     display: 'flex',
                     alignItems: 'center',
                     gap: '5px',
@@ -331,7 +362,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                   padding: `${6 * topbarSizeFactor}px ${
                     10 * topbarSizeFactor
                   }px`,
-                  fontSize: `${10 * topbarSizeFactor}px`, 
+                  fontSize: `${10 * topbarSizeFactor}px`,
                   borderTop: '1px solid rgba(0,0,0,0.1)',
                 }}
               >
@@ -343,6 +374,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                   )}
                   <span style={{ flex: 1 }}>{bannerMessage}</span>
                   <button
+                    onClick={requestPushPermission}
                     style={{
                       background: '#FBBF24',
                       border: 'none',
@@ -361,7 +393,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
               </div>
             )}
 
-            {/* BARRA INFERIOR – só se showBottomBar = true */}
+            {/* BARRA INFERIOR */}
             {showBottomBar && (
               <div
                 className="bottom-nav"
@@ -449,6 +481,7 @@ const PhonePreview: React.FC<PhonePreviewProps> = ({
                 }}
               >
                 <button
+                  onClick={requestPushPermission}
                   style={{
                     background: '#10B981',
                     color: '#fff',
