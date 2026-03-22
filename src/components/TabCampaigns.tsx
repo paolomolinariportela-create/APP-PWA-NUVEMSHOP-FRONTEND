@@ -34,6 +34,7 @@ interface OneSignalNotif {
     sent: number;
     opened: number;
     failed: number;
+    confirmed_deliveries: number; // ✅ NOVO
     taxa_abertura: number;
     created_at: number;
 }
@@ -139,6 +140,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
     const formatDate = (s: string) => { try { const d = new Date(s); return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); } catch { return s; } };
     const formatUnix = (ts: number) => { try { const d = new Date(ts * 1000); return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); } catch { return '—'; } };
 
+    // ── COMPUTED VALUES ──
     const activeSubscribers = osStats?.active_subscribers ?? stats.instalacoes ?? 0;
     const totalSubscribers = osStats?.subscribers ?? 0;
     const taxaOptin = osStats?.taxa_optin ?? 0;
@@ -153,8 +155,9 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
     const inativos = Math.max(0, totalSubscribers - activeSubscribers);
     const pctAtivos = totalSubscribers > 0 ? Math.round((activeSubscribers / totalSubscribers) * 100) : 0;
     const pctInativos = 100 - pctAtivos;
+    const churnRate = totalSubscribers > 0 ? Math.round((inativos / totalSubscribers) * 100) : 0;
 
-    // Melhor horário estimado (por abertura)
+    // Melhor horário estimado
     const melhorHorario = (() => {
         if (notifs.length === 0) return null;
         const horarios: Record<number, number> = {};
@@ -167,8 +170,25 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
         return melhor ? `${melhor[0]}:00` : null;
     })();
 
-    // ROI estimado por notificação (baseado em taxa de abertura * ticket médio do dashboard)
+    // Ticket médio do dashboard
     const ticketMedio = stats?.ticket_medio?.app ?? 0;
+
+    // ✅ Funil agregado de notificações
+    const totalEnviados = notifs.reduce((a, n) => a + n.sent, 0);
+    const totalConfirmados = notifs.reduce((a, n) => a + (n.confirmed_deliveries || 0), 0);
+    const totalClicados = notifs.reduce((a, n) => a + n.opened, 0);
+    const taxaConvGlobal = stats?.taxa_conversao?.app ?? 0;
+    const totalConvertidos = Math.round(totalClicados * (taxaConvGlobal / 100));
+    const pctEntrega = totalEnviados > 0 ? Math.round((totalConfirmados / totalEnviados) * 100) : 0;
+    const pctClique = totalEnviados > 0 ? Math.round((totalClicados / totalEnviados) * 100) : 0;
+    const pctConversao = totalClicados > 0 ? Math.round((totalConvertidos / totalClicados) * 100) : 0;
+
+    // ✅ Benchmarking badge
+    const getBenchmarkBadge = (taxa: number) => {
+        if (taxa >= 10) return { label: '🔥 Acima da Média', bg: '#dcfce7', color: '#166534' };
+        if (taxa >= 5) return { label: '✅ Na Média', bg: '#dbeafe', color: '#1d4ed8' };
+        return { label: '⚠️ Precisa Melhorar', bg: '#fef3c7', color: '#92400e' };
+    };
 
     const alcanceEstimado = () => {
         if (!osStats) return activeSubscribers;
@@ -280,7 +300,6 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'center' }}>
                         <div>
-                            {/* Barra Ativos */}
                             <div style={{ marginBottom: '14px' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '13px', fontWeight: 500 }}>
                                     <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -293,7 +312,6 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                     <div style={{ width: `${pctAtivos}%`, background: '#10B981', height: '100%', borderRadius: '999px', transition: 'width 0.6s ease' }} />
                                 </div>
                             </div>
-                            {/* Barra Inativos */}
                             <div style={{ marginBottom: '14px' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '13px', fontWeight: 500 }}>
                                     <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -305,6 +323,15 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                 <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '10px', overflow: 'hidden' }}>
                                     <div style={{ width: `${pctInativos}%`, background: '#EF4444', height: '100%', borderRadius: '999px', transition: 'width 0.6s ease' }} />
                                 </div>
+                            </div>
+                            {/* ✅ Churn Rate explícito */}
+                            <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+                                <span style={{ background: churnRate > 30 ? '#fee2e2' : '#f0fdf4', color: churnRate > 30 ? '#991b1b' : '#166534', padding: '4px 10px', borderRadius: '999px', fontSize: '12px', fontWeight: 600 }}>
+                                    📉 Churn: {churnRate}%
+                                </span>
+                                <span style={{ background: '#F3F4F6', color: '#374151', padding: '4px 10px', borderRadius: '999px', fontSize: '12px', fontWeight: 600 }}>
+                                    📈 Retenção: {pctAtivos}%
+                                </span>
                             </div>
                             <div style={{ padding: '10px 14px', background: pctAtivos >= 70 ? '#f0fdf4' : '#fef3c7', border: `1px solid ${pctAtivos >= 70 ? '#86efac' : '#fde68a'}`, borderRadius: '8px', fontSize: '12px', color: pctAtivos >= 70 ? '#166534' : '#92400e' }}>
                                 {pctAtivos >= 70 ? '✅ Base saudável — mais de 70% ativos' : pctAtivos >= 40 ? '⚠️ Base razoável — considere reativar inativos' : '🚨 Base comprometida — muitos usuários bloquearam'}
@@ -332,17 +359,134 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                 </div>
             )}
 
-            {/* ── DISTRIBUIÇÃO + BLOCO 2: PLATAFORMAS COM CLIQUES ── */}
+            {/* ── BLOCO 2: FUNIL DE NOTIFICAÇÕES ── */}
+            {!loadingStats && notifs.length > 0 && totalEnviados > 0 && (
+                <div className="config-card" style={{ marginBottom: '1.5rem' }}>
+                    <div className="card-header" style={{ paddingBottom: '0.8rem', marginBottom: '1.2rem' }}>
+                        <h3 style={{ margin: 0, fontSize: '1rem' }}>🔔 Funil de Notificações</h3>
+                        <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: '#6B7280' }}>Performance agregada de todas as {notifs.length} campanhas</p>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+                        {[
+                            { label: 'Enviados', value: totalEnviados, pct: 100, color: '#4F46E5', icon: '📤', desc: 'Total disparado' },
+                            { label: 'Entregues', value: totalConfirmados, pct: pctEntrega, color: '#3b82f6', icon: '📬', desc: `${pctEntrega}% do total` },
+                            { label: 'Clicados', value: totalClicados, pct: pctClique, color: '#10B981', icon: '👆', desc: `CTR: ${pctClique}%` },
+                            { label: 'Convertidos', value: totalConvertidos, pct: pctConversao, color: '#f59e0b', icon: '💰', desc: `${pctConversao}% dos cliques` },
+                        ].map((step, i) => (
+                            <div key={i} style={{ textAlign: 'center', position: 'relative' }}>
+                                {i > 0 && (
+                                    <div style={{ position: 'absolute', left: '-8px', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: '18px', zIndex: 1 }}>›</div>
+                                )}
+                                <div style={{ background: '#F9FAFB', border: `2px solid ${step.color}20`, borderRadius: '12px', padding: '16px 12px' }}>
+                                    <div style={{ fontSize: '22px', marginBottom: '6px' }}>{step.icon}</div>
+                                    <div style={{ fontSize: '22px', fontWeight: 700, color: step.color, marginBottom: '2px' }}>{step.value.toLocaleString('pt-BR')}</div>
+                                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '4px' }}>{step.label}</div>
+                                    <div style={{ fontSize: '11px', color: '#6B7280' }}>{step.desc}</div>
+                                    <div style={{ marginTop: '8px', background: '#E5E7EB', borderRadius: '999px', height: '4px', overflow: 'hidden' }}>
+                                        <div style={{ width: `${step.pct}%`, background: step.color, height: '100%', borderRadius: '999px', transition: 'width 0.6s ease' }} />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    {totalConfirmados === 0 && (
+                        <p style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '10px', textAlign: 'center' }}>
+                            * Entregas confirmadas disponíveis para campanhas futuras (OneSignal confirmed deliveries)
+                        </p>
+                    )}
+                </div>
+            )}
+
+            {/* ── BLOCO 3: SUGESTÕES INTELIGENTES ── */}
+            {!loadingStats && (melhorHorario || churnRate > 20 || activeSubscribers > 0) && (
+                <div className="config-card" style={{ marginBottom: '1.5rem' }}>
+                    <div className="card-header" style={{ paddingBottom: '0.8rem', marginBottom: '1.2rem' }}>
+                        <h3 style={{ margin: 0, fontSize: '1rem' }}>💡 Sugestões para sua Loja</h3>
+                        <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: '#6B7280' }}>Insights automáticos baseados nos seus dados</p>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        {melhorHorario && (
+                            <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', padding: '14px 16px', background: '#EEF2FF', border: '1px solid #C7D2FE', borderRadius: '10px' }}>
+                                <span style={{ fontSize: '22px', flexShrink: 0 }}>⏰</span>
+                                <div>
+                                    <div style={{ fontWeight: 600, fontSize: '14px', color: '#3730A3', marginBottom: '2px' }}>
+                                        Melhor horário para enviar: <strong>{melhorHorario}</strong>
+                                    </div>
+                                    <div style={{ fontSize: '12px', color: '#4338CA' }}>
+                                        Seu público costuma abrir mais as notificações nesse horário. Agende sua próxima campanha para maximizar o CTR.
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        {churnRate > 30 && (
+                            <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', padding: '14px 16px', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '10px' }}>
+                                <span style={{ fontSize: '22px', flexShrink: 0 }}>🚨</span>
+                                <div>
+                                    <div style={{ fontWeight: 600, fontSize: '14px', color: '#991B1B', marginBottom: '2px' }}>
+                                        Alerta: {inativos.toLocaleString('pt-BR')} usuários inativos ({churnRate}% de churn)
+                                    </div>
+                                    <div style={{ fontSize: '12px', color: '#B91C1C' }}>
+                                        Muitos usuários bloquearam o push. Tente enviar menos campanhas por semana ou usar mensagens mais personalizadas com <code style={{ background: '#FEE2E2', padding: '1px 4px', borderRadius: '3px' }}>{'{{first_name}}'}</code>.
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        {churnRate <= 30 && churnRate > 0 && (
+                            <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', padding: '14px 16px', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: '10px' }}>
+                                <span style={{ fontSize: '22px', flexShrink: 0 }}>✅</span>
+                                <div>
+                                    <div style={{ fontWeight: 600, fontSize: '14px', color: '#166534', marginBottom: '2px' }}>
+                                        Base com baixo churn ({churnRate}%) — continue assim!
+                                    </div>
+                                    <div style={{ fontSize: '12px', color: '#15803D' }}>
+                                        Sua frequência de envio está adequada. Os usuários não estão bloqueando as notificações.
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        {mediaAbertura > 0 && (() => { const badge = getBenchmarkBadge(mediaAbertura); return (
+                            <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', padding: '14px 16px', background: badge.bg + '40', border: `1px solid ${badge.bg}`, borderRadius: '10px' }}>
+                                <span style={{ fontSize: '22px', flexShrink: 0 }}>📊</span>
+                                <div>
+                                    <div style={{ fontWeight: 600, fontSize: '14px', color: badge.color, marginBottom: '2px' }}>
+                                        CTR Médio: {mediaAbertura}% — <span style={{ background: badge.bg, padding: '2px 8px', borderRadius: '999px', fontSize: '12px' }}>{badge.label}</span>
+                                    </div>
+                                    <div style={{ fontSize: '12px', color: badge.color }}>
+                                        {mediaAbertura >= 10
+                                            ? 'Seu CTR está acima da média do setor (5–10%). Continue com mensagens relevantes e segmentadas.'
+                                            : mediaAbertura >= 5
+                                                ? 'Na média do setor. Tente usar Rich Push com imagens e botões de ação para aumentar o CTR.'
+                                                : 'Abaixo da média. Revise os títulos das campanhas — use urgência, personalização e emojis com moderação.'}
+                                    </div>
+                                </div>
+                            </div>
+                        ); })()}
+                        {ticketMedio > 0 && totalClicados > 0 && (
+                            <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', padding: '14px 16px', background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: '10px' }}>
+                                <span style={{ fontSize: '22px', flexShrink: 0 }}>💰</span>
+                                <div>
+                                    <div style={{ fontWeight: 600, fontSize: '14px', color: '#92400E', marginBottom: '2px' }}>
+                                        Receita estimada via push: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Math.round(totalClicados * (taxaConvGlobal / 100) * ticketMedio))}
+                                    </div>
+                                    <div style={{ fontSize: '12px', color: '#B45309' }}>
+                                        Calculado como: {totalClicados} cliques × {taxaConvGlobal}% conversão × {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(ticketMedio)} ticket médio
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* ── BLOCO 4: DISPOSITIVOS + PAÍSES ── */}
             {!loadingStats && (porDisp.length > 0 || porPais.length > 0) && (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                    {/* Dispositivos com cliques por plataforma */}
                     <div className="config-card" style={{ marginBottom: 0 }}>
                         <div className="card-header" style={{ paddingBottom: '0.8rem', marginBottom: '1rem' }}>
                             <h3 style={{ margin: 0, fontSize: '1rem' }}>📱 Plataformas — Cliques Reais</h3>
                             <p style={{ margin: '4px 0 0', fontSize: '0.8rem', color: '#6B7280' }}>Distribuição de cliques por dispositivo</p>
                         </div>
                         {porDisp.map(d => {
-                            // Calcula cliques estimados por plataforma com base nas notifs
                             const totalCliquesGeral = notifs.reduce((acc, n) => acc + n.opened, 0);
                             const cliquesEstimados = Math.round(totalCliquesGeral * (d.pct / 100));
                             return (
@@ -362,7 +506,6 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                         })}
                         {notifs.length === 0 && <p style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '8px' }}>Cliques disponíveis após enviar campanhas</p>}
                     </div>
-                    {/* Países */}
                     <div className="config-card" style={{ marginBottom: 0 }}>
                         <div className="card-header" style={{ paddingBottom: '0.8rem', marginBottom: '1rem' }}>
                             <h3 style={{ margin: 0, fontSize: '1rem' }}>🌍 Por País</h3>
@@ -523,7 +666,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                         </button>
                     </div>
 
-                    {/* ── BLOCO 3: HISTÓRICO COM ROI ── */}
+                    {/* ── HISTÓRICO COM ROI + BENCHMARKING BADGE ── */}
                     <div className="config-card" style={{ marginTop: '24px' }}>
                         <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
@@ -557,85 +700,5 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                                 {ticketMedio > 0 && <th style={{ padding: '12px', textAlign: 'right' }}>ROI Est.</th>}
                                             </tr></thead>
                                             <tbody>{notifs.map(n => {
-                                                // ROI estimado: abertos * taxa de conversão média * ticket médio
                                                 const taxaConv = stats?.taxa_conversao?.app ?? 0;
-                                                const roiEstimado = ticketMedio > 0 ? Math.round(n.opened * (taxaConv / 100) * ticketMedio) : 0;
-                                                return (
-                                                    <tr key={n.id} style={{ borderBottom: '1px solid #eee' }}>
-                                                        <td style={{ padding: '12px', whiteSpace: 'nowrap', color: '#555', fontSize: '12px' }}>{formatUnix(n.created_at)}</td>
-                                                        <td style={{ padding: '12px' }}>
-                                                            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                                                                {n.image_url && <img src={n.image_url} alt="" style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover', flexShrink: 0 }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />}
-                                                                <div><div style={{ fontWeight: 'bold', fontSize: '13px' }}>{n.title}</div><div style={{ fontSize: '12px', color: '#666' }}>{n.message}</div></div>
-                                                            </div>
-                                                        </td>
-                                                        <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold', color: '#4F46E5' }}>{n.sent.toLocaleString('pt-BR')}</td>
-                                                        <td style={{ padding: '12px', textAlign: 'right', color: '#059669' }}>{n.opened.toLocaleString('pt-BR')}</td>
-                                                        <td style={{ padding: '12px', textAlign: 'right', color: '#DC2626' }}>{n.failed.toLocaleString('pt-BR')}</td>
-                                                        <td style={{ padding: '12px', textAlign: 'right' }}><span style={{ background: n.taxa_abertura >= 10 ? '#dcfce7' : '#f3f4f6', color: n.taxa_abertura >= 10 ? '#166534' : '#6B7280', padding: '3px 8px', borderRadius: '999px', fontSize: '12px', fontWeight: 600 }}>{n.taxa_abertura}%</span></td>
-                                                        {ticketMedio > 0 && (
-                                                            <td style={{ padding: '12px', textAlign: 'right' }}>
-                                                                {roiEstimado > 0
-                                                                    ? <span style={{ background: '#dcfce7', color: '#166534', padding: '3px 8px', borderRadius: '999px', fontSize: '12px', fontWeight: 600 }}>~{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(roiEstimado)}</span>
-                                                                    : <span style={{ color: '#9CA3AF', fontSize: '12px' }}>—</span>
-                                                                }
-                                                            </td>
-                                                        )}
-                                                    </tr>
-                                                );
-                                            })}</tbody>
-                                        </table>
-                                        {ticketMedio > 0 && (
-                                            <p style={{ fontSize: '11px', color: '#9CA3AF', padding: '8px 12px', margin: 0 }}>
-                                                * ROI estimado: abertos × taxa de conversão ({stats?.taxa_conversao?.app ?? 0}%) × ticket médio ({new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(ticketMedio)})
-                                            </p>
-                                        )}
-                                    </div>
-                        )}
-
-                        {activeHistoryTab === 'local' && (
-                            loadingHistory ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Carregando...</p>
-                                : history.length === 0 ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Nenhuma campanha local.</p>
-                                    : <div style={{ overflowX: 'auto' }}>
-                                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-                                            <thead><tr style={{ background: '#f9fafb', color: '#666', textAlign: 'left' }}><th style={{ padding: '12px' }}>Data</th><th style={{ padding: '12px' }}>Mensagem</th><th style={{ padding: '12px', textAlign: 'right' }}>Enviados</th></tr></thead>
-                                            <tbody>{history.map(item => (
-                                                <tr key={item.id} style={{ borderBottom: '1px solid #eee' }}>
-                                                    <td style={{ padding: '12px', whiteSpace: 'nowrap', color: '#555' }}>{formatDate(item.created_at)}</td>
-                                                    <td style={{ padding: '12px' }}><div style={{ fontWeight: 'bold' }}>{item.title}</div><div style={{ fontSize: '12px', color: '#666' }}>{item.message}</div></td>
-                                                    <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold', color: '#4F46E5' }}>{item.sent_count}</td>
-                                                </tr>
-                                            ))}</tbody>
-                                        </table>
-                                    </div>
-                        )}
-                    </div>
-                </>
-            )}
-
-            {/* ── ABA AUTOMAÇÕES ── */}
-            {activeTab === 'automacoes' && (
-                <div className="config-card">
-                    <div className="card-header">
-                        <h2 style={{ margin: 0 }}>🤖 Recuperação de Carrinho Abandonado</h2>
-                        <p style={{ color: '#6B7280', margin: '6px 0 0' }}>Configure as mensagens automáticas enviadas quando um cliente abandona o carrinho.</p>
-                    </div>
-                    <div style={{ background: '#EEF2FF', border: '1px solid #C7D2FE', borderRadius: '10px', padding: '14px 16px', marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                        <span style={{ fontSize: '20px' }}>💡</span>
-                        <div style={{ fontSize: '13px', color: '#3730A3', lineHeight: '1.5' }}><strong>Como funciona:</strong> Quando um cliente adiciona itens ao carrinho e sai sem comprar, o sistema aguarda o tempo configurado e envia a notificação automaticamente.</div>
-                    </div>
-                    {loadingAutomacao ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Carregando...</p> : (
-                        <>
-                            {renderPassoCard(1, automacao.passo1_ativo, automacao.passo1_horas, automacao.passo1_titulo, automacao.passo1_mensagem)}
-                            {renderPassoCard(2, automacao.passo2_ativo, automacao.passo2_horas, automacao.passo2_titulo, automacao.passo2_mensagem)}
-                            {renderPassoCard(3, automacao.passo3_ativo, automacao.passo3_horas, automacao.passo3_titulo, automacao.passo3_mensagem, automacao.passo3_cupom)}
-                            <button className="save-button" onClick={saveAutomacao} disabled={savingAutomacao} style={{ width: '100%', marginTop: '8px', background: savingAutomacao ? '#ccc' : '#111827' }}>
-                                {savingAutomacao ? 'Salvando...' : '💾 Salvar Automações'}
-                            </button>
-                        </>
-                    )}
-                </div>
-            )}
-        </div>
-    );
-}
+                                                const roiEstimado = ticketMedio > 0 ? Math.round(n.opened * (taxaConv / 100)
