@@ -10,6 +10,7 @@ interface PushCampaign {
     btn2_text?: string;          // Action Button 2
     btn2_url?: string;
     filter_behavior?: string;    // "buyers" | "non_buyers"
+    intelligent_delivery?: boolean;
     filter_device?: string;
     filter_country?: string;
     send_after?: string;
@@ -394,7 +395,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                         {showSegmentation && (
                             <div className="animate-fade-in" style={{ background: '#F9FAFB', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', marginBottom: '20px' }}>
                                 <h4 style={{ margin: '0 0 14px', fontSize: '14px', color: '#374151' }}>🎯 Filtros de Segmentação</h4>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '12px' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '12px' }}>
                                     <div>
                                         <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '5px' }}>💰 Comportamento</label>
                                         <select value={pushForm.filter_behavior ?? ''} onChange={e => setPushForm({ ...pushForm, filter_behavior: e.target.value || undefined })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', background: 'white', fontSize: '13px' }}>
@@ -428,10 +429,22 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                             <option value="CL">🇨🇱 Chile</option>
                                         </select>
                                     </div>
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '8px' }}>
                                     <div>
                                         <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '5px' }}>⏰ Agendar envio</label>
                                         <input type="datetime-local" value={pushForm.send_after ? pushForm.send_after.slice(0, 16) : ''} onChange={e => setPushForm({ ...pushForm, send_after: e.target.value ? new Date(e.target.value).toISOString() : undefined })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', background: 'white', fontSize: '13px' }} />
                                         <small style={{ fontSize: '10px', color: '#6B7280' }}>Vazio = envio imediato</small>
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '5px' }}>🧠 Intelligent Delivery</label>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px', border: `1px solid ${pushForm.intelligent_delivery ? '#818CF8' : '#d1d5db'}`, borderRadius: '6px', background: pushForm.intelligent_delivery ? '#EEF2FF' : 'white', cursor: 'pointer' }} onClick={() => setPushForm({ ...pushForm, intelligent_delivery: !pushForm.intelligent_delivery })}>
+                                            <Toggle checked={pushForm.intelligent_delivery ?? false} onChange={v => setPushForm({ ...pushForm, intelligent_delivery: v })} />
+                                            <span style={{ fontSize: '12px', color: pushForm.intelligent_delivery ? '#4F46E5' : '#6B7280' }}>
+                                                {pushForm.intelligent_delivery ? 'Ativo — entrega no horário ideal' : 'Desativado'}
+                                            </span>
+                                        </div>
+                                        <small style={{ fontSize: '10px', color: '#6B7280' }}>IA entrega quando cada usuário costuma abrir o celular</small>
                                     </div>
                                 </div>
                                 {(pushForm.filter_device || pushForm.filter_country || pushForm.send_after || pushForm.filter_behavior) && (
@@ -445,12 +458,12 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                         <div className="form-group">
                             <label>Título</label>
                             <input type="text" value={pushForm.title} onChange={e => setPushForm({ ...pushForm, title: e.target.value })} maxLength={50} placeholder="Ex: Oferta Relâmpago!" />
-                            <small>{pushForm.title.length}/50 caracteres</small>
+                            <small>{pushForm.title.length}/50 — use <code style={{ background: '#F3F4F6', padding: '1px 4px', borderRadius: '3px' }}>{'{{first_name}}'}</code> para personalizar com o nome do cliente</small>
                         </div>
                         <div className="form-group">
                             <label>Mensagem</label>
                             <input type="text" value={pushForm.message} onChange={e => setPushForm({ ...pushForm, message: e.target.value })} maxLength={120} placeholder="Ex: 10% OFF hoje por tempo limitado!" />
-                            <small>{pushForm.message.length}/120 caracteres</small>
+                            <small>{pushForm.message.length}/120 — ex: "Olá {'{{first_name}}'}, seu cupom exclusivo chegou!"</small>
                         </div>
                         <div className="form-group">
                             <label>Link (Opcional)</label>
