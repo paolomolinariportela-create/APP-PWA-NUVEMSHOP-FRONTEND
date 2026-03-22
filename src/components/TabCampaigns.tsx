@@ -701,4 +701,6 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                             </tr></thead>
                                             <tbody>{notifs.map(n => {
                                                 const taxaConv = stats?.taxa_conversao?.app ?? 0;
-                                                const roiEstimado = ticketMedio > 0 ? Math.round(n.opened * (taxaConv / 100)
+                                                const roiEstimado = ticketMedio > 0
+                                                    ? Math.round(n.opened * (taxaConv / 100) * ticketMedio)
+                                                    : 0;
