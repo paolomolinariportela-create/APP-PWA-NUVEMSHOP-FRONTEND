@@ -47,6 +47,35 @@ const AB_FORM_DEFAULT: ABTestForm = {
 };
 // ────────────────────────────────────────────────────────────────────────────
 
+// ── Interfaces Jornada ───────────────────────────────────────────────────────
+interface JornadaSubscriber {
+    visitor_id: string;
+    clicked_at: string;
+    converted: boolean;
+    converted_at: string | null;
+    revenue: number | null;
+}
+
+interface JornadaNotif {
+    notif_id: string;
+    titulo: string;
+    mensagem: string;
+    enviados: number;
+    cliques: number;
+    convertidos: number;
+    taxa_conversao: number;
+    receita_atribuida: number;
+    subscribers: JornadaSubscriber[];
+}
+
+interface JornadaResumo {
+    total_cliques: number;
+    total_convertidos: number;
+    taxa_conversao: number;
+    receita_atribuida: number;
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 interface PushHistoryItem {
     id: number;
     title: string;
@@ -441,6 +470,180 @@ function ABResultCard({ test, onRefresh }: { test: ABTestItem; onRefresh: (id: n
 }
 // ────────────────────────────────────────────────────────────────────────────
 
+// ── Componente: Aba de Jornada do Usuário ────────────────────────────────────
+function JornadaTab({ token, API_URL, brl }: { token: string | null; API_URL: string; brl: (v: number) => string }) {
+    const [jornada, setJornada] = useState<JornadaNotif[]>([]);
+    const [resumo, setResumo] = useState<JornadaResumo | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [expandido, setExpandido] = useState<string | null>(null);
+
+    const fetchJornada = () => {
+        if (!token) return;
+        setLoading(true);
+        fetch(`${API_URL}/analytics/jornada`, { headers: { Authorization: `Bearer ${token}` } })
+            .then(r => r.json())
+            .then(data => {
+                setJornada(data.jornada ?? []);
+                setResumo(data.resumo ?? null);
+            })
+            .catch(() => {})
+            .finally(() => setLoading(false));
+    };
+
+    useEffect(() => { fetchJornada(); }, [token]);
+
+    const formatDate = (s: string) => {
+        try {
+            const d = new Date(s);
+            return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        } catch { return s; }
+    };
+
+    if (loading) return <p style={{ textAlign: 'center', padding: '40px', color: '#888' }}>Carregando jornada...</p>;
+
+    if (!jornada.length) return (
+        <div style={{ textAlign: 'center', padding: '40px 20px', color: '#6B7280' }}>
+            <div style={{ fontSize: '40px', marginBottom: '12px' }}>🗺️</div>
+            <div style={{ fontWeight: 600, fontSize: '15px', marginBottom: '6px' }}>Nenhuma jornada registrada ainda</div>
+            <div style={{ fontSize: '13px', lineHeight: 1.5 }}>
+                A jornada aparece quando um usuário clica em um push e acessa a loja.<br />
+                Os cliques são detectados automaticamente pelo loader.
+            </div>
+        </div>
+    );
+
+    return (
+        <div>
+            {/* Cards de resumo */}
+            {resumo && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '20px' }}>
+                    {[
+                        { icon: '👆', label: 'Total de Cliques', value: resumo.total_cliques.toLocaleString('pt-BR'), color: '#4F46E5' },
+                        { icon: '💰', label: 'Convertidos', value: resumo.total_convertidos.toLocaleString('pt-BR'), color: '#10B981' },
+                        { icon: '📊', label: 'Taxa de Conversão', value: `${resumo.taxa_conversao}%`, color: '#f59e0b' },
+                        { icon: '💵', label: 'Receita Atribuída', value: brl(resumo.receita_atribuida), color: '#059669' },
+                    ].map((card, i) => (
+                        <div key={i} style={{ background: '#F9FAFB', border: `2px solid ${card.color}20`, borderRadius: '12px', padding: '14px', textAlign: 'center' }}>
+                            <div style={{ fontSize: '22px', marginBottom: '4px' }}>{card.icon}</div>
+                            <div style={{ fontSize: '20px', fontWeight: 700, color: card.color }}>{card.value}</div>
+                            <div style={{ fontSize: '11px', color: '#6B7280', marginTop: '2px' }}>{card.label}</div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Explicação */}
+            <div style={{ background: '#EEF2FF', border: '1px solid #C7D2FE', borderRadius: '10px', padding: '12px 16px', marginBottom: '16px', display: 'flex', gap: '10px' }}>
+                <span style={{ fontSize: '18px', flexShrink: 0 }}>💡</span>
+                <div style={{ fontSize: '12px', color: '#3730A3', lineHeight: 1.6 }}>
+                    <strong>Como funciona:</strong> Cada vez que um usuário clica em um push e acessa a loja, o sistema registra o clique. Se ele comprar em seguida, a venda é atribuída àquela notificação e você vê a receita gerada diretamente por cada campanha.
+                </div>
+            </div>
+
+            {/* Lista de notificações com jornada */}
+            {jornada.map(n => {
+                const aberto = expandido === n.notif_id;
+                const temConversao = n.convertidos > 0;
+                return (
+                    <div key={n.notif_id} style={{ border: `1px solid ${temConversao ? '#86efac' : '#E5E7EB'}`, borderRadius: '12px', marginBottom: '12px', overflow: 'hidden' }}>
+                        {/* Header da notificação */}
+                        <div
+                            onClick={() => setExpandido(aberto ? null : n.notif_id)}
+                            style={{ padding: '14px 16px', background: temConversao ? '#f0fdf4' : '#F9FAFB', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}
+                        >
+                            {/* Funil visual */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                                {[
+                                    { icon: '📤', label: n.enviados > 0 ? n.enviados.toLocaleString('pt-BR') : '—', color: '#4F46E5', title: 'Enviados' },
+                                    { icon: '👆', label: n.cliques.toLocaleString('pt-BR'), color: '#3b82f6', title: 'Cliques' },
+                                    { icon: '💰', label: n.convertidos.toLocaleString('pt-BR'), color: '#10B981', title: 'Compras' },
+                                ].map((step, i) => (
+                                    <React.Fragment key={i}>
+                                        {i > 0 && <span style={{ color: '#9CA3AF', fontSize: '12px' }}>›</span>}
+                                        <div style={{ textAlign: 'center' }}>
+                                            <div style={{ fontSize: '10px', color: '#9CA3AF' }}>{step.title}</div>
+                                            <div style={{ fontSize: '13px', fontWeight: 700, color: step.color }}>{step.label}</div>
+                                        </div>
+                                    </React.Fragment>
+                                ))}
+                            </div>
+
+                            {/* Título e métricas */}
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontWeight: 700, fontSize: '13px', color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.titulo || '—'}</div>
+                                <div style={{ fontSize: '11px', color: '#6B7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.mensagem}</div>
+                            </div>
+
+                            {/* Badges */}
+                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexShrink: 0 }}>
+                                <span style={{ background: '#dbeafe', color: '#1d4ed8', padding: '2px 8px', borderRadius: '999px', fontSize: '11px', fontWeight: 600 }}>
+                                    CTR {n.taxa_conversao}%
+                                </span>
+                                {temConversao && (
+                                    <span style={{ background: '#dcfce7', color: '#166534', padding: '2px 8px', borderRadius: '999px', fontSize: '11px', fontWeight: 600 }}>
+                                        {brl(n.receita_atribuida)}
+                                    </span>
+                                )}
+                                <span style={{ color: '#9CA3AF', fontSize: '16px' }}>{aberto ? '▲' : '▼'}</span>
+                            </div>
+                        </div>
+
+                        {/* Tabela de subscribers expandida */}
+                        {aberto && (
+                            <div style={{ borderTop: '1px solid #E5E7EB' }}>
+                                {n.subscribers.length === 0 ? (
+                                    <p style={{ textAlign: 'center', padding: '16px', color: '#888', fontSize: '13px' }}>Sem dados de subscribers.</p>
+                                ) : (
+                                    <div style={{ overflowX: 'auto' }}>
+                                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                                            <thead>
+                                                <tr style={{ background: '#F9FAFB', color: '#6B7280', textAlign: 'left' }}>
+                                                    <th style={{ padding: '10px 14px' }}>Visitor ID</th>
+                                                    <th style={{ padding: '10px 14px' }}>Clicou em</th>
+                                                    <th style={{ padding: '10px 14px', textAlign: 'center' }}>Comprou?</th>
+                                                    <th style={{ padding: '10px 14px' }}>Converteu em</th>
+                                                    <th style={{ padding: '10px 14px', textAlign: 'right' }}>Receita</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {n.subscribers.map((s, i) => (
+                                                    <tr key={i} style={{ borderTop: '1px solid #F3F4F6', background: s.converted ? '#f0fdf4' : 'white' }}>
+                                                        <td style={{ padding: '10px 14px', fontFamily: 'monospace', color: '#374151', fontSize: '11px' }}>
+                                                            {s.visitor_id.substring(0, 16)}...
+                                                        </td>
+                                                        <td style={{ padding: '10px 14px', color: '#6B7280' }}>{formatDate(s.clicked_at)}</td>
+                                                        <td style={{ padding: '10px 14px', textAlign: 'center' }}>
+                                                            {s.converted
+                                                                ? <span style={{ background: '#dcfce7', color: '#166534', padding: '2px 8px', borderRadius: '999px', fontWeight: 600 }}>✅ Sim</span>
+                                                                : <span style={{ background: '#F3F4F6', color: '#9CA3AF', padding: '2px 8px', borderRadius: '999px' }}>— Não</span>
+                                                            }
+                                                        </td>
+                                                        <td style={{ padding: '10px 14px', color: '#6B7280' }}>
+                                                            {s.converted_at ? formatDate(s.converted_at) : '—'}
+                                                        </td>
+                                                        <td style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 600, color: s.revenue ? '#059669' : '#9CA3AF' }}>
+                                                            {s.revenue ? brl(s.revenue) : '—'}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
+
+            <button onClick={fetchJornada} style={{ marginTop: '8px', background: 'none', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '8px 16px', cursor: 'pointer', fontSize: '13px', color: '#374151' }}>
+                🔄 Atualizar jornada
+            </button>
+        </div>
+    );
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 // ── Função: inferir etapa do funil pelo texto da campanha ───────────────────
 function inferirFunil(title: string, message: string): { label: string; color: string; bg: string; etapa: 'fundo' | 'meio' | 'topo' } {
     const texto = `${title} ${message}`.toLowerCase();
@@ -755,7 +958,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
     const [sendingAB, setSendingAB] = useState(false);
     const [abTests, setAbTests] = useState<ABTestItem[]>([]);
     const [loadingAB, setLoadingAB] = useState(false);
-    const [activeHistorySubTab, setActiveHistorySubTab] = useState<'onesignal' | 'ab' | 'local'>('onesignal');
+    const [activeHistorySubTab, setActiveHistorySubTab] = useState<'onesignal' | 'ab' | 'jornada' | 'local'>('onesignal');
 
     const handleSelecionarObjetivo = (obj: ObjetivoConfig) => {
         // Se já estava selecionado, deseleciona (toggle)
@@ -1503,9 +1706,9 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             </div>
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <div style={{ display: 'flex', background: '#F3F4F6', borderRadius: '8px', padding: '3px', gap: '2px' }}>
-                                    {(['onesignal', 'ab', 'local'] as const).map(tab => (
+                                    {(['onesignal', 'ab', 'jornada', 'local'] as const).map(tab => (
                                         <button key={tab} onClick={() => setActiveHistorySubTab(tab)} style={{ padding: '5px 12px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 500, background: activeHistorySubTab === tab ? '#fff' : 'transparent', color: activeHistorySubTab === tab ? '#111827' : '#6B7280', boxShadow: activeHistorySubTab === tab ? '0 1px 3px rgba(0,0,0,0.1)' : 'none', whiteSpace: 'nowrap' }}>
-                                            {tab === 'onesignal' ? 'OneSignal' : tab === 'ab' ? '🧪 Testes A/B' : 'Local'}
+                                            {tab === 'onesignal' ? 'OneSignal' : tab === 'ab' ? '🧪 A/B' : tab === 'jornada' ? '🗺️ Jornada' : 'Local'}
                                         </button>
                                     ))}
                                 </div>
@@ -1584,6 +1787,11 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                         )
                                         : abTests.map(t => <ABResultCard key={t.id} test={t} onRefresh={refreshABTest} />)
                                 }
+                            </div>
+                        )}
+                        {activeHistorySubTab === 'jornada' && (
+                            <div style={{ padding: '8px 0' }}>
+                                <JornadaTab token={token} API_URL={API_URL} brl={brl} />
                             </div>
                         )}
                         {activeHistorySubTab === 'local' && (
