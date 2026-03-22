@@ -76,97 +76,134 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
   const metaRecorrentes = clientesRec < 10 ? 10 : clientesRec < 50 ? 50 : clientesRec < 100 ? 100 : Math.ceil(clientesRec / 100) * 100;
 
   // ── DIAGNÓSTICO AUTOMÁTICO ──────────────────────────────────────────
-  // Detecta o maior gargalo do funil e gera ação direta
   const taxaVisitaCarrinho = funilVisitas > 0 ? (funilCarrinho / funilVisitas) * 100 : 0;
   const taxaCarrinhoCheckout = funilCarrinho > 0 ? (funilCheckout / funilCarrinho) * 100 : 0;
-  const mediaConversaoMercado = 1.5; // % médio e-commerce Brasil
+  const mediaConversaoMercado = 1.5;
+
+  // Produto mais visitado (top páginas — exclui home e install)
+  const produtoDestaque = topPaginasPwa.find(p => p && p !== '/' && p !== 'install' && p.length > 1) ?? null;
 
   type Severidade = 'critico' | 'alerta' | 'ok';
+  interface AcaoCampanha { label: string; titulo: string; msg: string; icon: string; }
   interface Diagnostico {
     severidade: Severidade;
     titulo: string;
+    urgencia: string; // frase curta de pressão
     descricao: string;
-    acao: string;
-    campanha_titulo?: string;
-    campanha_msg?: string;
+    causas: string[];
+    acoes: AcaoCampanha[];
+    projecao_inline?: string; // frase de projeção rápida
+    proximo_passo: string; // gamificação
   }
 
   const getDiagnostico = (): Diagnostico => {
-    // Sem dados ainda
-    if (funilVisitas === 0) {
-      return {
-        severidade: 'alerta',
-        titulo: 'Aguardando primeiras visitas',
-        descricao: 'O app ainda não registrou visitantes. Compartilhe o link de instalação com seus clientes.',
-        acao: 'Criar campanha de boas-vindas',
-        campanha_titulo: 'Instale nosso app e ganhe 10% OFF!',
-        campanha_msg: 'Baixe o app e use o cupom BEMVINDO10 na sua primeira compra.',
-      };
-    }
-    // Tem visitas mas ninguém vai ao carrinho
+    if (funilVisitas === 0) return {
+      severidade: 'alerta',
+      titulo: 'Aguardando primeiras visitas',
+      urgencia: '🚨 Seu app ainda não tem tráfego',
+      descricao: 'Nenhum visitante registrado ainda. Compartilhe o link de instalação e comece a capturar clientes.',
+      causas: ['📲 App não divulgado para clientes', '🔗 Link de instalação não compartilhado', '📣 Falta campanha de lançamento'],
+      acoes: [
+        { label: 'Campanha de boas-vindas', titulo: 'Instale nosso app e ganhe 10% OFF!', msg: 'Baixe o app e use o cupom BEMVINDO10 na sua primeira compra.', icon: '🎁' },
+        { label: 'Divulgar no WhatsApp', titulo: 'Novidade! Nosso app chegou', msg: 'Instale agora pelo link e ganhe desconto exclusivo de cliente app.', icon: '📲' },
+      ],
+      proximo_passo: '🎯 Próximo passo: conseguir as primeiras 10 visitas',
+    };
+
     if (funilVisitas > 0 && funilCarrinho === 0) {
+      const projecaoRapida = ticketApp > 0 ? `💰 Se converter apenas 2% dessas ${funilVisitas} visitas → ${brl(Math.round(funilVisitas * 0.02 * ticketApp))} em vendas` : '';
       return {
         severidade: 'critico',
-        titulo: 'Usuários visitam mas não adicionam ao carrinho',
-        descricao: 'Você tem visitas mas nenhuma conversão para carrinho. O problema pode ser preço, confiança ou oferta pouco atraente.',
-        acao: 'Criar campanha com cupom de produto',
-        campanha_titulo: 'Oferta especial só para você!',
-        campanha_msg: 'Escolha seu produto favorito e use o cupom PROMO10 para 10% de desconto.',
+        titulo: `Você tem ${funilVisitas} visitas mas 0 carrinhos`,
+        urgencia: '🚨 Você está perdendo vendas AGORA — visitantes saem sem comprar',
+        descricao: 'Usuários entram no app mas não adicionam nada ao carrinho. Isso indica barreira na decisão de compra.',
+        causas: ['💸 Preço acima do mercado', '📦 Frete alto ou oculto', '❌ Falta de prova social (avaliações)', '⏳ Falta de urgência na oferta'],
+        acoes: [
+          { label: 'Cupom de desconto', titulo: 'Oferta especial só para você!', msg: 'Use o cupom PROMO10 e ganhe 10% de desconto hoje.', icon: '🎟️' },
+          { label: 'Urgência — estoque', titulo: 'Ultimas unidades disponíveis!', msg: 'Estoque acabando. Garanta o seu antes que esgote!', icon: '🔥' },
+          { label: 'Frete grátis', titulo: 'Frete GRÁTIS hoje!', msg: 'Aproveite frete grátis em todos os pedidos. Só hoje!', icon: '🚚' },
+        ],
+        projecao_inline: projecaoRapida,
+        proximo_passo: '🎯 Próximo passo: gerar o 1º carrinho',
       };
     }
-    // Tem carrinho mas não finaliza
+
     if (funilCarrinho > 0 && funilCheckout === 0) {
+      const projecaoRapida = ticketApp > 0 ? `💰 Recuperar ${funilCarrinho} carrinhos pode gerar até ${brl(funilCarrinho * ticketApp)} em vendas` : '';
       return {
         severidade: 'critico',
-        titulo: 'Clientes chegam ao carrinho mas não finalizam',
-        descricao: 'Seu maior gargalo é no checkout. Pode ser frete, forma de pagamento ou insegurança na compra.',
-        acao: 'Criar campanha de recuperação de carrinho',
-        campanha_titulo: 'Seus itens estão te esperando!',
-        campanha_msg: 'Finalize sua compra agora com frete grátis. Oferta por tempo limitado!',
+        titulo: `${funilCarrinho} carrinho${funilCarrinho > 1 ? 's' : ''} abandonado${funilCarrinho > 1 ? 's' : ''} sem nenhuma venda`,
+        urgencia: '🚨 Clientes chegam ao carrinho mas desistem na hora H',
+        descricao: 'O gargalo está no checkout. Clientes querem comprar mas algo os impede de finalizar.',
+        causas: ['📦 Frete revelado só no checkout', '💳 Forma de pagamento não aceita', '🔐 Insegurança no site (falta SSL visível)', '⏱️ Processo de compra longo demais'],
+        acoes: [
+          { label: 'Recuperar carrinho + frete grátis', titulo: 'Seus itens estão te esperando!', msg: 'Finalize agora com frete grátis. Oferta válida hoje!', icon: '🛒' },
+          { label: 'Urgência — tempo limitado', titulo: 'Últimas horas para garantir!', msg: 'Seu carrinho expira em breve. Finalize e ganhe desconto especial.', icon: '⏰' },
+          { label: 'Cupom de finalização', titulo: 'Presente para você finalizar!', msg: 'Use FINALIZA5 e ganhe 5% OFF na sua compra agora.', icon: '🎁' },
+        ],
+        projecao_inline: projecaoRapida,
+        proximo_passo: '🎯 Próximo passo: converter o 1º carrinho em venda',
       };
     }
-    // Conversão abaixo da média do mercado
+
     if (taxaConvApp < mediaConversaoMercado && funilVisitas > 10) {
+      const potencial = ticketApp > 0 ? brl(Math.round(funilVisitas * (mediaConversaoMercado / 100) * ticketApp)) : '';
       return {
         severidade: 'alerta',
-        titulo: `Conversão ${taxaConvApp}% — abaixo da média do mercado (${mediaConversaoMercado}%)`,
-        descricao: 'Sua taxa está abaixo da média. Uma campanha com urgência ou cupom pode acelerar as vendas.',
-        acao: 'Criar campanha de urgência',
-        campanha_titulo: 'Só hoje: frete grátis + 5% OFF!',
-        campanha_msg: 'Aproveite essa oferta relâmpago. Válida apenas hoje!',
+        titulo: `Conversão ${taxaConvApp}% — ${(mediaConversaoMercado - taxaConvApp).toFixed(1)}pp abaixo da média`,
+        urgencia: `📉 Você está ${Math.round(((mediaConversaoMercado - taxaConvApp) / mediaConversaoMercado) * 100)}% abaixo do seu potencial de conversão`,
+        descricao: 'Sua taxa está abaixo da média do mercado. Pequenos ajustes de oferta podem dobrar suas vendas.',
+        causas: ['⏳ Falta de urgência nas campanhas', '🎯 Segmentação muito ampla', '📝 Copy das mensagens pouco persuasivo', '🔔 Frequência de push insuficiente'],
+        acoes: [
+          { label: 'Campanha de urgência', titulo: 'Só hoje: frete grátis + 5% OFF!', msg: 'Aproveite essa oferta relâmpago. Válida apenas hoje!', icon: '⚡' },
+          { label: 'Reativar clientes inativos', titulo: 'Saudades de você!', msg: 'Faz um tempo que não te vemos. Temos ofertas exclusivas esperando.', icon: '💌' },
+          ...(potencial ? [{ label: 'Campanha para atingir média', titulo: 'Oferta imperdível para você!', msg: 'Não perca essa chance. Desconto exclusivo por tempo limitado!', icon: '🎯' }] : []),
+        ],
+        projecao_inline: potencial ? `💰 Na média do mercado você faturaria ${potencial} — ${brl(Math.round(funilVisitas * (mediaConversaoMercado / 100) * ticketApp) - receita)} a mais` : '',
+        proximo_passo: `🎯 Próximo passo: atingir ${mediaConversaoMercado}% de conversão`,
       };
     }
-    // Carrinhos abandonados com valor alto
-    if (carrinhosValor > 0 && receita === 0) {
-      return {
-        severidade: 'alerta',
-        titulo: `${brl(carrinhosValor)} em carrinhos abandonados sem nenhuma venda`,
-        descricao: 'Você tem dinheiro parado em carrinhos. Ative a automação de recuperação para recuperar essas vendas.',
-        acao: 'Recuperar carrinhos agora',
-        campanha_titulo: 'Seus itens ainda estão no carrinho!',
-        campanha_msg: 'Complete sua compra e ganhe frete grátis. Estoque limitado!',
-      };
-    }
-    // Tudo ok
+
+    if (carrinhosValor > 0 && receita === 0) return {
+      severidade: 'alerta',
+      titulo: `${brl(carrinhosValor)} parados em carrinhos sem nenhuma venda fechada`,
+      urgencia: '⚠️ Dinheiro parado — ative a recuperação automática agora',
+      descricao: 'Você tem carrinhos com valor mas zero vendas. Ativar as automações pode recuperar parte desse valor hoje.',
+      causas: ['🤖 Automação de carrinho desativada', '📧 Clientes sem e-mail vinculado', '⏰ Tempo de recuperação muito longo'],
+      acoes: [
+        { label: 'Recuperar carrinhos agora', titulo: 'Seus itens ainda estão no carrinho!', msg: 'Complete sua compra e ganhe frete grátis. Estoque limitado!', icon: '🛒' },
+        { label: 'Oferecer cupom de retorno', titulo: 'Presente especial para você!', msg: 'Volte e use o cupom VOLTA10 para 10% OFF na sua compra.', icon: '🎁' },
+      ],
+      proximo_passo: '🎯 Próximo passo: fechar a 1ª venda',
+    };
+
     return {
       severidade: 'ok',
       titulo: 'Loja performando bem!',
-      descricao: `Conversão em ${taxaConvApp}% — acima da média do mercado. Continue enviando campanhas para manter o ritmo.`,
-      acao: 'Criar nova campanha',
-      campanha_titulo: 'Novidades chegando!',
-      campanha_msg: 'Confira as novidades da loja. Aproveite as ofertas exclusivas do app!',
+      urgencia: `✅ Conversão ${taxaConvApp}% — acima da média do mercado`,
+      descricao: 'Parabéns! Sua loja está convertendo acima da média. Continue enviando campanhas segmentadas para manter o ritmo.',
+      causas: [],
+      acoes: [
+        { label: 'Nova campanha VIP', titulo: 'Oferta exclusiva para clientes fiéis!', msg: 'Você é especial! Desconto exclusivo só para clientes do app.', icon: '👑' },
+        { label: 'Campanha de novidades', titulo: 'Novidades chegando!', msg: 'Confira os lançamentos exclusivos do app. Aproveite as ofertas!', icon: '🆕' },
+      ],
+      proximo_passo: `🎯 Próximo passo: manter acima de ${taxaConvApp + 0.5}% de conversão`,
     };
   };
 
   const diagnostico = getDiagnostico();
 
-  // ── PROJEÇÃO DE GANHO ───────────────────────────────────────────────
-  // "Se converter X% → R$ estimado"
+  // Projeção de ganho (bloco separado)
   const projecoes = ticketApp > 0 && funilVisitas > 0 ? [
     { pct: 1, valor: Math.round(funilVisitas * 0.01 * ticketApp) },
     { pct: 3, valor: Math.round(funilVisitas * 0.03 * ticketApp) },
     { pct: 5, valor: Math.round(funilVisitas * 0.05 * ticketApp) },
   ] : [];
+
+  // Insight do produto mais visitado
+  const insightProduto = produtoDestaque
+    ? `💡 Dica: usuários estão visitando "${produtoDestaque.replace(/\//g, '').slice(0, 30)}" — use esse produto na campanha para aumentar o CTR`
+    : null;
 
   const corSeveridade = {
     critico: { bg: '#FEF2F2', border: '#FECACA', titulo: '#991B1B', badge: '#DC2626', badgeBg: '#FEE2E2' },
@@ -182,61 +219,64 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
       {/* ══════════════════════════════════════════════════════════════
           BLOCO DE DIAGNÓSTICO + AÇÃO — SEMPRE NO TOPO
       ══════════════════════════════════════════════════════════════ */}
-      <div style={{
-        background: corSeveridade.bg,
-        border: `2px solid ${corSeveridade.border}`,
-        borderRadius: '14px',
-        padding: '20px 24px',
-        marginBottom: '24px',
-      }}>
-        {/* Cabeçalho */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-              <span style={{ fontSize: '22px' }}>{iconesDiagnostico[diagnostico.severidade]}</span>
-              <span style={{
-                background: corSeveridade.badgeBg,
-                color: corSeveridade.badge,
-                fontSize: '11px',
-                fontWeight: 700,
-                padding: '3px 10px',
-                borderRadius: '999px',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-              }}>
-                {diagnostico.severidade === 'critico' ? 'Ação urgente' : diagnostico.severidade === 'alerta' ? 'Atenção' : 'Tudo certo'}
-              </span>
-            </div>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: corSeveridade.titulo, marginBottom: '6px' }}>
-              {diagnostico.titulo}
-            </div>
-            <div style={{ fontSize: '13px', color: corSeveridade.titulo, opacity: 0.85, lineHeight: 1.5 }}>
-              {diagnostico.descricao}
-            </div>
-          </div>
-          <button
-            onClick={onNavigateCampanhas}
-            style={{
-              background: corSeveridade.badge,
-              color: '#fff',
-              border: 'none',
-              borderRadius: '10px',
-              padding: '12px 20px',
-              fontSize: '13px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              flexShrink: 0,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-            }}
-          >
-            🚀 {diagnostico.acao}
-          </button>
+      <div style={{ background: corSeveridade.bg, border: `2px solid ${corSeveridade.border}`, borderRadius: '14px', padding: '20px 24px', marginBottom: '24px' }}>
+
+        {/* Badge + urgência */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '22px' }}>{iconesDiagnostico[diagnostico.severidade]}</span>
+          <span style={{ background: corSeveridade.badgeBg, color: corSeveridade.badge, fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '999px', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>
+            {diagnostico.severidade === 'critico' ? 'Ação urgente' : diagnostico.severidade === 'alerta' ? 'Atenção' : 'Tudo certo'}
+          </span>
+          <span style={{ fontSize: '13px', fontWeight: 700, color: corSeveridade.titulo }}>{diagnostico.urgencia}</span>
         </div>
 
-        {/* Funil rápido de diagnóstico */}
+        {/* Título e descrição */}
+        <div style={{ fontSize: '16px', fontWeight: 800, color: corSeveridade.titulo, marginBottom: '6px' }}>{diagnostico.titulo}</div>
+        <div style={{ fontSize: '13px', color: corSeveridade.titulo, opacity: 0.85, lineHeight: 1.5, marginBottom: diagnostico.causas.length > 0 ? '12px' : '0' }}>{diagnostico.descricao}</div>
+
+        {/* Causas possíveis */}
+        {diagnostico.causas.length > 0 && (
+          <div style={{ background: 'rgba(255,255,255,0.6)', borderRadius: '8px', padding: '10px 14px', marginBottom: '14px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 700, color: corSeveridade.titulo, marginBottom: '6px', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>Possíveis causas:</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+              {diagnostico.causas.map((c, i) => (
+                <span key={i} style={{ fontSize: '12px', color: corSeveridade.titulo, background: 'rgba(255,255,255,0.8)', padding: '3px 10px', borderRadius: '999px', border: `1px solid ${corSeveridade.border}` }}>{c}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Projeção inline rápida */}
+        {diagnostico.projecao_inline && (
+          <div style={{ background: '#111827', color: '#FCD34D', borderRadius: '8px', padding: '10px 14px', marginBottom: '14px', fontSize: '13px', fontWeight: 600 }}>
+            {diagnostico.projecao_inline}
+          </div>
+        )}
+
+        {/* Múltiplas ações */}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
+          {diagnostico.acoes.map((acao, i) => (
+            <button key={i} onClick={onNavigateCampanhas} style={{ background: i === 0 ? corSeveridade.badge : 'white', color: i === 0 ? '#fff' : corSeveridade.badge, border: `1px solid ${corSeveridade.badge}`, borderRadius: '8px', padding: '9px 16px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              {acao.icon} {acao.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Insight do produto + próximo passo */}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          {insightProduto && (
+            <div style={{ flex: 1, minWidth: '200px', background: 'rgba(255,255,255,0.7)', borderRadius: '8px', padding: '8px 12px', fontSize: '12px', color: corSeveridade.titulo }}>
+              {insightProduto}
+            </div>
+          )}
+          <div style={{ flex: 1, minWidth: '200px', background: 'rgba(255,255,255,0.7)', borderRadius: '8px', padding: '8px 12px', fontSize: '12px', fontWeight: 600, color: corSeveridade.titulo }}>
+            {diagnostico.proximo_passo}
+          </div>
+        </div>
+
+        {/* Funil rápido */}
         {funilVisitas > 0 && (
-          <div style={{ display: 'flex', gap: '8px', marginTop: '16px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '8px', marginTop: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
             {[
               { label: 'Visitas', val: funilVisitas, pct: 100, cor: '#6B7280' },
               { label: 'Carrinho', val: funilCarrinho, pct: taxaVisitaCarrinho, cor: funilCarrinho === 0 ? '#DC2626' : '#3B82F6' },
@@ -244,14 +284,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
             ].map((etapa, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 {i > 0 && <span style={{ color: '#9CA3AF', fontSize: '16px' }}>→</span>}
-                <div style={{
-                  background: 'white',
-                  borderRadius: '8px',
-                  padding: '6px 12px',
-                  fontSize: '12px',
-                  border: `1px solid ${etapa.cor}40`,
-                  textAlign: 'center',
-                }}>
+                <div style={{ background: 'white', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', border: `1px solid ${etapa.cor}40`, textAlign: 'center' as const }}>
                   <div style={{ fontWeight: 700, color: etapa.cor }}>{etapa.val}</div>
                   <div style={{ color: '#6B7280', fontSize: '10px' }}>{etapa.label}</div>
                   {i > 0 && <div style={{ color: etapa.cor, fontSize: '10px', fontWeight: 600 }}>{etapa.pct.toFixed(1)}%</div>}
@@ -260,7 +293,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
             ))}
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span style={{ color: '#9CA3AF', fontSize: '16px' }}>→</span>
-              <div style={{ background: 'white', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', border: '1px solid #E5E7EB', textAlign: 'center' }}>
+              <div style={{ background: 'white', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', border: '1px solid #E5E7EB', textAlign: 'center' as const }}>
                 <div style={{ fontWeight: 700, color: '#6B7280' }}>Mercado</div>
                 <div style={{ color: '#6B7280', fontSize: '10px' }}>Benchmark</div>
                 <div style={{ color: '#6B7280', fontSize: '10px', fontWeight: 600 }}>1–3%</div>
