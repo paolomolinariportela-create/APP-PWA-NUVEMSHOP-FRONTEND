@@ -1,43 +1,156 @@
 import React from "react";
 
+// ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
+const C = {
+  brand:       '#4F46E5',
+  brandHover:  '#4338CA',
+  brandLight:  '#EEF2FF',
+  brandMuted:  '#818CF8',
+
+  success:     '#059669',
+  successBg:   '#F0FDF4',
+  successBorder:'#A7F3D0',
+
+  warning:     '#B45309',
+  warningBg:   '#FFFBEB',
+  warningBorder:'#FDE68A',
+
+  danger:      '#B91C1C',
+  dangerBg:    '#FFF5F5',
+  dangerBorder:'#FECACA',
+
+  neutral:     '#374151',
+  neutralMid:  '#6B7280',
+  neutralLight:'#9CA3AF',
+  neutralBorder:'#E5E7EB',
+  neutralBg:   '#F9FAFB',
+
+  text:        '#111827',
+  textMid:     '#374151',
+  textSoft:    '#6B7280',
+
+  white:       '#FFFFFF',
+  dark:        '#111827',
+  darkMid:     '#1F2937',
+};
+
+// ─── SVG ICONS ────────────────────────────────────────────────────────────────
+const Icon = {
+  revenue: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>
+    </svg>
+  ),
+  ticket: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/>
+    </svg>
+  ),
+  mobile: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>
+    </svg>
+  ),
+  trending: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+    </svg>
+  ),
+  users: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+  ),
+  eye: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+    </svg>
+  ),
+  pages: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+    </svg>
+  ),
+  cart: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+    </svg>
+  ),
+  conversion: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+    </svg>
+  ),
+  alert: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+  ),
+  check: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  ),
+  info: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+    </svg>
+  ),
+  arrow: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+    </svg>
+  ),
+  lightning: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+    </svg>
+  ),
+  target: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+    </svg>
+  ),
+  dollar: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+    </svg>
+  ),
+  bulb: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/>
+    </svg>
+  ),
+};
+
+// ─── REUSABLE COMPONENTS ──────────────────────────────────────────────────────
+const Badge = ({ color, bg, border, children }: { color: string; bg: string; border: string; children: React.ReactNode }) => (
+  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: bg, color, border: `1px solid ${border}`, fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '4px', letterSpacing: '0.02em' }}>
+    {children}
+  </span>
+);
+
+const ActionBtn = ({ primary, onClick, children }: { primary?: boolean; onClick?: () => void; children: React.ReactNode }) => (
+  <button onClick={onClick} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', border: primary ? 'none' : `1px solid ${C.neutralBorder}`, background: primary ? C.brand : C.white, color: primary ? C.white : C.textMid, transition: 'all 0.15s' }}>
+    {children}
+  </button>
+);
+
+// ─── INTERFACES ───────────────────────────────────────────────────────────────
 interface DashboardStats {
   receita: number;
   vendas: number;
   instalacoes: number;
   instalacoes_banco?: number;
   crescimento_instalacoes_7d: number;
-  carrinhos_abandonados: {
-    valor: number;
-    qtd: number;
-    ativos_automacao?: number;
-    ativos_onesignal?: number;
-  };
+  carrinhos_abandonados: { valor: number; qtd: number; ativos_automacao?: number; ativos_onesignal?: number; };
   taxa_conversao: { app: number; site: number };
-  visualizacoes: {
-    pageviews: number;
-    tempo_medio: string;
-    top_paginas: string[];
-    top_paginas_pwa?: string[];
-  };
+  visualizacoes: { pageviews: number; tempo_medio: string; top_paginas: string[]; top_paginas_pwa?: string[]; };
   funil: { visitas: number; carrinho: number; checkout: number };
-  recorrencia: {
-    clientes_2x: number;
-    taxa_recompra: number;
-    compradores_onesignal?: number;
-  };
+  recorrencia: { clientes_2x: number; taxa_recompra: number; compradores_onesignal?: number; };
   ticket_medio: { app: number; site: number };
-  visitas?: { app: number; site: number; total: number };
-  extra_pwa?: {
-    visitas_pwa: number;
-    visitas_site: number;
-    vendas_pwa: number;
-    vendas_site: number;
-  };
-  onesignal?: {
-    active_subscribers: number;
-    carrinho_ativo_count: number;
-    compradores_count: number;
-  };
+  extra_pwa?: { visitas_pwa: number; visitas_site: number; vendas_pwa: number; vendas_site: number; };
+  onesignal?: { active_subscribers: number; carrinho_ativo_count: number; compradores_count: number; };
 }
 
 interface Props {
@@ -45,443 +158,393 @@ interface Props {
   onNavigateCampanhas?: () => void;
 }
 
+type Severidade = 'critico' | 'alerta' | 'ok';
+interface AcaoCampanha { label: string; icon: React.ReactNode; }
+interface Diagnostico {
+  severidade: Severidade;
+  badge: string;
+  titulo: string;
+  urgencia: string;
+  descricao: string;
+  causas: string[];
+  acoes: AcaoCampanha[];
+  projecao_inline?: string;
+  proximo_passo: string;
+}
+
+// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
-  const receita = stats?.receita ?? 0;
-  const vendas = stats?.vendas ?? 0;
-  const crescimento7d = stats?.crescimento_instalacoes_7d ?? 0;
+  const receita        = stats?.receita ?? 0;
+  const vendas         = stats?.vendas ?? 0;
+  const crescimento7d  = stats?.crescimento_instalacoes_7d ?? 0;
   const carrinhosValor = stats?.carrinhos_abandonados?.valor ?? 0;
-  const carrinhosQtd = stats?.carrinhos_abandonados?.qtd ?? 0;
-  const ticketApp = stats?.ticket_medio?.app ?? 0;
-  const taxaConvApp = stats?.taxa_conversao?.app ?? 0;
-  const clientesRec = stats?.recorrencia?.clientes_2x ?? 0;
-  const taxaRecompra = stats?.recorrencia?.taxa_recompra ?? 0;
-  const pageviews = stats?.visualizacoes?.pageviews ?? 0;
-  const tempoMedio = stats?.visualizacoes?.tempo_medio ?? "--";
-  const topPaginasPwa = stats?.visualizacoes?.top_paginas_pwa ?? [];
-  const funilVisitas = stats?.funil?.visitas ?? 0;
-  const funilCarrinho = stats?.funil?.carrinho ?? 0;
-  const funilCheckout = stats?.funil?.checkout ?? 0;
+  const carrinhosQtd   = stats?.carrinhos_abandonados?.qtd ?? 0;
+  const ticketApp      = stats?.ticket_medio?.app ?? 0;
+  const taxaConvApp    = stats?.taxa_conversao?.app ?? 0;
+  const clientesRec    = stats?.recorrencia?.clientes_2x ?? 0;
+  const taxaRecompra   = stats?.recorrencia?.taxa_recompra ?? 0;
+  const pageviews      = stats?.visualizacoes?.pageviews ?? 0;
+  const tempoMedio     = stats?.visualizacoes?.tempo_medio ?? '--';
+  const topPaginasPwa  = stats?.visualizacoes?.top_paginas_pwa ?? [];
+  const funilVisitas   = stats?.funil?.visitas ?? 0;
+  const funilCarrinho  = stats?.funil?.carrinho ?? 0;
+  const funilCheckout  = stats?.funil?.checkout ?? 0;
 
-  const osData = stats?.onesignal;
-  const instalacoes = osData?.active_subscribers || stats?.instalacoes || 0;
-  const carrinhoAtivoOS = osData?.carrinho_ativo_count ?? 0;
+  const osData       = stats?.onesignal;
+  const instalacoes  = osData?.active_subscribers || stats?.instalacoes || 0;
+  const carrinhoOS   = osData?.carrinho_ativo_count ?? 0;
   const compradoresOS = osData?.compradores_count ?? 0;
-  const temOsData = !!osData && osData.active_subscribers > 0;
+  const temOsData    = !!osData && osData.active_subscribers > 0;
 
-  const brl = (v: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
+  const brl = (v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 
-  // Metas dinâmicas
   const metaInstalacoes = instalacoes < 100 ? 100 : instalacoes < 500 ? 500 : instalacoes < 1000 ? 1000 : Math.ceil(instalacoes / 1000) * 1000;
-  const metaReceita = receita < 500 ? 500 : receita < 1000 ? 1000 : receita < 5000 ? 5000 : Math.ceil(receita / 5000) * 5000;
-  const metaRecorrentes = clientesRec < 10 ? 10 : clientesRec < 50 ? 50 : clientesRec < 100 ? 100 : Math.ceil(clientesRec / 100) * 100;
+  const metaReceita     = receita < 500 ? 500 : receita < 1000 ? 1000 : receita < 5000 ? 5000 : Math.ceil(receita / 5000) * 5000;
+  const metaRec         = clientesRec < 10 ? 10 : clientesRec < 50 ? 50 : clientesRec < 100 ? 100 : Math.ceil(clientesRec / 100) * 100;
 
-  // ── DIAGNÓSTICO AUTOMÁTICO ──────────────────────────────────────────
-  const taxaVisitaCarrinho = funilVisitas > 0 ? (funilCarrinho / funilVisitas) * 100 : 0;
-  const taxaCarrinhoCheckout = funilCarrinho > 0 ? (funilCheckout / funilCarrinho) * 100 : 0;
-  const mediaConversaoMercado = 1.5;
-
-  // Produto mais visitado (top páginas — exclui home e install)
+  const mediaConv       = 1.5;
+  const taxaV2C         = funilVisitas > 0 ? (funilCarrinho / funilVisitas) * 100 : 0;
+  const taxaC2O         = funilCarrinho > 0 ? (funilCheckout / funilCarrinho) * 100 : 0;
   const produtoDestaque = topPaginasPwa.find(p => p && p !== '/' && p !== 'install' && p.length > 1) ?? null;
 
-  type Severidade = 'critico' | 'alerta' | 'ok';
-  interface AcaoCampanha { label: string; titulo: string; msg: string; icon: string; }
-  interface Diagnostico {
-    severidade: Severidade;
-    titulo: string;
-    urgencia: string; // frase curta de pressão
-    descricao: string;
-    causas: string[];
-    acoes: AcaoCampanha[];
-    projecao_inline?: string; // frase de projeção rápida
-    proximo_passo: string; // gamificação
-  }
-
+  // ── DIAGNÓSTICO ──
   const getDiagnostico = (): Diagnostico => {
     if (funilVisitas === 0) return {
-      severidade: 'alerta',
-      titulo: 'Aguardando primeiras visitas',
-      urgencia: '🚨 Seu app ainda não tem tráfego',
-      descricao: 'Nenhum visitante registrado ainda. Compartilhe o link de instalação e comece a capturar clientes.',
-      causas: ['📲 App não divulgado para clientes', '🔗 Link de instalação não compartilhado', '📣 Falta campanha de lançamento'],
+      severidade: 'alerta', badge: 'Sem tráfego',
+      titulo: 'Nenhuma visita registrada ainda',
+      urgencia: 'O app ainda não tem dados de tráfego para analisar.',
+      descricao: 'Compartilhe o link de instalação com seus clientes para começar a capturar dados e visitantes.',
+      causas: ['App não divulgado para a base de clientes', 'Link de instalação não compartilhado', 'Nenhuma campanha de lançamento ativa'],
       acoes: [
-        { label: 'Campanha de boas-vindas', titulo: 'Instale nosso app e ganhe 10% OFF!', msg: 'Baixe o app e use o cupom BEMVINDO10 na sua primeira compra.', icon: '🎁' },
-        { label: 'Divulgar no WhatsApp', titulo: 'Novidade! Nosso app chegou', msg: 'Instale agora pelo link e ganhe desconto exclusivo de cliente app.', icon: '📲' },
+        { label: 'Campanha de lançamento', icon: Icon.lightning },
+        { label: 'Cupom de boas-vindas', icon: Icon.target },
       ],
-      proximo_passo: '🎯 Próximo passo: conseguir as primeiras 10 visitas',
+      proximo_passo: 'Próximo passo: registrar as primeiras 10 visitas',
     };
 
     if (funilVisitas > 0 && funilCarrinho === 0) {
-      const projecaoRapida = ticketApp > 0 ? `💰 Se converter apenas 2% dessas ${funilVisitas} visitas → ${brl(Math.round(funilVisitas * 0.02 * ticketApp))} em vendas` : '';
+      const proj = ticketApp > 0 ? `Converter 2% dessas ${funilVisitas} visitas geraria ${brl(Math.round(funilVisitas * 0.02 * ticketApp))} em receita` : '';
       return {
-        severidade: 'critico',
-        titulo: `Você tem ${funilVisitas} visitas mas 0 carrinhos`,
-        urgencia: '🚨 Você está perdendo vendas AGORA — visitantes saem sem comprar',
-        descricao: 'Usuários entram no app mas não adicionam nada ao carrinho. Isso indica barreira na decisão de compra.',
-        causas: ['💸 Preço acima do mercado', '📦 Frete alto ou oculto', '❌ Falta de prova social (avaliações)', '⏳ Falta de urgência na oferta'],
+        severidade: 'critico', badge: 'Gargalo identificado',
+        titulo: `${funilVisitas} visitas — nenhuma adição ao carrinho`,
+        urgencia: 'Visitantes chegam mas não iniciam o processo de compra.',
+        descricao: 'O problema está na etapa de decisão. O cliente visualiza mas não age. Uma oferta com incentivo claro costuma resolver.',
+        causas: ['Preço acima da percepção de valor', 'Frete alto ou revelado tarde', 'Ausência de prova social ou avaliações', 'Falta de urgência ou escassez na oferta'],
         acoes: [
-          { label: 'Cupom de desconto', titulo: 'Oferta especial só para você!', msg: 'Use o cupom PROMO10 e ganhe 10% de desconto hoje.', icon: '🎟️' },
-          { label: 'Urgência — estoque', titulo: 'Ultimas unidades disponíveis!', msg: 'Estoque acabando. Garanta o seu antes que esgote!', icon: '🔥' },
-          { label: 'Frete grátis', titulo: 'Frete GRÁTIS hoje!', msg: 'Aproveite frete grátis em todos os pedidos. Só hoje!', icon: '🚚' },
+          { label: 'Criar campanha com cupom', icon: Icon.lightning },
+          { label: 'Oferta de urgência', icon: Icon.target },
+          { label: 'Frete grátis por tempo limitado', icon: Icon.arrow },
         ],
-        projecao_inline: projecaoRapida,
-        proximo_passo: '🎯 Próximo passo: gerar o 1º carrinho',
+        projecao_inline: proj,
+        proximo_passo: 'Próximo passo: gerar o primeiro carrinho',
       };
     }
 
     if (funilCarrinho > 0 && funilCheckout === 0) {
-      const projecaoRapida = ticketApp > 0 ? `💰 Recuperar ${funilCarrinho} carrinhos pode gerar até ${brl(funilCarrinho * ticketApp)} em vendas` : '';
+      const proj = ticketApp > 0 ? `Recuperar ${funilCarrinho} carrinho${funilCarrinho > 1 ? 's' : ''} representa até ${brl(funilCarrinho * ticketApp)} em receita potencial` : '';
       return {
-        severidade: 'critico',
+        severidade: 'critico', badge: 'Abandono no checkout',
         titulo: `${funilCarrinho} carrinho${funilCarrinho > 1 ? 's' : ''} abandonado${funilCarrinho > 1 ? 's' : ''} sem nenhuma venda`,
-        urgencia: '🚨 Clientes chegam ao carrinho mas desistem na hora H',
-        descricao: 'O gargalo está no checkout. Clientes querem comprar mas algo os impede de finalizar.',
-        causas: ['📦 Frete revelado só no checkout', '💳 Forma de pagamento não aceita', '🔐 Insegurança no site (falta SSL visível)', '⏱️ Processo de compra longo demais'],
+        urgencia: 'Clientes adicionam produtos mas não finalizam a compra.',
+        descricao: 'O gargalo está na etapa de checkout. O cliente quer comprar mas algo o impede de concluir.',
+        causas: ['Frete revelado apenas no checkout', 'Método de pagamento não disponível', 'Processo de compra longo ou confuso', 'Insegurança na finalização'],
         acoes: [
-          { label: 'Recuperar carrinho + frete grátis', titulo: 'Seus itens estão te esperando!', msg: 'Finalize agora com frete grátis. Oferta válida hoje!', icon: '🛒' },
-          { label: 'Urgência — tempo limitado', titulo: 'Últimas horas para garantir!', msg: 'Seu carrinho expira em breve. Finalize e ganhe desconto especial.', icon: '⏰' },
-          { label: 'Cupom de finalização', titulo: 'Presente para você finalizar!', msg: 'Use FINALIZA5 e ganhe 5% OFF na sua compra agora.', icon: '🎁' },
+          { label: 'Recuperar carrinhos + frete grátis', icon: Icon.lightning },
+          { label: 'Cupom de finalização', icon: Icon.target },
+          { label: 'Push de urgência — tempo limitado', icon: Icon.arrow },
         ],
-        projecao_inline: projecaoRapida,
-        proximo_passo: '🎯 Próximo passo: converter o 1º carrinho em venda',
+        projecao_inline: proj,
+        proximo_passo: 'Próximo passo: converter o primeiro carrinho em venda',
       };
     }
 
-    if (taxaConvApp < mediaConversaoMercado && funilVisitas > 10) {
-      const potencial = ticketApp > 0 ? brl(Math.round(funilVisitas * (mediaConversaoMercado / 100) * ticketApp)) : '';
+    if (taxaConvApp < mediaConv && funilVisitas > 10) {
+      const gap = brl(Math.round(funilVisitas * (mediaConv / 100) * ticketApp) - receita);
       return {
-        severidade: 'alerta',
-        titulo: `Conversão ${taxaConvApp}% — ${(mediaConversaoMercado - taxaConvApp).toFixed(1)}pp abaixo da média`,
-        urgencia: `📉 Você está ${Math.round(((mediaConversaoMercado - taxaConvApp) / mediaConversaoMercado) * 100)}% abaixo do seu potencial de conversão`,
-        descricao: 'Sua taxa está abaixo da média do mercado. Pequenos ajustes de oferta podem dobrar suas vendas.',
-        causas: ['⏳ Falta de urgência nas campanhas', '🎯 Segmentação muito ampla', '📝 Copy das mensagens pouco persuasivo', '🔔 Frequência de push insuficiente'],
+        severidade: 'alerta', badge: 'Abaixo da média',
+        titulo: `Taxa de conversão ${taxaConvApp}% — média do mercado é ${mediaConv}%`,
+        urgencia: `Diferença de ${(mediaConv - taxaConvApp).toFixed(1)}pp em relação à média do setor.`,
+        descricao: 'Sua taxa está abaixo da média. Ajustes de oferta e segmentação costumam resolver isso rapidamente.',
+        causas: ['Campanhas sem segmentação de comportamento', 'Copy das mensagens pouco persuasivo', 'Frequência de push insuficiente', 'Falta de urgência ou escassez'],
         acoes: [
-          { label: 'Campanha de urgência', titulo: 'Só hoje: frete grátis + 5% OFF!', msg: 'Aproveite essa oferta relâmpago. Válida apenas hoje!', icon: '⚡' },
-          { label: 'Reativar clientes inativos', titulo: 'Saudades de você!', msg: 'Faz um tempo que não te vemos. Temos ofertas exclusivas esperando.', icon: '💌' },
-          ...(potencial ? [{ label: 'Campanha para atingir média', titulo: 'Oferta imperdível para você!', msg: 'Não perca essa chance. Desconto exclusivo por tempo limitado!', icon: '🎯' }] : []),
+          { label: 'Campanha segmentada — compradores', icon: Icon.target },
+          { label: 'Push de urgência', icon: Icon.lightning },
+          ...(ticketApp > 0 ? [{ label: `Potencial: +${gap} em receita`, icon: Icon.dollar }] : []),
         ],
-        projecao_inline: potencial ? `💰 Na média do mercado você faturaria ${potencial} — ${brl(Math.round(funilVisitas * (mediaConversaoMercado / 100) * ticketApp) - receita)} a mais` : '',
-        proximo_passo: `🎯 Próximo passo: atingir ${mediaConversaoMercado}% de conversão`,
+        projecao_inline: ticketApp > 0 ? `Na média do mercado (${mediaConv}%) você faturaria mais ${gap} com o tráfego atual` : '',
+        proximo_passo: `Próximo passo: atingir ${mediaConv}% de taxa de conversão`,
       };
     }
 
     if (carrinhosValor > 0 && receita === 0) return {
-      severidade: 'alerta',
-      titulo: `${brl(carrinhosValor)} parados em carrinhos sem nenhuma venda fechada`,
-      urgencia: '⚠️ Dinheiro parado — ative a recuperação automática agora',
-      descricao: 'Você tem carrinhos com valor mas zero vendas. Ativar as automações pode recuperar parte desse valor hoje.',
-      causas: ['🤖 Automação de carrinho desativada', '📧 Clientes sem e-mail vinculado', '⏰ Tempo de recuperação muito longo'],
+      severidade: 'alerta', badge: 'Receita represada',
+      titulo: `${brl(carrinhosValor)} em carrinhos sem nenhuma venda concluída`,
+      urgencia: 'Há valor potencial parado em carrinhos abandonados.',
+      descricao: 'Ativar as automações de recuperação pode converter parte desse valor hoje mesmo.',
+      causas: ['Automação de carrinho desativada', 'Clientes sem identificação vinculada', 'Intervalo de recuperação muito longo'],
       acoes: [
-        { label: 'Recuperar carrinhos agora', titulo: 'Seus itens ainda estão no carrinho!', msg: 'Complete sua compra e ganhe frete grátis. Estoque limitado!', icon: '🛒' },
-        { label: 'Oferecer cupom de retorno', titulo: 'Presente especial para você!', msg: 'Volte e use o cupom VOLTA10 para 10% OFF na sua compra.', icon: '🎁' },
+        { label: 'Ativar recuperação de carrinhos', icon: Icon.lightning },
+        { label: 'Enviar cupom de retorno', icon: Icon.target },
       ],
-      proximo_passo: '🎯 Próximo passo: fechar a 1ª venda',
+      proximo_passo: 'Próximo passo: fechar a primeira venda',
     };
 
     return {
-      severidade: 'ok',
-      titulo: 'Loja performando bem!',
-      urgencia: `✅ Conversão ${taxaConvApp}% — acima da média do mercado`,
-      descricao: 'Parabéns! Sua loja está convertendo acima da média. Continue enviando campanhas segmentadas para manter o ritmo.',
+      severidade: 'ok', badge: 'Performance saudável',
+      titulo: `Conversão em ${taxaConvApp}% — acima da média do mercado`,
+      urgencia: 'A loja está performando bem. Mantenha o ritmo de campanhas.',
+      descricao: 'Continue enviando campanhas segmentadas e acompanhe o funil semanalmente para manter a consistência.',
       causas: [],
       acoes: [
-        { label: 'Nova campanha VIP', titulo: 'Oferta exclusiva para clientes fiéis!', msg: 'Você é especial! Desconto exclusivo só para clientes do app.', icon: '👑' },
-        { label: 'Campanha de novidades', titulo: 'Novidades chegando!', msg: 'Confira os lançamentos exclusivos do app. Aproveite as ofertas!', icon: '🆕' },
+        { label: 'Nova campanha para clientes VIP', icon: Icon.target },
+        { label: 'Campanha de novidades', icon: Icon.arrow },
       ],
-      proximo_passo: `🎯 Próximo passo: manter acima de ${taxaConvApp + 0.5}% de conversão`,
+      proximo_passo: `Próximo passo: manter conversão acima de ${(taxaConvApp + 0.5).toFixed(1)}%`,
     };
   };
 
-  const diagnostico = getDiagnostico();
+  const diag = getDiagnostico();
 
-  // Projeção de ganho (bloco separado)
+  const paleta = {
+    critico: { bg: C.dangerBg,  border: C.dangerBorder,  text: C.danger,  badgeBg: '#FEE2E2', accentIcon: C.danger },
+    alerta:  { bg: C.warningBg, border: C.warningBorder, text: C.warning, badgeBg: '#FEF3C7', accentIcon: C.warning },
+    ok:      { bg: C.successBg, border: C.successBorder, text: C.success, badgeBg: '#D1FAE5', accentIcon: C.success },
+  }[diag.severidade];
+
+  const severidadeIcon = {
+    critico: Icon.alert,
+    alerta:  Icon.info,
+    ok:      Icon.check,
+  }[diag.severidade];
+
+  // Projeções de ganho
   const projecoes = ticketApp > 0 && funilVisitas > 0 ? [
-    { pct: 1, valor: Math.round(funilVisitas * 0.01 * ticketApp) },
-    { pct: 3, valor: Math.round(funilVisitas * 0.03 * ticketApp) },
-    { pct: 5, valor: Math.round(funilVisitas * 0.05 * ticketApp) },
+    { pct: 1, valor: Math.round(funilVisitas * 0.01 * ticketApp), label: 'Conservador' },
+    { pct: 3, valor: Math.round(funilVisitas * 0.03 * ticketApp), label: 'Realista', destaque: true },
+    { pct: 5, valor: Math.round(funilVisitas * 0.05 * ticketApp), label: 'Otimista' },
   ] : [];
 
-  // Insight do produto mais visitado
-  const insightProduto = produtoDestaque
-    ? `💡 Dica: usuários estão visitando "${produtoDestaque.replace(/\//g, '').slice(0, 30)}" — use esse produto na campanha para aumentar o CTR`
-    : null;
-
-  const corSeveridade = {
-    critico: { bg: '#FEF2F2', border: '#FECACA', titulo: '#991B1B', badge: '#DC2626', badgeBg: '#FEE2E2' },
-    alerta:  { bg: '#FFFBEB', border: '#FDE68A', titulo: '#92400E', badge: '#D97706', badgeBg: '#FEF3C7' },
-    ok:      { bg: '#F0FDF4', border: '#BBF7D0', titulo: '#166534', badge: '#16A34A', badgeBg: '#DCFCE7' },
-  }[diagnostico.severidade];
-
-  const iconesDiagnostico = { critico: '🚨', alerta: '⚠️', ok: '✅' };
-
+  // ── RENDER ──────────────────────────────────────────────────────────────────
   return (
     <section className="animate-fade-in">
 
-      {/* ══════════════════════════════════════════════════════════════
-          BLOCO DE DIAGNÓSTICO + AÇÃO — SEMPRE NO TOPO
-      ══════════════════════════════════════════════════════════════ */}
-      <div style={{ background: corSeveridade.bg, border: `2px solid ${corSeveridade.border}`, borderRadius: '14px', padding: '20px 24px', marginBottom: '24px' }}>
+      {/* ── BLOCO DE DIAGNÓSTICO ───────────────────────────────────────── */}
+      <div style={{ background: paleta.bg, border: `1px solid ${paleta.border}`, borderRadius: '10px', padding: '18px 20px', marginBottom: '20px' }}>
 
-        {/* Badge + urgência */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '22px' }}>{iconesDiagnostico[diagnostico.severidade]}</span>
-          <span style={{ background: corSeveridade.badgeBg, color: corSeveridade.badge, fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '999px', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>
-            {diagnostico.severidade === 'critico' ? 'Ação urgente' : diagnostico.severidade === 'alerta' ? 'Atenção' : 'Tudo certo'}
-          </span>
-          <span style={{ fontSize: '13px', fontWeight: 700, color: corSeveridade.titulo }}>{diagnostico.urgencia}</span>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+          <span style={{ color: paleta.text, display: 'flex' }}>{severidadeIcon}</span>
+          <Badge color={paleta.text} bg={paleta.badgeBg} border={paleta.border}>{diag.badge}</Badge>
+          <span style={{ fontSize: '13px', color: paleta.text, fontWeight: 500, marginLeft: '2px' }}>{diag.urgencia}</span>
         </div>
 
-        {/* Título e descrição */}
-        <div style={{ fontSize: '16px', fontWeight: 800, color: corSeveridade.titulo, marginBottom: '6px' }}>{diagnostico.titulo}</div>
-        <div style={{ fontSize: '13px', color: corSeveridade.titulo, opacity: 0.85, lineHeight: 1.5, marginBottom: diagnostico.causas.length > 0 ? '12px' : '0' }}>{diagnostico.descricao}</div>
+        {/* Título */}
+        <div style={{ fontSize: '15px', fontWeight: 700, color: C.text, marginBottom: '4px' }}>{diag.titulo}</div>
+        <div style={{ fontSize: '13px', color: C.textSoft, lineHeight: 1.55, marginBottom: diag.causas.length > 0 ? '12px' : '0' }}>{diag.descricao}</div>
 
-        {/* Causas possíveis */}
-        {diagnostico.causas.length > 0 && (
-          <div style={{ background: 'rgba(255,255,255,0.6)', borderRadius: '8px', padding: '10px 14px', marginBottom: '14px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 700, color: corSeveridade.titulo, marginBottom: '6px', textTransform: 'uppercase' as const, letterSpacing: '0.05em' }}>Possíveis causas:</div>
+        {/* Causas */}
+        {diag.causas.length > 0 && (
+          <div style={{ marginBottom: '12px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 600, color: C.textMid, textTransform: 'uppercase' as const, letterSpacing: '0.06em', marginBottom: '6px' }}>Possíveis causas</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-              {diagnostico.causas.map((c, i) => (
-                <span key={i} style={{ fontSize: '12px', color: corSeveridade.titulo, background: 'rgba(255,255,255,0.8)', padding: '3px 10px', borderRadius: '999px', border: `1px solid ${corSeveridade.border}` }}>{c}</span>
+              {diag.causas.map((c, i) => (
+                <span key={i} style={{ fontSize: '12px', color: C.textMid, background: C.white, padding: '3px 10px', borderRadius: '4px', border: `1px solid ${C.neutralBorder}` }}>{c}</span>
               ))}
             </div>
           </div>
         )}
 
-        {/* Projeção inline rápida */}
-        {diagnostico.projecao_inline && (
-          <div style={{ background: '#111827', color: '#FCD34D', borderRadius: '8px', padding: '10px 14px', marginBottom: '14px', fontSize: '13px', fontWeight: 600 }}>
-            {diagnostico.projecao_inline}
+        {/* Projeção inline */}
+        {diag.projecao_inline && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: C.dark, color: '#FCD34D', borderRadius: '6px', padding: '9px 14px', marginBottom: '12px', fontSize: '12px', fontWeight: 600 }}>
+            <span style={{ color: '#FCD34D', display: 'flex' }}>{Icon.dollar}</span>
+            {diag.projecao_inline}
           </div>
         )}
 
-        {/* Múltiplas ações */}
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '12px' }}>
-          {diagnostico.acoes.map((acao, i) => (
-            <button key={i} onClick={onNavigateCampanhas} style={{ background: i === 0 ? corSeveridade.badge : 'white', color: i === 0 ? '#fff' : corSeveridade.badge, border: `1px solid ${corSeveridade.badge}`, borderRadius: '8px', padding: '9px 16px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+        {/* Ações */}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
+          {diag.acoes.map((acao, i) => (
+            <ActionBtn key={i} primary={i === 0} onClick={onNavigateCampanhas}>
               {acao.icon} {acao.label}
-            </button>
+            </ActionBtn>
           ))}
         </div>
 
-        {/* Insight do produto + próximo passo */}
+        {/* Próximo passo + Insight */}
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          {insightProduto && (
-            <div style={{ flex: 1, minWidth: '200px', background: 'rgba(255,255,255,0.7)', borderRadius: '8px', padding: '8px 12px', fontSize: '12px', color: corSeveridade.titulo }}>
-              {insightProduto}
+          <div style={{ flex: 1, minWidth: '180px', display: 'flex', alignItems: 'center', gap: '6px', background: C.white, borderRadius: '6px', padding: '7px 10px', border: `1px solid ${C.neutralBorder}`, fontSize: '12px', color: C.textMid, fontWeight: 500 }}>
+            <span style={{ color: C.brand, display: 'flex' }}>{Icon.target}</span>
+            {diag.proximo_passo}
+          </div>
+          {produtoDestaque && (
+            <div style={{ flex: 1, minWidth: '180px', display: 'flex', alignItems: 'center', gap: '6px', background: C.white, borderRadius: '6px', padding: '7px 10px', border: `1px solid ${C.neutralBorder}`, fontSize: '12px', color: C.textSoft }}>
+              <span style={{ color: C.brand, display: 'flex' }}>{Icon.bulb}</span>
+              Página mais visitada: <strong style={{ color: C.textMid }}>"{produtoDestaque.replace(/\//g, '').slice(0, 25)}"</strong> — use-a na campanha
             </div>
           )}
-          <div style={{ flex: 1, minWidth: '200px', background: 'rgba(255,255,255,0.7)', borderRadius: '8px', padding: '8px 12px', fontSize: '12px', fontWeight: 600, color: corSeveridade.titulo }}>
-            {diagnostico.proximo_passo}
-          </div>
         </div>
 
-        {/* Funil rápido */}
+        {/* Mini funil */}
         {funilVisitas > 0 && (
-          <div style={{ display: 'flex', gap: '8px', marginTop: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '14px', flexWrap: 'wrap' }}>
             {[
-              { label: 'Visitas', val: funilVisitas, pct: 100, cor: '#6B7280' },
-              { label: 'Carrinho', val: funilCarrinho, pct: taxaVisitaCarrinho, cor: funilCarrinho === 0 ? '#DC2626' : '#3B82F6' },
-              { label: 'Checkout', val: funilCheckout, pct: taxaCarrinhoCheckout, cor: funilCheckout === 0 ? '#DC2626' : '#10B981' },
-            ].map((etapa, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                {i > 0 && <span style={{ color: '#9CA3AF', fontSize: '16px' }}>→</span>}
-                <div style={{ background: 'white', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', border: `1px solid ${etapa.cor}40`, textAlign: 'center' as const }}>
-                  <div style={{ fontWeight: 700, color: etapa.cor }}>{etapa.val}</div>
-                  <div style={{ color: '#6B7280', fontSize: '10px' }}>{etapa.label}</div>
-                  {i > 0 && <div style={{ color: etapa.cor, fontSize: '10px', fontWeight: 600 }}>{etapa.pct.toFixed(1)}%</div>}
+              { label: 'Visitas', val: funilVisitas, pct: null, ok: true },
+              { label: 'Carrinho', val: funilCarrinho, pct: taxaV2C, ok: funilCarrinho > 0 },
+              { label: 'Checkout', val: funilCheckout, pct: taxaC2O, ok: funilCheckout > 0 },
+            ].map((e, i) => (
+              <React.Fragment key={i}>
+                {i > 0 && <span style={{ color: C.neutralLight, fontSize: '14px' }}>›</span>}
+                <div style={{ background: C.white, borderRadius: '6px', padding: '6px 12px', textAlign: 'center' as const, border: `1px solid ${e.ok ? C.neutralBorder : C.dangerBorder}`, minWidth: '70px' }}>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: e.ok ? C.text : C.danger }}>{e.val}</div>
+                  <div style={{ fontSize: '10px', color: C.textSoft, marginTop: '1px' }}>{e.label}</div>
+                  {e.pct !== null && <div style={{ fontSize: '10px', fontWeight: 600, color: e.ok ? C.success : C.danger, marginTop: '1px' }}>{e.pct.toFixed(1)}%</div>}
                 </div>
-              </div>
+              </React.Fragment>
             ))}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ color: '#9CA3AF', fontSize: '16px' }}>→</span>
-              <div style={{ background: 'white', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', border: '1px solid #E5E7EB', textAlign: 'center' as const }}>
-                <div style={{ fontWeight: 700, color: '#6B7280' }}>Mercado</div>
-                <div style={{ color: '#6B7280', fontSize: '10px' }}>Benchmark</div>
-                <div style={{ color: '#6B7280', fontSize: '10px', fontWeight: 600 }}>1–3%</div>
-              </div>
+            <span style={{ color: C.neutralLight, fontSize: '14px' }}>›</span>
+            <div style={{ background: C.neutralBg, borderRadius: '6px', padding: '6px 12px', textAlign: 'center' as const, border: `1px solid ${C.neutralBorder}`, minWidth: '70px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: C.neutralMid }}>1–3%</div>
+              <div style={{ fontSize: '10px', color: C.neutralLight, marginTop: '1px' }}>Mercado</div>
+              <div style={{ fontSize: '10px', color: C.neutralLight, marginTop: '1px' }}>benchmark</div>
             </div>
           </div>
         )}
       </div>
 
-      {/* ══════════════════════════════════════════════════════════════
-          PROJEÇÃO DE GANHO — só aparece quando tem dados suficientes
-      ══════════════════════════════════════════════════════════════ */}
+      {/* ── PROJEÇÃO DE GANHO ─────────────────────────────────────────── */}
       {projecoes.length > 0 && (
-        <div style={{
-          background: 'linear-gradient(135deg, #111827 0%, #1f2937 100%)',
-          borderRadius: '14px',
-          padding: '20px 24px',
-          marginBottom: '24px',
-          color: '#fff',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-            <span style={{ fontSize: '20px' }}>💸</span>
-            <span style={{ fontSize: '15px', fontWeight: 700 }}>Projeção de Ganho</span>
-            <span style={{ fontSize: '11px', color: '#9CA3AF', marginLeft: '4px' }}>
-              baseado em {funilVisitas} visitas × {brl(ticketApp)} ticket médio
-            </span>
+        <div style={{ background: C.dark, borderRadius: '10px', padding: '18px 20px', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <span style={{ color: '#FCD34D', display: 'flex' }}>{Icon.dollar}</span>
+            <span style={{ fontSize: '14px', fontWeight: 700, color: C.white }}>Projeção de receita</span>
+            <span style={{ fontSize: '11px', color: C.neutralLight }}>— {funilVisitas} visitas × {brl(ticketApp)} ticket médio</span>
           </div>
-          <div style={{ fontSize: '12px', color: '#9CA3AF', marginBottom: '16px' }}>
-            Se você converter esse tráfego, quanto pode faturar:
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+          <div style={{ fontSize: '12px', color: C.neutralLight, marginBottom: '14px' }}>Se você converter esse tráfego:</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
             {projecoes.map((p, i) => (
-              <div key={i} style={{
-                background: i === 1 ? '#4F46E5' : 'rgba(255,255,255,0.07)',
-                borderRadius: '10px',
-                padding: '14px',
-                textAlign: 'center',
-                border: i === 1 ? '2px solid #818CF8' : '1px solid rgba(255,255,255,0.1)',
-                position: 'relative',
-              }}>
-                {i === 1 && (
-                  <div style={{ position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)', background: '#F59E0B', color: '#111', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '999px', whiteSpace: 'nowrap' }}>
+              <div key={i} style={{ background: p.destaque ? C.brand : 'rgba(255,255,255,0.06)', borderRadius: '8px', padding: '14px 12px', textAlign: 'center' as const, border: p.destaque ? `1px solid ${C.brandMuted}` : '1px solid rgba(255,255,255,0.08)', position: 'relative' as const }}>
+                {p.destaque && (
+                  <div style={{ position: 'absolute' as const, top: '-9px', left: '50%', transform: 'translateX(-50%)', background: '#F59E0B', color: C.dark, fontSize: '10px', fontWeight: 700, padding: '1px 8px', borderRadius: '4px', whiteSpace: 'nowrap' as const }}>
                     META REALISTA
                   </div>
                 )}
-                <div style={{ fontSize: '11px', color: i === 1 ? '#C7D2FE' : '#9CA3AF', marginBottom: '4px' }}>
-                  Convertendo {p.pct}%
-                </div>
-                <div style={{ fontSize: '20px', fontWeight: 800, color: i === 1 ? '#fff' : '#E5E7EB' }}>
-                  {brl(p.valor)}
-                </div>
-                <div style={{ fontSize: '10px', color: i === 1 ? '#A5B4FC' : '#6B7280', marginTop: '4px' }}>
-                  {Math.round(funilVisitas * p.pct / 100)} vendas estimadas
-                </div>
+                <div style={{ fontSize: '10px', color: p.destaque ? '#C7D2FE' : C.neutralLight, marginBottom: '4px', fontWeight: 500 }}>{p.label} — {p.pct}%</div>
+                <div style={{ fontSize: '19px', fontWeight: 800, color: p.destaque ? C.white : '#D1D5DB' }}>{brl(p.valor)}</div>
+                <div style={{ fontSize: '10px', color: p.destaque ? '#A5B4FC' : C.neutralLight, marginTop: '3px' }}>{Math.round(funilVisitas * p.pct / 100)} vendas</div>
               </div>
             ))}
           </div>
-          <button
-            onClick={onNavigateCampanhas}
-            style={{ marginTop: '16px', width: '100%', background: '#4F46E5', color: '#fff', border: 'none', borderRadius: '8px', padding: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
-          >
-            🎯 Criar campanha para atingir essa meta
+          <button onClick={onNavigateCampanhas} style={{ marginTop: '14px', width: '100%', background: C.brand, color: C.white, border: 'none', borderRadius: '6px', padding: '9px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+            {Icon.target} Criar campanha para atingir essa meta
           </button>
         </div>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════
-          CARDS DE MÉTRICAS — igual ao original
-      ══════════════════════════════════════════════════════════════ */}
-      <div className="stats-grid" style={{ marginBottom: '0' }}>
+      {/* ── METRIC CARDS ──────────────────────────────────────────────── */}
+      <div className="stats-grid">
 
-        {/* RECEITA APP */}
-        <div className="stat-card" style={{ borderLeft: "4px solid #10B981" }}>
-          <div className="stat-icon green">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zm0 2v8h16V8H4zm8 7a3 3 0 0 1-3-3h2a1 1 0 1 0 1-1 3 3 0 1 1 3-3h-2a1 1 0 1 0-1 1 3 3 0 0 1 0 6z" /></svg>
-          </div>
+        {/* Receita */}
+        <div className="stat-card" style={{ borderLeft: `3px solid ${C.success}` }}>
+          <div className="stat-icon green" style={{ color: C.success }}>{Icon.revenue}</div>
           <div className="stat-info">
             <h3>Receita App</h3>
             <p>{brl(receita)}</p>
-            <span className="stat-growth">🔥 {vendas} pedidos realizados</span>
-            <div className="card-meta-text">🎯 Próxima meta: {brl(metaReceita)}</div>
+            <span className="stat-growth" style={{ color: C.success, fontWeight: 500 }}>{vendas} pedidos realizados</span>
+            <div className="card-meta-text">Meta: {brl(metaReceita)}</div>
           </div>
         </div>
 
-        {/* TICKET MÉDIO */}
+        {/* Ticket Médio */}
         <div className="stat-card">
-          <div className="stat-icon">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 5h16a2 2 0 0 1 2 2v3h-2a2 2 0 1 0 0 4h2v3a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-3h2a2 2 0 1 0 0-4H2V7a2 2 0 0 1 2-2zm0 2v2h2a4 4 0 0 1 0 8H4v2h16v-2h-2a4 4 0 0 1 0-8h2V7H4z" /></svg>
-          </div>
+          <div className="stat-icon" style={{ color: C.brand }}>{Icon.ticket}</div>
           <div className="stat-info">
             <h3>Ticket Médio</h3>
             <div className="ticket-main-row">
-              <span className="ticket-main-label" style={{ color: "#10B981", fontWeight: "bold" }}>APP</span>
+              <span className="ticket-main-label" style={{ color: C.brand, fontWeight: 600 }}>App</span>
               <span className="ticket-main-value">{brl(ticketApp)}</span>
             </div>
           </div>
         </div>
 
-        {/* INSTALAÇÕES ATIVAS */}
+        {/* Instalações */}
         <div className="stat-card">
-          <div className="stat-icon purple">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 2v14h10V4H7zm5 15a1.25 1.25 0 1 1 0 2.5A1.25 1.25 0 0 1 12 19z" /></svg>
-          </div>
+          <div className="stat-icon purple" style={{ color: C.brand }}>{Icon.mobile}</div>
           <div className="stat-info">
             <h3>Instalações Ativas</h3>
             <p>{instalacoes}</p>
-            <span className="stat-growth">{temOsData ? '🔔 Com notificações ativas' : 'Base de clientes fiéis'}</span>
-            {temOsData && <div style={{ marginTop: '4px', fontSize: '11px', color: '#6B7280' }}>via OneSignal — tempo real</div>}
-            <div className="card-meta-text">🎯 Meta: {instalacoes} / {metaInstalacoes}</div>
+            <span className="stat-growth" style={{ color: temOsData ? C.brand : C.textSoft, fontWeight: 500 }}>
+              {temOsData ? 'Push habilitado — dados em tempo real' : 'Base de clientes fiéis'}
+            </span>
+            <div className="card-meta-text">Meta: {instalacoes} / {metaInstalacoes}</div>
           </div>
         </div>
 
-        {/* CRESCIMENTO */}
+        {/* Crescimento */}
         <div className="stat-card">
-          <div className="stat-icon">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 17v2h18v-2H3zm0-4 4-4 4 4 6-6 4 4v-3.5L17 4l-6 6-4-4-4 4V13z" /></svg>
-          </div>
+          <div className="stat-icon" style={{ color: crescimento7d > 0 ? C.success : C.neutralMid }}>{Icon.trending}</div>
           <div className="stat-info">
             <h3>Crescimento do App</h3>
-            <p>+{crescimento7d}%</p>
-            <span className="stat-growth">vs últimos 7 dias</span>
+            <p style={{ color: crescimento7d > 0 ? C.success : C.text }}>+{crescimento7d}%</p>
+            <span className="stat-growth" style={{ color: C.textSoft }}>vs. últimos 7 dias</span>
           </div>
         </div>
 
-        {/* CLIENTES CONVERTIDOS */}
+        {/* Clientes Convertidos */}
         <div className="stat-card">
-          <div className="stat-icon blue">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 7h11V4l4 4-4 4V9H8a3 3 0 0 0 0 6h3v2H8a5 5 0 0 1 0-10zm10 10H6v3l-4-4 4-4v3h11a3 3 0 0 0 0-6h-3V7h3a5 5 0 0 1 0 10z" /></svg>
-          </div>
+          <div className="stat-icon blue" style={{ color: C.brand }}>{Icon.users}</div>
           <div className="stat-info">
             <h3>Clientes Convertidos</h3>
             <p>{temOsData && compradoresOS > 0 ? compradoresOS : clientesRec}</p>
             {temOsData && compradoresOS > 0 ? (
               <>
-                <div style={{ fontSize: '0.95rem', color: '#111827', marginTop: '6px', fontWeight: 500 }}>
-                  Dos <strong>{instalacoes}</strong> usuários,{' '}
-                  <strong style={{ color: '#10B981' }}>
-                    {instalacoes > 0 ? Math.round((compradoresOS / instalacoes) * 100) : 0}%
-                  </strong> já compraram
+                <div style={{ fontSize: '12px', color: C.textMid, marginTop: '4px', fontWeight: 500 }}>
+                  {instalacoes > 0 ? Math.round((compradoresOS / instalacoes) * 100) : 0}% dos usuários com app já compraram
                 </div>
-                <div style={{ fontSize: '11px', color: '#6B7280', marginTop: '2px' }}>via OneSignal (tag fez_compra)</div>
+                <div style={{ fontSize: '11px', color: C.textSoft, marginTop: '2px' }}>via OneSignal</div>
               </>
             ) : (
               <>
-                <div style={{ fontSize: '0.95rem', color: '#111827', marginTop: '6px', fontWeight: 500 }}>
-                  Taxa de Recompra: <strong>{taxaRecompra}%</strong>
+                <div style={{ fontSize: '12px', color: C.textMid, marginTop: '4px', fontWeight: 500 }}>
+                  Taxa de recompra: {taxaRecompra}%
                 </div>
-                <div className="card-meta-text">🎯 Próxima meta: {metaRecorrentes} clientes</div>
+                <div className="card-meta-text">Meta: {metaRec} clientes</div>
               </>
             )}
           </div>
         </div>
 
-        {/* PÁGINAS VISUALIZADAS */}
+        {/* Pageviews */}
         <div className="stat-card">
-          <div className="stat-icon">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 5C7 5 3.73 8.11 2 12c1.73 3.89 5 7 10 7s8.27-3.11 10-7c-1.73-3.89-5-7-10-7zm0 2c3.04 0 5.64 1.96 7.19 5-1.55 3.04-4.15 5-7.19 5S6.36 15.04 4.81 12C6.36 8.96 8.96 7 12 7zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" /></svg>
-          </div>
+          <div className="stat-icon" style={{ color: C.brand }}>{Icon.eye}</div>
           <div className="stat-info">
             <h3>Páginas Visualizadas</h3>
             <p>{pageviews.toLocaleString()}</p>
-            <div style={{ marginTop: '10px', fontSize: '0.95rem', color: '#111827', fontWeight: 500 }}>
-              ⏱️ Tempo médio: <strong>{tempoMedio}</strong>
+            <div style={{ fontSize: '12px', color: C.textMid, marginTop: '6px', fontWeight: 500 }}>
+              Tempo médio: <strong>{tempoMedio}</strong>
             </div>
           </div>
         </div>
 
-        {/* TOP PÁGINAS */}
+        {/* Top Páginas */}
         {topPaginasPwa.length > 0 && (
           <div className="stat-card">
-            <div className="stat-icon">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 3 8 11l3 3-5 5 1.5 1.5 5-5 3 3 8-8z" /></svg>
-            </div>
+            <div className="stat-icon" style={{ color: C.brand }}>{Icon.pages}</div>
             <div className="stat-info">
               <h3>Top páginas do App</h3>
-              <ul style={{ marginTop: '8px', paddingLeft: 0, listStyle: 'none', fontSize: '11px', color: '#374151' }}>
+              <ul style={{ marginTop: '8px', paddingLeft: 0, listStyle: 'none', fontSize: '11px', color: C.textMid }}>
                 {topPaginasPwa.filter(p => p !== 'install').slice(0, 5).map((pagina, idx) => {
                   let label = pagina || '/';
                   let badge: string | null = null;
                   if (label === '/') { label = 'Página inicial'; badge = 'HOME'; }
                   const display = label.length > 50 ? label.slice(0, 47) + '...' : label;
                   return (
-                    <li key={pagina + idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <li key={pagina + idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '5px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1, minWidth: 0 }}>
-                        <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 16, height: 16, borderRadius: '999px', background: '#E5E7EB', fontSize: '10px', color: '#374151', flexShrink: 0 }}>{idx + 1}</span>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 16, height: 16, borderRadius: '3px', background: C.neutralBg, fontSize: '10px', color: C.textSoft, border: `1px solid ${C.neutralBorder}`, flexShrink: 0, fontWeight: 600 }}>{idx + 1}</span>
                         <span title={label} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{display}</span>
                       </div>
-                      {badge && <span style={{ marginLeft: '6px', fontSize: '9px', padding: '2px 6px', borderRadius: '999px', background: '#E0F2FE', color: '#0369A1', flexShrink: 0 }}>{badge}</span>}
+                      {badge && <span style={{ marginLeft: '6px', fontSize: '9px', padding: '1px 5px', borderRadius: '3px', background: C.brandLight, color: C.brand, flexShrink: 0, fontWeight: 600 }}>{badge}</span>}
                     </li>
                   );
                 })}
@@ -490,36 +553,24 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
           </div>
         )}
 
-        {/* FUNIL DE VENDAS — com botões de ação e comparativo */}
+        {/* Funil com botões e comparativo */}
         <div className="stat-card" style={{ gridRow: 'span 2' }}>
           <div className="stat-info" style={{ width: '100%' }}>
-            <h3>Funil de Vendas 📉</h3>
-            <div style={{ marginTop: '15px' }}>
+            <h3>Funil de Vendas</h3>
+            <div style={{ marginTop: '14px' }}>
               {[
-                { label: '1. Visitas Únicas', val: funilVisitas, pct: 100, cor: '#9CA3AF', benchPct: null, botao: null },
-                {
-                  label: '2. Carrinho', val: funilCarrinho,
-                  pct: funilVisitas > 0 ? (funilCarrinho / funilVisitas) * 100 : 0,
-                  cor: funilCarrinho === 0 ? '#EF4444' : '#60A5FA',
-                  benchPct: 10, // benchmark visita→carrinho ~10%
-                  botao: funilCarrinho === 0 ? 'Criar campanha de produto' : null,
-                },
-                {
-                  label: '3. Checkout', val: funilCheckout,
-                  pct: funilVisitas > 0 ? (funilCheckout / funilVisitas) * 100 : 0,
-                  cor: funilCheckout === 0 ? '#EF4444' : '#10B981',
-                  benchPct: 3, // benchmark geral ~1–3%
-                  botao: funilCarrinho > 0 && funilCheckout === 0 ? 'Recuperar carrinhos' : null,
-                },
+                { label: '1. Visitas Únicas', val: funilVisitas, pct: 100, cor: C.neutralLight, bench: null, botao: null },
+                { label: '2. Carrinho', val: funilCarrinho, pct: taxaV2C, cor: funilCarrinho === 0 ? C.danger : '#60A5FA', bench: 10, botao: funilCarrinho === 0 ? 'Campanha de produto' : null },
+                { label: '3. Checkout', val: funilCheckout, pct: taxaC2O, cor: funilCheckout === 0 ? C.danger : C.success, bench: mediaConv, botao: funilCarrinho > 0 && funilCheckout === 0 ? 'Recuperar carrinhos' : null },
               ].map((etapa, i) => (
-                <div key={i} className="conversion-bar" style={{ marginBottom: etapa.botao ? '4px' : '12px' }}>
+                <div key={i} style={{ marginBottom: etapa.botao ? '6px' : '12px' }}>
                   <div className="bar-label">
-                    <span>{etapa.label}</span>
+                    <span style={{ fontSize: '12px', color: C.textMid }}>{etapa.label}</span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <strong>{etapa.val}</strong>
-                      {etapa.benchPct !== null && (
-                        <span style={{ fontSize: '10px', color: etapa.pct >= etapa.benchPct ? '#10B981' : '#EF4444', fontWeight: 600 }}>
-                          {etapa.pct.toFixed(1)}% {etapa.pct >= etapa.benchPct ? '✓' : '↓'}
+                      <strong style={{ color: C.text }}>{etapa.val}</strong>
+                      {etapa.bench !== null && (
+                        <span style={{ fontSize: '10px', color: etapa.pct >= etapa.bench ? C.success : C.danger, fontWeight: 600 }}>
+                          {etapa.pct.toFixed(1)}% {etapa.pct >= etapa.bench ? '↑' : '↓'}
                         </span>
                       )}
                     </div>
@@ -528,83 +579,84 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
                     <div className="bar-fill" style={{ width: `${Math.min(etapa.pct, 100)}%`, background: etapa.cor }} />
                   </div>
                   {etapa.botao && (
-                    <button
-                      onClick={onNavigateCampanhas}
-                      style={{ marginTop: '4px', marginBottom: '8px', background: 'none', border: `1px solid ${etapa.cor}`, color: etapa.cor, borderRadius: '6px', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontWeight: 600 }}
-                    >
-                      🚀 {etapa.botao}
+                    <button onClick={onNavigateCampanhas} style={{ marginTop: '4px', marginBottom: '6px', display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'none', border: `1px solid ${C.brand}`, color: C.brand, borderRadius: '5px', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontWeight: 600 }}>
+                      {Icon.lightning} {etapa.botao}
                     </button>
                   )}
                 </div>
               ))}
-              <div style={{ marginTop: '8px', padding: '8px 10px', background: '#F9FAFB', borderRadius: '8px', fontSize: '11px', color: '#6B7280' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
-                  <span>Sua conversão:</span>
-                  <strong style={{ color: taxaConvApp >= mediaConversaoMercado ? '#10B981' : '#EF4444' }}>{taxaConvApp}%</strong>
+              <div style={{ marginTop: '10px', padding: '10px 12px', background: C.neutralBg, borderRadius: '6px', border: `1px solid ${C.neutralBorder}` }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '12px' }}>
+                  <span style={{ color: C.textSoft }}>Sua conversão</span>
+                  <strong style={{ color: taxaConvApp >= mediaConv ? C.success : C.danger }}>{taxaConvApp}%</strong>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>Média do mercado:</span>
-                  <strong style={{ color: '#6B7280' }}>{mediaConversaoMercado}%</strong>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                  <span style={{ color: C.textSoft }}>Média do mercado</span>
+                  <strong style={{ color: C.textSoft }}>{mediaConv}%</strong>
+                </div>
+                <div style={{ marginTop: '6px', fontSize: '11px', fontWeight: 600, color: taxaConvApp >= mediaConv ? C.success : C.danger }}>
+                  {taxaConvApp >= mediaConv
+                    ? `${(taxaConvApp - mediaConv).toFixed(1)}pp acima da média`
+                    : `${(mediaConv - taxaConvApp).toFixed(1)}pp abaixo da média`}
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* CARRINHOS ABANDONADOS */}
-        <div className="stat-card" style={{ borderLeft: '4px solid #ef4444' }}>
-          <div className="stat-icon red">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm10 2a2 2 0 1 0-4.001.001A2 2 0 0 0 17 20zM6.2 4l-.4-2H2v2h2l3.6 7.59-1.35 2.44A1 1 0 0 0 7.1 15H19v-2H8.42l.93-1.68L18.55 11a1 1 0 0 0 .92-.63L22 3h-2.09l-2.13 5H8.53L6.2 4z" /></svg>
-          </div>
+        {/* Carrinhos Abandonados */}
+        <div className="stat-card" style={{ borderLeft: `3px solid ${C.danger}` }}>
+          <div className="stat-icon red" style={{ color: C.danger }}>{Icon.cart}</div>
           <div className="stat-info">
             <h3>Carrinhos Abandonados</h3>
             <p>{brl(carrinhosValor)}</p>
-            <div style={{ marginTop: '4px', fontSize: '11px', color: '#555' }}>
-              {temOsData && carrinhoAtivoOS > 0 ? (
-                <>
-                  <span style={{ fontWeight: 700, color: '#dc2626', fontSize: '13px' }}>{carrinhoAtivoOS}</span>
-                  {' '}com carrinho ativo agora
-                  <span style={{ marginLeft: '6px', fontSize: '10px', color: '#9CA3AF' }}>(OneSignal)</span>
-                </>
+            <div style={{ fontSize: '12px', color: C.textSoft, marginTop: '4px' }}>
+              {temOsData && carrinhoOS > 0 ? (
+                <><strong style={{ color: C.danger }}>{carrinhoOS}</strong> com carrinho ativo agora <span style={{ color: C.neutralLight }}>(OneSignal)</span></>
               ) : (
-                <>{carrinhosQtd} carrinho{carrinhosQtd === 1 ? '' : 's'} abandonado{carrinhosQtd === 1 ? '' : 's'}</>
+                <>{carrinhosQtd} abandono{carrinhosQtd !== 1 ? 's' : ''} registrado{carrinhosQtd !== 1 ? 's' : ''}</>
               )}
             </div>
-            <button
-              onClick={onNavigateCampanhas}
-              style={{ marginTop: '8px', background: '#dc2626', color: 'white', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '11px', cursor: 'pointer', fontWeight: 'bold' }}
-            >
-              🔔 RECUPERAR AGORA
+            <button onClick={onNavigateCampanhas} style={{ marginTop: '8px', display: 'inline-flex', alignItems: 'center', gap: '6px', background: C.brand, color: C.white, border: 'none', borderRadius: '5px', padding: '6px 12px', fontSize: '11px', cursor: 'pointer', fontWeight: 600 }}>
+              {Icon.lightning} Recuperar agora
             </button>
           </div>
         </div>
 
-        {/* TAXA DE CONVERSÃO com comparativo */}
+        {/* Taxa de Conversão */}
         <div className="stat-card">
           <div className="stat-info" style={{ width: '100%' }}>
-            <h3>Taxa de Conversão 🏆</h3>
-            <div className="conversion-bar" style={{ marginBottom: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <h3 style={{ margin: 0 }}>Taxa de Conversão</h3>
+              <span style={{ color: C.brand, display: 'flex' }}>{Icon.conversion}</span>
+            </div>
+            <div className="conversion-bar" style={{ marginBottom: '8px' }}>
               <div className="bar-label">
-                <span>APP</span>
-                <strong style={{ color: taxaConvApp >= mediaConversaoMercado ? '#10B981' : '#EF4444' }}>{taxaConvApp}%</strong>
+                <span style={{ fontSize: '12px', color: C.textMid }}>App</span>
+                <strong style={{ color: taxaConvApp >= mediaConv ? C.success : C.danger }}>{taxaConvApp}%</strong>
               </div>
               <div className="bar-track">
-                <div className="bar-fill" style={{ width: `${Math.min(taxaConvApp, 100)}%`, background: taxaConvApp >= mediaConversaoMercado ? '#10B981' : '#EF4444' }} />
+                <div className="bar-fill" style={{ width: `${Math.min(taxaConvApp, 100)}%`, background: taxaConvApp >= mediaConv ? C.success : C.danger }} />
               </div>
             </div>
-            <div className="conversion-bar" style={{ marginBottom: '0' }}>
+            <div className="conversion-bar">
               <div className="bar-label">
-                <span style={{ color: '#9CA3AF' }}>Mercado</span>
-                <strong style={{ color: '#9CA3AF' }}>{mediaConversaoMercado}%</strong>
+                <span style={{ fontSize: '12px', color: C.textSoft }}>Mercado</span>
+                <strong style={{ color: C.neutralMid }}>{mediaConv}%</strong>
               </div>
               <div className="bar-track">
-                <div className="bar-fill" style={{ width: `${mediaConversaoMercado}%`, background: '#D1D5DB' }} />
+                <div className="bar-fill" style={{ width: `${mediaConv}%`, background: C.neutralBorder }} />
               </div>
             </div>
-            <div style={{ marginTop: '8px', fontSize: '11px', color: taxaConvApp >= mediaConversaoMercado ? '#10B981' : '#EF4444', fontWeight: 600 }}>
-              {taxaConvApp >= mediaConversaoMercado
-                ? `✅ ${(taxaConvApp - mediaConversaoMercado).toFixed(1)}pp acima da média`
-                : `⚠️ ${(mediaConversaoMercado - taxaConvApp).toFixed(1)}pp abaixo da média`}
+            <div style={{ marginTop: '8px' }}>
+              <Badge
+                color={taxaConvApp >= mediaConv ? C.success : C.danger}
+                bg={taxaConvApp >= mediaConv ? C.successBg : C.dangerBg}
+                border={taxaConvApp >= mediaConv ? C.successBorder : C.dangerBorder}
+              >
+                {taxaConvApp >= mediaConv ? Icon.check : Icon.alert}
+                {taxaConvApp >= mediaConv ? `${(taxaConvApp - mediaConv).toFixed(1)}pp acima da média` : `${(mediaConv - taxaConvApp).toFixed(1)}pp abaixo da média`}
+              </Badge>
             </div>
           </div>
         </div>
