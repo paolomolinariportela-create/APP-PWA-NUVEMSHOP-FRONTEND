@@ -82,48 +82,52 @@ const Icon = {
     </svg>
   ),
   alert: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
       <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
     </svg>
   ),
   check: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="20 6 9 17 4 12"/>
     </svg>
   ),
   info: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
     </svg>
   ),
   arrow: (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
       <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
     </svg>
   ),
   lightning: (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
       <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
     </svg>
   ),
   target: (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
     </svg>
   ),
   dollar: (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
       <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
     </svg>
   ),
   bulb: (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
       <line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/>
     </svg>
   ),
 };
 
 // ─── REUSABLE COMPONENTS ──────────────────────────────────────────────────────
+// Número grande estilo fintech — tracking tight
+const Num = ({ children, color }: { children: React.ReactNode; color?: string }) => (
+  <p style={{ letterSpacing: '-0.03em', color: color ?? 'inherit', margin: '4px 0' }}>{children}</p>
+);
 const Badge = ({ color, bg, border, children }: { color: string; bg: string; border: string; children: React.ReactNode }) => (
   <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: bg, color, border: `1px solid ${border}`, fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '4px', letterSpacing: '0.02em' }}>
     {children}
@@ -378,14 +382,14 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
 
         {/* Próximo passo + Insight */}
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <div style={{ flex: 1, minWidth: '180px', display: 'flex', alignItems: 'center', gap: '6px', background: C.white, borderRadius: '6px', padding: '7px 10px', border: `1px solid ${C.neutralBorder}`, fontSize: '12px', color: C.textMid, fontWeight: 500 }}>
-            <span style={{ color: C.brand, display: 'flex' }}>{Icon.target}</span>
+          <div style={{ flex: 1, minWidth: '180px', display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.5)', borderRadius: '6px', padding: '7px 10px', fontSize: '12px', color: C.textMid, fontWeight: 500 }}>
+            <span style={{ color: C.brand, display: 'flex', flexShrink: 0 }}>{Icon.target}</span>
             {diag.proximo_passo}
           </div>
           {produtoDestaque && (
-            <div style={{ flex: 1, minWidth: '180px', display: 'flex', alignItems: 'center', gap: '6px', background: C.white, borderRadius: '6px', padding: '7px 10px', border: `1px solid ${C.neutralBorder}`, fontSize: '12px', color: C.textSoft }}>
-              <span style={{ color: C.brand, display: 'flex' }}>{Icon.bulb}</span>
-              Página mais visitada: <strong style={{ color: C.textMid }}>"{produtoDestaque.replace(/\//g, '').slice(0, 25)}"</strong> — use-a na campanha
+            <div style={{ flex: 1, minWidth: '180px', display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.5)', borderRadius: '6px', padding: '7px 10px', fontSize: '12px', color: C.textSoft }}>
+              <span style={{ color: C.brand, display: 'flex', flexShrink: 0 }}>{Icon.bulb}</span>
+              Mais visitada: <strong style={{ color: C.textMid, marginLeft: '3px' }}>"{produtoDestaque.replace(/\//g, '').slice(0, 20)}"</strong> — use na campanha
             </div>
           )}
         </div>
@@ -454,7 +458,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
           <div className="stat-icon green" style={{ color: C.success }}>{Icon.revenue}</div>
           <div className="stat-info">
             <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Receita app</h3>
-            <p>{brl(receita)}</p>
+            <Num>{brl(receita)}</Num>
             <span className="stat-growth" style={{ color: C.success, fontWeight: 500 }}>{vendas} pedidos realizados</span>
             <div className="card-meta-text">Meta: {brl(metaReceita)}</div>
           </div>
@@ -477,7 +481,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
           <div className="stat-icon purple" style={{ color: C.brand }}>{Icon.mobile}</div>
           <div className="stat-info">
             <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Instalações ativas</h3>
-            <p>{instalacoes}</p>
+            <Num>{instalacoes}</Num>
             <span className="stat-growth" style={{ color: temOsData ? C.brand : C.textSoft, fontWeight: 500 }}>
               {temOsData ? 'Push habilitado — dados em tempo real' : 'Base de clientes fiéis'}
             </span>
@@ -490,7 +494,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
           <div className="stat-icon" style={{ color: crescimento7d > 0 ? C.success : C.neutralMid }}>{Icon.trending}</div>
           <div className="stat-info">
             <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Crescimento do app</h3>
-            <p style={{ color: crescimento7d > 0 ? C.success : C.text }}>+{crescimento7d}%</p>
+            <Num color={crescimento7d > 0 ? C.success : C.text}>+{crescimento7d}%</Num>
             <span className="stat-growth" style={{ color: C.textSoft }}>vs. últimos 7 dias</span>
           </div>
         </div>
@@ -500,7 +504,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
           <div className="stat-icon blue" style={{ color: C.brand }}>{Icon.users}</div>
           <div className="stat-info">
             <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Clientes convertidos</h3>
-            <p>{temOsData && compradoresOS > 0 ? compradoresOS : clientesRec}</p>
+            <Num>{temOsData && compradoresOS > 0 ? compradoresOS : clientesRec}</Num>
             {temOsData && compradoresOS > 0 ? (
               <>
                 <div style={{ fontSize: '12px', color: C.textMid, marginTop: '4px', fontWeight: 500 }}>
@@ -524,7 +528,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
           <div className="stat-icon" style={{ color: C.brand }}>{Icon.eye}</div>
           <div className="stat-info">
             <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Páginas visualizadas</h3>
-            <p>{pageviews.toLocaleString()}</p>
+            <Num>{pageviews.toLocaleString()}</Num>
             <div style={{ fontSize: '12px', color: C.textMid, marginTop: '6px', fontWeight: 500 }}>
               Tempo médio: <strong>{tempoMedio}</strong>
             </div>
@@ -614,7 +618,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
           <div className="stat-icon red" style={{ color: C.danger }}>{Icon.cart}</div>
           <div className="stat-info">
             <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Carrinhos abandonados</h3>
-            <p>{brl(carrinhosValor)}</p>
+            <Num>{brl(carrinhosValor)}</Num>
             <div style={{ fontSize: '12px', color: C.textSoft, marginTop: '4px' }}>
               {temOsData && carrinhoOS > 0 ? (
                 <><strong style={{ color: C.danger }}>{carrinhoOS}</strong> com carrinho ativo agora <span style={{ color: C.neutralLight }}>(OneSignal)</span></>
