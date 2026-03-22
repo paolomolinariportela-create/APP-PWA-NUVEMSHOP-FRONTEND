@@ -57,6 +57,15 @@ interface AutomacaoConfig {
     passo2_ativo: boolean; passo2_horas: number; passo2_titulo: string; passo2_mensagem: string;
     passo3_ativo: boolean; passo3_horas: number; passo3_titulo: string; passo3_mensagem: string;
     passo3_cupom?: string;
+    // Novos
+    produto_visitado_ativo: boolean;
+    produto_visitado_horas: number;
+    produto_visitado_titulo: string;
+    produto_visitado_mensagem: string;
+    inativo_ativo: boolean;
+    inativo_dias: number;
+    inativo_titulo: string;
+    inativo_mensagem: string;
 }
 
 const AUTOMACAO_DEFAULT: AutomacaoConfig = {
@@ -70,6 +79,14 @@ const AUTOMACAO_DEFAULT: AutomacaoConfig = {
     passo3_titulo: 'Ultimo aviso! Oferta especial para voce.',
     passo3_mensagem: 'Seu carrinho ainda esta salvo. Use o cupom abaixo para ganhar desconto!',
     passo3_cupom: '',
+    produto_visitado_ativo: false,
+    produto_visitado_horas: 2,
+    produto_visitado_titulo: 'Voce ainda esta interessado?',
+    produto_visitado_mensagem: 'O produto que voce viu ainda esta disponivel. Garanta o seu antes que acabe!',
+    inativo_ativo: false,
+    inativo_dias: 7,
+    inativo_titulo: 'Saudades de voce!',
+    inativo_mensagem: 'Faz um tempo que nao te vemos. Temos novidades e ofertas esperando por voce.',
 };
 
 interface Props {
@@ -848,6 +865,95 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             {renderPassoCard(1, automacao.passo1_ativo, automacao.passo1_horas, automacao.passo1_titulo, automacao.passo1_mensagem)}
                             {renderPassoCard(2, automacao.passo2_ativo, automacao.passo2_horas, automacao.passo2_titulo, automacao.passo2_mensagem)}
                             {renderPassoCard(3, automacao.passo3_ativo, automacao.passo3_horas, automacao.passo3_titulo, automacao.passo3_mensagem, automacao.passo3_cupom)}
+
+                            {/* ── PRODUTO VISITADO ── */}
+                            <div style={{ borderTop: '1px solid #E5E7EB', paddingTop: '20px', marginTop: '4px', marginBottom: '16px' }}>
+                                <div style={{ fontSize: '13px', fontWeight: 700, color: '#374151', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span>🛍️</span> Produto Visitado
+                                    <span style={{ fontSize: '11px', fontWeight: 400, color: '#6B7280' }}>— lembrete automático após visitar produto</span>
+                                </div>
+                            </div>
+                            <div style={{ border: `2px solid ${automacao.produto_visitado_ativo ? '#8b5cf6' : '#E5E7EB'}`, borderRadius: '12px', padding: '20px', marginBottom: '16px', background: automacao.produto_visitado_ativo ? '#fafafa' : '#f9fafb', transition: 'all 0.2s' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: automacao.produto_visitado_ativo ? '16px' : '0' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>🛍️</div>
+                                        <div>
+                                            <div style={{ fontWeight: 600, fontSize: '14px', color: '#111827' }}>Visitou produto sem comprar</div>
+                                            <div style={{ fontSize: '12px', color: '#6B7280' }}>{automacao.produto_visitado_ativo ? `Lembrete apos ${automacao.produto_visitado_horas}h` : 'Desativado'}</div>
+                                        </div>
+                                    </div>
+                                    <Toggle checked={automacao.produto_visitado_ativo} onChange={v => setAutomacao({ ...automacao, produto_visitado_ativo: v })} />
+                                </div>
+                                {automacao.produto_visitado_ativo && (
+                                    <div className="animate-fade-in">
+                                        <div className="form-group" style={{ marginBottom: '12px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Enviar apos</label>
+                                            <select value={automacao.produto_visitado_horas} onChange={e => setAutomacao({ ...automacao, produto_visitado_horas: parseFloat(e.target.value) })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', background: 'white', fontSize: '13px' }}>
+                                                {HORAS_OPCOES.map(op => <option key={op.value} value={op.value}>{op.label}</option>)}
+                                            </select>
+                                        </div>
+                                        <div className="form-group" style={{ marginBottom: '12px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Titulo</label>
+                                            <input type="text" value={automacao.produto_visitado_titulo} maxLength={50} onChange={e => setAutomacao({ ...automacao, produto_visitado_titulo: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} />
+                                        </div>
+                                        <div className="form-group" style={{ marginBottom: '0' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Mensagem</label>
+                                            <textarea value={automacao.produto_visitado_mensagem} maxLength={120} rows={2} onChange={e => setAutomacao({ ...automacao, produto_visitado_mensagem: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px', resize: 'vertical' }} />
+                                        </div>
+                                        <div style={{ marginTop: '12px', background: '#111827', borderRadius: '10px', padding: '10px 14px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                                            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#8b5cf6', flexShrink: 0 }} />
+                                            <div><div style={{ fontSize: '12px', fontWeight: 600, color: '#fff' }}>{automacao.produto_visitado_titulo || 'Titulo'}</div><div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>{automacao.produto_visitado_mensagem || 'Mensagem'}</div></div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* ── CLIENTE INATIVO ── */}
+                            <div style={{ borderTop: '1px solid #E5E7EB', paddingTop: '20px', marginTop: '4px', marginBottom: '16px' }}>
+                                <div style={{ fontSize: '13px', fontWeight: 700, color: '#374151', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span>😴</span> Cliente Inativo
+                                    <span style={{ fontSize: '11px', fontWeight: 400, color: '#6B7280' }}>— reativacao automatica de clientes sumidos</span>
+                                </div>
+                            </div>
+                            <div style={{ border: `2px solid ${automacao.inativo_ativo ? '#f59e0b' : '#E5E7EB'}`, borderRadius: '12px', padding: '20px', marginBottom: '16px', background: automacao.inativo_ativo ? '#fafafa' : '#f9fafb', transition: 'all 0.2s' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: automacao.inativo_ativo ? '16px' : '0' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>😴</div>
+                                        <div>
+                                            <div style={{ fontWeight: 600, fontSize: '14px', color: '#111827' }}>Nao visita ha X dias</div>
+                                            <div style={{ fontSize: '12px', color: '#6B7280' }}>{automacao.inativo_ativo ? `Dispara apos ${automacao.inativo_dias} dias sem visita` : 'Desativado'}</div>
+                                        </div>
+                                    </div>
+                                    <Toggle checked={automacao.inativo_ativo} onChange={v => setAutomacao({ ...automacao, inativo_ativo: v })} />
+                                </div>
+                                {automacao.inativo_ativo && (
+                                    <div className="animate-fade-in">
+                                        <div className="form-group" style={{ marginBottom: '12px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Dias de inatividade</label>
+                                            <select value={automacao.inativo_dias} onChange={e => setAutomacao({ ...automacao, inativo_dias: parseInt(e.target.value) })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', background: 'white', fontSize: '13px' }}>
+                                                <option value={3}>3 dias</option>
+                                                <option value={7}>7 dias</option>
+                                                <option value={14}>14 dias</option>
+                                                <option value={30}>30 dias</option>
+                                                <option value={60}>60 dias</option>
+                                            </select>
+                                            <small style={{ fontSize: '10px', color: '#6B7280' }}>Baseado na tag ultima_visita — roda 1x por dia automaticamente</small>
+                                        </div>
+                                        <div className="form-group" style={{ marginBottom: '12px' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Titulo</label>
+                                            <input type="text" value={automacao.inativo_titulo} maxLength={50} onChange={e => setAutomacao({ ...automacao, inativo_titulo: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} />
+                                        </div>
+                                        <div className="form-group" style={{ marginBottom: '0' }}>
+                                            <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Mensagem</label>
+                                            <textarea value={automacao.inativo_mensagem} maxLength={120} rows={2} onChange={e => setAutomacao({ ...automacao, inativo_mensagem: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px', resize: 'vertical' }} />
+                                        </div>
+                                        <div style={{ marginTop: '12px', background: '#111827', borderRadius: '10px', padding: '10px 14px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                                            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#f59e0b', flexShrink: 0 }} />
+                                            <div><div style={{ fontSize: '12px', fontWeight: 600, color: '#fff' }}>{automacao.inativo_titulo || 'Titulo'}</div><div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>{automacao.inativo_mensagem || 'Mensagem'}</div></div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                             <button className="save-button" onClick={saveAutomacao} disabled={savingAutomacao} style={{ width: '100%', marginTop: '8px', background: savingAutomacao ? '#ccc' : '#111827' }}>
                                 {savingAutomacao ? 'Salvando...' : '💾 Salvar Automacoes'}
                             </button>
