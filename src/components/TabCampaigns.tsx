@@ -4,6 +4,7 @@ interface PushCampaign {
     title: string;
     message: string;
     url: string;
+    image_url?: string;          // Rich Push
     filter_device?: string;
     filter_country?: string;
     send_after?: string;
@@ -23,6 +24,7 @@ interface OneSignalNotif {
     title: string;
     message: string;
     url: string;
+    image_url?: string;
     sent: number;
     opened: number;
     failed: number;
@@ -124,8 +126,6 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
     const [loadingStats, setLoadingStats] = useState(false);
     const [activeHistoryTab, setActiveHistoryTab] = useState<'onesignal' | 'local'>('onesignal');
     const [showSegmentation, setShowSegmentation] = useState(false);
-
-    // ── Automações
     const [automacao, setAutomacao] = useState<AutomacaoConfig>(AUTOMACAO_DEFAULT);
     const [loadingAutomacao, setLoadingAutomacao] = useState(false);
     const [savingAutomacao, setSavingAutomacao] = useState(false);
@@ -210,103 +210,55 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
         return base;
     };
 
-    // ── Render de um card de passo de automação
     const renderPassoCard = (
         passo: 1 | 2 | 3,
-        ativo: boolean,
-        horas: number,
-        titulo: string,
-        mensagem: string,
-        cupom?: string,
+        ativo: boolean, horas: number, titulo: string, mensagem: string, cupom?: string,
     ) => {
         const key = `passo${passo}` as 'passo1' | 'passo2' | 'passo3';
         const cor = passo === 1 ? '#3b82f6' : passo === 2 ? '#f59e0b' : '#10b981';
         const emoji = passo === 1 ? '⏰' : passo === 2 ? '🔥' : '🎁';
         const label = passo === 1 ? '1ª Mensagem' : passo === 2 ? '2ª Mensagem' : '3ª Mensagem (com cupom)';
-
         return (
             <div key={passo} style={{ border: `2px solid ${ativo ? cor : '#E5E7EB'}`, borderRadius: '12px', padding: '20px', marginBottom: '16px', background: ativo ? '#fafafa' : '#f9fafb', transition: 'all 0.2s' }}>
-                {/* Header do passo */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: ativo ? '16px' : '0' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: cor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
-                            {emoji}
-                        </div>
+                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: cor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>{emoji}</div>
                         <div>
                             <div style={{ fontWeight: 600, fontSize: '14px', color: '#111827' }}>{label}</div>
-                            <div style={{ fontSize: '12px', color: '#6B7280' }}>
-                                {ativo ? `Envia após ${horas >= 1 ? `${horas}h` : '30 min'}` : 'Desativado'}
-                            </div>
+                            <div style={{ fontSize: '12px', color: '#6B7280' }}>{ativo ? `Envia após ${horas >= 1 ? `${horas}h` : '30 min'}` : 'Desativado'}</div>
                         </div>
                     </div>
                     <Toggle checked={ativo} onChange={v => setAutomacao({ ...automacao, [`${key}_ativo`]: v })} />
                 </div>
-
                 {ativo && (
                     <div className="animate-fade-in">
-                        {/* Tempo */}
                         <div className="form-group" style={{ marginBottom: '12px' }}>
                             <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Enviar após</label>
-                            <select
-                                value={horas}
-                                onChange={e => setAutomacao({ ...automacao, [`${key}_horas`]: parseFloat(e.target.value) })}
-                                style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', background: 'white', fontSize: '13px' }}
-                            >
-                                {HORAS_OPCOES.map(op => (
-                                    <option key={op.value} value={op.value}>{op.label}</option>
-                                ))}
+                            <select value={horas} onChange={e => setAutomacao({ ...automacao, [`${key}_horas`]: parseFloat(e.target.value) })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', background: 'white', fontSize: '13px' }}>
+                                {HORAS_OPCOES.map(op => <option key={op.value} value={op.value}>{op.label}</option>)}
                             </select>
                         </div>
-
-                        {/* Título */}
                         <div className="form-group" style={{ marginBottom: '12px' }}>
-                            <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Título da notificação</label>
-                            <input
-                                type="text"
-                                value={titulo}
-                                maxLength={50}
-                                onChange={e => setAutomacao({ ...automacao, [`${key}_titulo`]: e.target.value })}
-                                style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }}
-                            />
+                            <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Título</label>
+                            <input type="text" value={titulo} maxLength={50} onChange={e => setAutomacao({ ...automacao, [`${key}_titulo`]: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} />
                             <small style={{ fontSize: '10px', color: '#6B7280' }}>{titulo.length}/50</small>
                         </div>
-
-                        {/* Mensagem */}
                         <div className="form-group" style={{ marginBottom: passo === 3 ? '12px' : '0' }}>
                             <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Mensagem</label>
-                            <textarea
-                                value={mensagem}
-                                maxLength={120}
-                                rows={2}
-                                onChange={e => setAutomacao({ ...automacao, [`${key}_mensagem`]: e.target.value })}
-                                style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px', resize: 'vertical' }}
-                            />
+                            <textarea value={mensagem} maxLength={120} rows={2} onChange={e => setAutomacao({ ...automacao, [`${key}_mensagem`]: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px', resize: 'vertical' }} />
                             <small style={{ fontSize: '10px', color: '#6B7280' }}>{mensagem.length}/120</small>
                         </div>
-
-                        {/* Cupom (só passo 3) */}
                         {passo === 3 && (
                             <div className="form-group" style={{ marginBottom: '0' }}>
-                                <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Cupom de desconto (opcional)</label>
-                                <input
-                                    type="text"
-                                    value={cupom ?? ''}
-                                    placeholder="Ex: VOLTA10"
-                                    onChange={e => setAutomacao({ ...automacao, passo3_cupom: e.target.value })}
-                                    style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px', textTransform: 'uppercase' }}
-                                />
-                                <small style={{ fontSize: '10px', color: '#6B7280' }}>O cupom será incluído automaticamente na mensagem.</small>
+                                <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Cupom (opcional)</label>
+                                <input type="text" value={cupom ?? ''} placeholder="Ex: VOLTA10" onChange={e => setAutomacao({ ...automacao, passo3_cupom: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px', textTransform: 'uppercase' }} />
                             </div>
                         )}
-
-                        {/* Preview da notificação */}
                         <div style={{ marginTop: '12px', background: '#111827', borderRadius: '10px', padding: '10px 14px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
                             <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: cor, flexShrink: 0 }} />
                             <div>
-                                <div style={{ fontSize: '12px', fontWeight: 600, color: '#fff' }}>{titulo || 'Título da notificação'}</div>
-                                <div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>
-                                    {mensagem || 'Mensagem da notificação'}{passo === 3 && cupom ? ` Cupom: ${cupom}` : ''}
-                                </div>
+                                <div style={{ fontSize: '12px', fontWeight: 600, color: '#fff' }}>{titulo || 'Título'}</div>
+                                <div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>{mensagem || 'Mensagem'}{passo === 3 && cupom ? ` Cupom: ${cupom}` : ''}</div>
                             </div>
                         </div>
                     </div>
@@ -318,7 +270,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
     return (
         <div className="animate-fade-in" style={{ marginTop: '20px' }}>
 
-            {/* ── CARDS DE MÉTRICAS ── */}
+            {/* CARDS DE MÉTRICAS */}
             <div className="stats-grid" style={{ marginBottom: '2rem' }}>
                 <div className="stat-card">
                     <div className="stat-icon">
@@ -360,7 +312,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                 </div>
             </div>
 
-            {/* ── DISTRIBUIÇÃO POR DISPOSITIVO E PAÍS ── */}
+            {/* DISTRIBUIÇÃO */}
             {!loadingStats && (porDisp.length > 0 || porPais.length > 0) && (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
                     <div className="config-card" style={{ marginBottom: 0 }}>
@@ -401,28 +353,25 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                 </div>
             )}
 
-            {/* ── TABS: CAMPANHAS / AUTOMAÇÕES ── */}
+            {/* TABS */}
             <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
                 {(['campanhas', 'automacoes'] as const).map(tab => (
-                    <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        style={{ padding: '8px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: 600, background: activeTab === tab ? '#111827' : '#F3F4F6', color: activeTab === tab ? '#fff' : '#6B7280', transition: 'all 0.2s' }}
-                    >
+                    <button key={tab} onClick={() => setActiveTab(tab)} style={{ padding: '8px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: 600, background: activeTab === tab ? '#111827' : '#F3F4F6', color: activeTab === tab ? '#fff' : '#6B7280', transition: 'all 0.2s' }}>
                         {tab === 'campanhas' ? '📢 Campanhas' : '🤖 Automações'}
                     </button>
                 ))}
             </div>
 
-            {/* ── ABA CAMPANHAS ── */}
+            {/* ABA CAMPANHAS */}
             {activeTab === 'campanhas' && (
                 <>
-                    {/* CRIAR CAMPANHA */}
                     <div className="config-card">
                         <div className="card-header" style={{ borderBottom: 'none', paddingBottom: 0 }}>
                             <h2 style={{ margin: 0 }}>📢 Criar Nova Campanha</h2>
                             <p style={{ color: '#666' }}>Envie notificações push para seus clientes.</p>
                         </div>
+
+                        {/* Alcance + segmentação */}
                         <div style={{ background: '#F3F4F6', padding: '15px', borderRadius: '8px', margin: '20px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <span style={{ fontSize: '20px' }}>👥</span>
@@ -436,6 +385,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                 🎯 {showSegmentation ? 'Ocultar' : 'Segmentar'}
                             </button>
                         </div>
+
                         {showSegmentation && (
                             <div className="animate-fade-in" style={{ background: '#F9FAFB', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', marginBottom: '20px' }}>
                                 <h4 style={{ margin: '0 0 14px', fontSize: '14px', color: '#374151' }}>🎯 Filtros de Segmentação</h4>
@@ -477,6 +427,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                 )}
                             </div>
                         )}
+
                         <div className="form-group">
                             <label>Título</label>
                             <input type="text" value={pushForm.title} onChange={e => setPushForm({ ...pushForm, title: e.target.value })} maxLength={50} placeholder="Ex: Oferta Relâmpago!" />
@@ -491,6 +442,38 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             <label>Link (Opcional)</label>
                             <input type="text" value={pushForm.url} onChange={e => setPushForm({ ...pushForm, url: e.target.value })} placeholder="https://..." />
                         </div>
+
+                        {/* ✅ RICH PUSH — Campo de imagem */}
+                        <div className="form-group">
+                            <label>🖼️ Imagem do Push (Rich Push — opcional)</label>
+                            <input
+                                type="text"
+                                value={pushForm.image_url ?? ''}
+                                onChange={e => setPushForm({ ...pushForm, image_url: e.target.value || undefined })}
+                                placeholder="https://... (banner de promoção, foto do produto)"
+                            />
+                            <small>Aparece como imagem grande na notificação (Android + Chrome). Aumenta o CTR em até 50%.</small>
+                        </div>
+
+                        {/* Preview Rich Push */}
+                        {(pushForm.title || pushForm.message) && (
+                            <div style={{ background: '#111827', borderRadius: '12px', padding: '12px 14px', marginBottom: '16px' }}>
+                                <div style={{ fontSize: '10px', color: '#6B7280', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Preview da notificação</div>
+                                {pushForm.image_url && (
+                                    <div style={{ width: '100%', height: '120px', borderRadius: '8px', marginBottom: '10px', overflow: 'hidden', background: '#1f2937' }}>
+                                        <img src={pushForm.image_url} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                    </div>
+                                )}
+                                <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#4F46E5', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>🔔</div>
+                                    <div>
+                                        <div style={{ fontSize: '13px', fontWeight: 600, color: '#fff' }}>{pushForm.title || 'Título da notificação'}</div>
+                                        <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>{pushForm.message || 'Mensagem da notificação'}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         <button className="save-button" onClick={handleSendPush} disabled={sendingPush || !pushForm.title || !pushForm.message} style={{ background: sendingPush ? '#ccc' : '#4F46E5', width: '100%', marginTop: '10px' }}>
                             {sendingPush ? 'Enviando...' : pushForm.send_after ? `⏰ Agendar para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos` : `🚀 Enviar para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`}
                         </button>
@@ -514,20 +497,34 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                 <button onClick={() => { fetchHistory(); fetchOsStats(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px' }}>🔄</button>
                             </div>
                         </div>
+
                         {activeHistoryTab === 'onesignal' && (
                             loadingStats ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Carregando...</p>
                                 : notifs.length === 0 ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Nenhuma campanha ainda.</p>
                                     : <div style={{ overflowX: 'auto' }}>
                                         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
                                             <thead><tr style={{ background: '#f9fafb', color: '#666', textAlign: 'left' }}>
-                                                <th style={{ padding: '12px' }}>Data</th><th style={{ padding: '12px' }}>Mensagem</th>
-                                                <th style={{ padding: '12px', textAlign: 'right' }}>Enviados</th><th style={{ padding: '12px', textAlign: 'right' }}>Abertos</th>
-                                                <th style={{ padding: '12px', textAlign: 'right' }}>Falhos</th><th style={{ padding: '12px', textAlign: 'right' }}>Taxa</th>
+                                                <th style={{ padding: '12px' }}>Data</th>
+                                                <th style={{ padding: '12px' }}>Mensagem</th>
+                                                <th style={{ padding: '12px', textAlign: 'right' }}>Enviados</th>
+                                                <th style={{ padding: '12px', textAlign: 'right' }}>Abertos</th>
+                                                <th style={{ padding: '12px', textAlign: 'right' }}>Falhos</th>
+                                                <th style={{ padding: '12px', textAlign: 'right' }}>Taxa</th>
                                             </tr></thead>
                                             <tbody>{notifs.map(n => (
                                                 <tr key={n.id} style={{ borderBottom: '1px solid #eee' }}>
                                                     <td style={{ padding: '12px', whiteSpace: 'nowrap', color: '#555', fontSize: '12px' }}>{formatUnix(n.created_at)}</td>
-                                                    <td style={{ padding: '12px' }}><div style={{ fontWeight: 'bold', fontSize: '13px' }}>{n.title}</div><div style={{ fontSize: '12px', color: '#666' }}>{n.message}</div></td>
+                                                    <td style={{ padding: '12px' }}>
+                                                        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                                                            {n.image_url && (
+                                                                <img src={n.image_url} alt="" style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover', flexShrink: 0 }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                                            )}
+                                                            <div>
+                                                                <div style={{ fontWeight: 'bold', fontSize: '13px' }}>{n.title}</div>
+                                                                <div style={{ fontSize: '12px', color: '#666' }}>{n.message}</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
                                                     <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold', color: '#4F46E5' }}>{n.sent.toLocaleString('pt-BR')}</td>
                                                     <td style={{ padding: '12px', textAlign: 'right', color: '#059669' }}>{n.opened.toLocaleString('pt-BR')}</td>
                                                     <td style={{ padding: '12px', textAlign: 'right', color: '#DC2626' }}>{n.failed.toLocaleString('pt-BR')}</td>
@@ -537,6 +534,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                         </table>
                                     </div>
                         )}
+
                         {activeHistoryTab === 'local' && (
                             loadingHistory ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Carregando...</p>
                                 : history.length === 0 ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Nenhuma campanha local.</p>
@@ -557,35 +555,24 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                 </>
             )}
 
-            {/* ── ABA AUTOMAÇÕES ── */}
+            {/* ABA AUTOMAÇÕES */}
             {activeTab === 'automacoes' && (
                 <div className="config-card">
                     <div className="card-header">
                         <h2 style={{ margin: 0 }}>🤖 Recuperação de Carrinho Abandonado</h2>
-                        <p style={{ color: '#6B7280', margin: '6px 0 0' }}>
-                            Configure as mensagens automáticas enviadas quando um cliente abandona o carrinho.
-                            As mensagens padrão já estão prontas — personalize como quiser.
-                        </p>
+                        <p style={{ color: '#6B7280', margin: '6px 0 0' }}>Configure as mensagens automáticas enviadas quando um cliente abandona o carrinho.</p>
                     </div>
-
-                    {/* Banner explicativo */}
                     <div style={{ background: '#EEF2FF', border: '1px solid #C7D2FE', borderRadius: '10px', padding: '14px 16px', marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                         <span style={{ fontSize: '20px' }}>💡</span>
                         <div style={{ fontSize: '13px', color: '#3730A3', lineHeight: '1.5' }}>
-                            <strong>Como funciona:</strong> Quando um cliente adiciona itens ao carrinho e sai sem comprar,
-                            o sistema aguarda o tempo configurado e envia a notificação automaticamente.
-                            Se o cliente comprar antes, o envio é cancelado.
+                            <strong>Como funciona:</strong> Quando um cliente adiciona itens ao carrinho e sai sem comprar, o sistema aguarda o tempo configurado e envia a notificação automaticamente.
                         </div>
                     </div>
-
-                    {loadingAutomacao ? (
-                        <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Carregando configurações...</p>
-                    ) : (
+                    {loadingAutomacao ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Carregando...</p> : (
                         <>
                             {renderPassoCard(1, automacao.passo1_ativo, automacao.passo1_horas, automacao.passo1_titulo, automacao.passo1_mensagem)}
                             {renderPassoCard(2, automacao.passo2_ativo, automacao.passo2_horas, automacao.passo2_titulo, automacao.passo2_mensagem)}
                             {renderPassoCard(3, automacao.passo3_ativo, automacao.passo3_horas, automacao.passo3_titulo, automacao.passo3_mensagem, automacao.passo3_cupom)}
-
                             <button className="save-button" onClick={saveAutomacao} disabled={savingAutomacao} style={{ width: '100%', marginTop: '8px', background: savingAutomacao ? '#ccc' : '#111827' }}>
                                 {savingAutomacao ? 'Salvando...' : '💾 Salvar Automações'}
                             </button>
