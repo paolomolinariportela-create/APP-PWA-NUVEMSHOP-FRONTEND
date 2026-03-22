@@ -102,6 +102,30 @@ interface ScoreData {
 }
 // ────────────────────────────────────────────────────────────────────────────
 
+// ── Interfaces Deep Link ─────────────────────────────────────────────────────
+interface DeepLinkProduto {
+    product_id: string;
+    variant_id: string;
+    nome: string;
+    preco: string | null;
+    visitas: number;
+    ultima_visita: string;
+    url: string;
+}
+
+interface DeepLinkPagina {
+    pagina: string;
+    visitas: number;
+    label: string;
+}
+
+interface DeepLinkData {
+    produtos_visitados: DeepLinkProduto[];
+    paginas_produto: DeepLinkPagina[];
+    carrinhos_ativos: { visitor_id: string; cart_total: number | null; cart_count: number; url: string }[];
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 interface PushHistoryItem {
     id: number;
     title: string;
@@ -1545,10 +1569,34 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
         setShowSegmentation(true);
         setActiveTab('campanhas');
         setActiveHistorySubTab('onesignal');
-        // Scroll suave até o formulário
         setTimeout(() => {
             document.querySelector('.config-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 100);
+    };
+
+    // ── Deep Link ────────────────────────────────────────────────────────────
+    const [showDeepLink, setShowDeepLink] = useState(false);
+    const [deepLinkData, setDeepLinkData] = useState<DeepLinkData | null>(null);
+    const [loadingDeepLink, setLoadingDeepLink] = useState(false);
+
+    const fetchDeepLinks = () => {
+        if (!token || deepLinkData) return; // cache simples
+        setLoadingDeepLink(true);
+        fetch(`${API_URL}/analytics/deep-links`, { headers: { Authorization: `Bearer ${token}` } })
+            .then(r => r.json())
+            .then(d => setDeepLinkData(d))
+            .catch(() => {})
+            .finally(() => setLoadingDeepLink(false));
+    };
+
+    const handleAbrirDeepLink = () => {
+        setShowDeepLink(true);
+        fetchDeepLinks();
+    };
+
+    const handleSelecionarDeepLink = (url: string, nome?: string) => {
+        setPushForm({ ...pushForm, url });
+        setShowDeepLink(false);
     };
     // ────────────────────────────────────────────────────────────────────────
     // ────────────────────────────────────────────────────────────────────────
@@ -2058,7 +2106,33 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                         </div>
                         <div className="form-group">
                             <label>Link (Opcional)</label>
-                            <input type="text" value={pushForm.url} onChange={e => setPushForm({ ...pushForm, url: e.target.value })} placeholder="https://..." />
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                                <input
+                                    type="text"
+                                    value={pushForm.url}
+                                    onChange={e => setPushForm({ ...pushForm, url: e.target.value })}
+                                    placeholder="https://..."
+                                    style={{ flex: 1 }}
+                                />
+                                <button
+                                    onClick={handleAbrirDeepLink}
+                                    title="Usar produto ou página visitada automaticamente"
+                                    style={{
+                                        padding: '8px 12px', borderRadius: '8px', border: '1px solid #d1d5db',
+                                        background: '#F9FAFB', cursor: 'pointer', fontSize: '13px',
+                                        fontWeight: 600, color: '#374151', whiteSpace: 'nowrap',
+                                        display: 'flex', alignItems: 'center', gap: '4px',
+                                        transition: 'all 0.2s', flexShrink: 0,
+                                    }}
+                                    onMouseOver={e => { e.currentTarget.style.background = '#EEF2FF'; e.currentTarget.style.color = '#4F46E5'; e.currentTarget.style.borderColor = '#818CF8'; }}
+                                    onMouseOut={e => { e.currentTarget.style.background = '#F9FAFB'; e.currentTarget.style.color = '#374151'; e.currentTarget.style.borderColor = '#d1d5db'; }}
+                                >
+                                    🔗 Auto
+                                </button>
+                            </div>
+                            <small style={{ fontSize: '11px', color: '#6B7280' }}>
+                                Clique em <strong>🔗 Auto</strong> para usar um produto visitado ou página de carrinho automaticamente
+                            </small>
                         </div>
                         <div className="form-group">
                             <label>🖼️ Imagem do Push (Rich Push — opcional)</label>
@@ -2427,6 +2501,137 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             </button>
                         </>
                     )}
+                </div>
+            )}
+
+            {/* ── MODAL DEEP LINK ── */}
+            {showDeepLink && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setShowDeepLink(false)}>
+                    <div style={{ background: '#fff', borderRadius: '16px', width: '100%', maxWidth: '560px', maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }} onClick={e => e.stopPropagation()}>
+                        {/* Header */}
+                        <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid #E5E7EB', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                                <div style={{ fontSize: '16px', fontWeight: 700, color: '#111827' }}>🔗 Deep Link Automático</div>
+                                <div style={{ fontSize: '13px', color: '#6B7280', marginTop: '2px' }}>Selecione o destino da notificação</div>
+                            </div>
+                            <button onClick={() => setShowDeepLink(false)} style={{ background: '#F3F4F6', border: 'none', borderRadius: '8px', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px' }}>×</button>
+                        </div>
+
+                        <div style={{ padding: '20px 24px' }}>
+                            {loadingDeepLink ? (
+                                <div style={{ textAlign: 'center', padding: '30px', color: '#6B7280' }}>Carregando produtos...</div>
+                            ) : !deepLinkData ? (
+                                <div style={{ textAlign: 'center', padding: '30px', color: '#6B7280' }}>Nenhum dado disponível</div>
+                            ) : (
+                                <>
+                                    {/* Atalhos rápidos */}
+                                    <div style={{ marginBottom: '20px' }}>
+                                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Atalhos</div>
+                                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                            {[
+                                                { label: '🏠 Página Inicial', url: '/' },
+                                                { label: '🛒 Carrinho', url: '/checkout' },
+                                                { label: '🛍️ Produtos', url: '/produtos' },
+                                                { label: '👤 Minha Conta', url: '/minha-conta' },
+                                            ].map(a => (
+                                                <button
+                                                    key={a.url}
+                                                    onClick={() => handleSelecionarDeepLink(a.url)}
+                                                    style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #E5E7EB', background: '#F9FAFB', cursor: 'pointer', fontSize: '12px', fontWeight: 500, color: '#374151', transition: 'all 0.15s' }}
+                                                    onMouseOver={e => { e.currentTarget.style.background = '#EEF2FF'; e.currentTarget.style.borderColor = '#818CF8'; e.currentTarget.style.color = '#4F46E5'; }}
+                                                    onMouseOut={e => { e.currentTarget.style.background = '#F9FAFB'; e.currentTarget.style.borderColor = '#E5E7EB'; e.currentTarget.style.color = '#374151'; }}
+                                                >
+                                                    {a.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Produtos mais visitados */}
+                                    {deepLinkData.produtos_visitados.length > 0 && (
+                                        <div style={{ marginBottom: '20px' }}>
+                                            <div style={{ fontSize: '11px', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>
+                                                🔥 Produtos mais visitados (últimos 7 dias)
+                                            </div>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                                {deepLinkData.produtos_visitados.map((p, i) => (
+                                                    <button
+                                                        key={i}
+                                                        onClick={() => handleSelecionarDeepLink(p.url, p.nome)}
+                                                        style={{ padding: '10px 14px', borderRadius: '10px', border: '1px solid #E5E7EB', background: '#F9FAFB', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', transition: 'all 0.15s' }}
+                                                        onMouseOver={e => { e.currentTarget.style.background = '#EEF2FF'; e.currentTarget.style.borderColor = '#818CF8'; }}
+                                                        onMouseOut={e => { e.currentTarget.style.background = '#F9FAFB'; e.currentTarget.style.borderColor = '#E5E7EB'; }}
+                                                    >
+                                                        <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#4F46E520', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>🛍️</div>
+                                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                                            <div style={{ fontSize: '13px', fontWeight: 600, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.nome}</div>
+                                                            <div style={{ fontSize: '11px', color: '#6B7280', marginTop: '1px' }}>
+                                                                {p.visitas} visitas · {p.preco ? `R$ ${p.preco}` : 'sem preço'}
+                                                            </div>
+                                                        </div>
+                                                        <span style={{ fontSize: '11px', color: '#4F46E5', fontWeight: 600, flexShrink: 0 }}>Usar →</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Páginas de produto visitadas */}
+                                    {deepLinkData.paginas_produto.length > 0 && (
+                                        <div style={{ marginBottom: '20px' }}>
+                                            <div style={{ fontSize: '11px', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>
+                                                📄 Páginas visitadas
+                                            </div>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                                {deepLinkData.paginas_produto.slice(0, 5).map((p, i) => (
+                                                    <button
+                                                        key={i}
+                                                        onClick={() => handleSelecionarDeepLink(p.pagina)}
+                                                        style={{ padding: '8px 14px', borderRadius: '10px', border: '1px solid #E5E7EB', background: '#F9FAFB', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '10px', transition: 'all 0.15s' }}
+                                                        onMouseOver={e => { e.currentTarget.style.background = '#EEF2FF'; e.currentTarget.style.borderColor = '#818CF8'; }}
+                                                        onMouseOut={e => { e.currentTarget.style.background = '#F9FAFB'; e.currentTarget.style.borderColor = '#E5E7EB'; }}
+                                                    >
+                                                        <span style={{ fontSize: '16px' }}>🔗</span>
+                                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                                            <div style={{ fontSize: '12px', fontWeight: 500, color: '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.label}</div>
+                                                            <div style={{ fontSize: '10px', color: '#9CA3AF', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.pagina}</div>
+                                                        </div>
+                                                        <span style={{ fontSize: '11px', color: '#6B7280', flexShrink: 0 }}>{p.visitas}x</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Carrinhos ativos */}
+                                    {deepLinkData.carrinhos_ativos.length > 0 && (
+                                        <div>
+                                            <div style={{ fontSize: '11px', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>
+                                                🛒 Recuperar carrinhos ativos
+                                            </div>
+                                            <button
+                                                onClick={() => handleSelecionarDeepLink('/checkout')}
+                                                style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '2px solid #FED7AA', background: '#FFF7ED', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px' }}
+                                            >
+                                                <span style={{ fontSize: '22px' }}>🛒</span>
+                                                <div>
+                                                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#92400E' }}>Direcionar para o Checkout</div>
+                                                    <div style={{ fontSize: '11px', color: '#B45309' }}>{deepLinkData.carrinhos_ativos.length} carrinhos ativos aguardando</div>
+                                                </div>
+                                                <span style={{ marginLeft: 'auto', fontSize: '11px', color: '#d97706', fontWeight: 600 }}>Usar →</span>
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {deepLinkData.produtos_visitados.length === 0 && deepLinkData.paginas_produto.length === 0 && deepLinkData.carrinhos_ativos.length === 0 && (
+                                        <div style={{ textAlign: 'center', padding: '20px', color: '#6B7280', fontSize: '13px' }}>
+                                            Nenhum produto visitado nos últimos 7 dias. Use os atalhos acima.
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    </div>
                 </div>
             )}
 
