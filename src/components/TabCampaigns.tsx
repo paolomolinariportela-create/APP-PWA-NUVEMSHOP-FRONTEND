@@ -4,12 +4,12 @@ interface PushCampaign {
     title: string;
     message: string;
     url: string;
-    image_url?: string;          // Rich Push
-    btn1_text?: string;          // Action Button 1
+    image_url?: string;
+    btn1_text?: string;
     btn1_url?: string;
-    btn2_text?: string;          // Action Button 2
+    btn2_text?: string;
     btn2_url?: string;
-    filter_behavior?: string;    // "buyers" | "non_buyers"
+    filter_behavior?: string;
     intelligent_delivery?: boolean;
     filter_device?: string;
     filter_country?: string;
@@ -52,35 +52,16 @@ interface OneSignalStats {
 }
 
 interface AutomacaoConfig {
-    passo1_ativo: boolean;
-    passo1_horas: number;
-    passo1_titulo: string;
-    passo1_mensagem: string;
-    passo2_ativo: boolean;
-    passo2_horas: number;
-    passo2_titulo: string;
-    passo2_mensagem: string;
-    passo3_ativo: boolean;
-    passo3_horas: number;
-    passo3_titulo: string;
-    passo3_mensagem: string;
+    passo1_ativo: boolean; passo1_horas: number; passo1_titulo: string; passo1_mensagem: string;
+    passo2_ativo: boolean; passo2_horas: number; passo2_titulo: string; passo2_mensagem: string;
+    passo3_ativo: boolean; passo3_horas: number; passo3_titulo: string; passo3_mensagem: string;
     passo3_cupom?: string;
 }
 
 const AUTOMACAO_DEFAULT: AutomacaoConfig = {
-    passo1_ativo: true,
-    passo1_horas: 1,
-    passo1_titulo: 'Seus itens estão te esperando!',
-    passo1_mensagem: 'Você deixou alguns itens no carrinho. Que tal finalizar sua compra?',
-    passo2_ativo: true,
-    passo2_horas: 24,
-    passo2_titulo: 'Seus itens estão acabando!',
-    passo2_mensagem: 'O estoque é limitado! Garanta os seus itens antes que esgotem.',
-    passo3_ativo: false,
-    passo3_horas: 48,
-    passo3_titulo: 'Último aviso! Oferta especial para você.',
-    passo3_mensagem: 'Seu carrinho ainda está salvo. Use o cupom abaixo para ganhar desconto!',
-    passo3_cupom: '',
+    passo1_ativo: true, passo1_horas: 1, passo1_titulo: 'Seus itens estão te esperando!', passo1_mensagem: 'Você deixou alguns itens no carrinho. Que tal finalizar sua compra?',
+    passo2_ativo: true, passo2_horas: 24, passo2_titulo: 'Seus itens estão acabando!', passo2_mensagem: 'O estoque é limitado! Garanta os seus itens antes que esgotem.',
+    passo3_ativo: false, passo3_horas: 48, passo3_titulo: 'Último aviso! Oferta especial para você.', passo3_mensagem: 'Seu carrinho ainda está salvo. Use o cupom abaixo para ganhar desconto!', passo3_cupom: '',
 };
 
 interface Props {
@@ -93,26 +74,12 @@ interface Props {
     API_URL: string;
 }
 
-const FLAG: Record<string, string> = {
-    BR: '🇧🇷', US: '🇺🇸', PT: '🇵🇹', AR: '🇦🇷', MX: '🇲🇽',
-    CO: '🇨🇴', CL: '🇨🇱', PE: '🇵🇪', UY: '🇺🇾', GB: '🇬🇧',
-};
-const PAIS_NOME: Record<string, string> = {
-    BR: 'Brasil', US: 'EUA', PT: 'Portugal', AR: 'Argentina',
-    MX: 'México', CO: 'Colômbia', CL: 'Chile', PE: 'Peru',
-    UY: 'Uruguai', GB: 'Reino Unido',
-};
-
+const FLAG: Record<string, string> = { BR: '🇧🇷', US: '🇺🇸', PT: '🇵🇹', AR: '🇦🇷', MX: '🇲🇽', CO: '🇨🇴', CL: '🇨🇱', PE: '🇵🇪', UY: '🇺🇾', GB: '🇬🇧' };
+const PAIS_NOME: Record<string, string> = { BR: 'Brasil', US: 'EUA', PT: 'Portugal', AR: 'Argentina', MX: 'México', CO: 'Colômbia', CL: 'Chile', PE: 'Peru', UY: 'Uruguai', GB: 'Reino Unido' };
 const HORAS_OPCOES = [
-    { label: '30 minutos', value: 0.5 },
-    { label: '1 hora', value: 1 },
-    { label: '2 horas', value: 2 },
-    { label: '3 horas', value: 3 },
-    { label: '6 horas', value: 6 },
-    { label: '12 horas', value: 12 },
-    { label: '24 horas', value: 24 },
-    { label: '48 horas', value: 48 },
-    { label: '72 horas', value: 72 },
+    { label: '30 minutos', value: 0.5 }, { label: '1 hora', value: 1 }, { label: '2 horas', value: 2 },
+    { label: '3 horas', value: 3 }, { label: '6 horas', value: 6 }, { label: '12 horas', value: 12 },
+    { label: '24 horas', value: 24 }, { label: '48 horas', value: 48 }, { label: '72 horas', value: 72 },
 ];
 
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
@@ -141,72 +108,67 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
         if (!token) return;
         setLoadingHistory(true);
         fetch(`${API_URL}/push/history`, { headers: { Authorization: `Bearer ${token}` } })
-            .then(r => r.json())
-            .then(data => { if (Array.isArray(data)) setHistory(data); else setHistory([]); })
-            .catch(() => setHistory([]))
-            .finally(() => setLoadingHistory(false));
+            .then(r => r.json()).then(data => { if (Array.isArray(data)) setHistory(data); else setHistory([]); })
+            .catch(() => setHistory([])).finally(() => setLoadingHistory(false));
     };
-
     const fetchOsStats = () => {
         if (!token) return;
         setLoadingStats(true);
         fetch(`${API_URL}/push/stats`, { headers: { Authorization: `Bearer ${token}` } })
-            .then(r => r.json())
-            .then(data => setOsStats(data))
-            .catch(() => setOsStats(null))
-            .finally(() => setLoadingStats(false));
+            .then(r => r.json()).then(data => setOsStats(data))
+            .catch(() => setOsStats(null)).finally(() => setLoadingStats(false));
     };
-
     const fetchAutomacao = () => {
         if (!token) return;
         setLoadingAutomacao(true);
         fetch(`${API_URL}/automacao/config`, { headers: { Authorization: `Bearer ${token}` } })
-            .then(r => r.json())
-            .then(data => setAutomacao({ ...AUTOMACAO_DEFAULT, ...data }))
-            .catch(() => {})
-            .finally(() => setLoadingAutomacao(false));
+            .then(r => r.json()).then(data => setAutomacao({ ...AUTOMACAO_DEFAULT, ...data }))
+            .catch(() => {}).finally(() => setLoadingAutomacao(false));
     };
-
     const saveAutomacao = async () => {
         if (!token) return;
         setSavingAutomacao(true);
         try {
-            await fetch(`${API_URL}/automacao/config`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                body: JSON.stringify(automacao),
-            });
+            await fetch(`${API_URL}/automacao/config`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(automacao) });
             alert('Automações salvas!');
-        } catch { alert('Erro ao salvar.'); }
-        finally { setSavingAutomacao(false); }
+        } catch { alert('Erro ao salvar.'); } finally { setSavingAutomacao(false); }
     };
 
-    useEffect(() => {
-        if (!sendingPush) { fetchHistory(); fetchOsStats(); fetchAutomacao(); }
-    }, [token, sendingPush]);
+    useEffect(() => { if (!sendingPush) { fetchHistory(); fetchOsStats(); fetchAutomacao(); } }, [token, sendingPush]);
 
-    const formatDate = (s: string) => {
-        try {
-            const d = new Date(s);
-            return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        } catch { return s; }
-    };
-    const formatUnix = (ts: number) => {
-        try {
-            const d = new Date(ts * 1000);
-            return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        } catch { return '—'; }
-    };
+    const formatDate = (s: string) => { try { const d = new Date(s); return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); } catch { return s; } };
+    const formatUnix = (ts: number) => { try { const d = new Date(ts * 1000); return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); } catch { return '—'; } };
 
     const activeSubscribers = osStats?.active_subscribers ?? stats.instalacoes ?? 0;
+    const totalSubscribers = osStats?.subscribers ?? 0;
     const taxaOptin = osStats?.taxa_optin ?? 0;
     const notifs = osStats?.notifications ?? [];
-    const mediaAbertura = notifs.length > 0
-        ? Math.round(notifs.reduce((acc, n) => acc + n.taxa_abertura, 0) / notifs.length) : 0;
+    const mediaAbertura = notifs.length > 0 ? Math.round(notifs.reduce((acc, n) => acc + n.taxa_abertura, 0) / notifs.length) : 0;
     const porPais = osStats?.por_pais ?? [];
     const porDisp = osStats?.por_dispositivo ?? [];
     const dispColors: Record<string, string> = { Android: '#22c55e', iOS: '#3b82f6', Web: '#8b5cf6' };
     const dispIcons: Record<string, string> = { Android: '🤖', iOS: '🍎', Web: '🌐' };
+
+    // Saúde da base
+    const inativos = Math.max(0, totalSubscribers - activeSubscribers);
+    const pctAtivos = totalSubscribers > 0 ? Math.round((activeSubscribers / totalSubscribers) * 100) : 0;
+    const pctInativos = 100 - pctAtivos;
+
+    // Melhor horário estimado (por abertura)
+    const melhorHorario = (() => {
+        if (notifs.length === 0) return null;
+        const horarios: Record<number, number> = {};
+        notifs.forEach(n => {
+            if (!n.created_at) return;
+            const h = new Date(n.created_at * 1000).getHours();
+            horarios[h] = (horarios[h] || 0) + n.opened;
+        });
+        const melhor = Object.entries(horarios).sort((a, b) => b[1] - a[1])[0];
+        return melhor ? `${melhor[0]}:00` : null;
+    })();
+
+    // ROI estimado por notificação (baseado em taxa de abertura * ticket médio do dashboard)
+    const ticketMedio = stats?.ticket_medio?.app ?? 0;
 
     const alcanceEstimado = () => {
         if (!osStats) return activeSubscribers;
@@ -216,10 +178,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
         return base;
     };
 
-    const renderPassoCard = (
-        passo: 1 | 2 | 3,
-        ativo: boolean, horas: number, titulo: string, mensagem: string, cupom?: string,
-    ) => {
+    const renderPassoCard = (passo: 1 | 2 | 3, ativo: boolean, horas: number, titulo: string, mensagem: string, cupom?: string) => {
         const key = `passo${passo}` as 'passo1' | 'passo2' | 'passo3';
         const cor = passo === 1 ? '#3b82f6' : passo === 2 ? '#f59e0b' : '#10b981';
         const emoji = passo === 1 ? '⏰' : passo === 2 ? '🔥' : '🎁';
@@ -229,10 +188,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: ativo ? '16px' : '0' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: cor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>{emoji}</div>
-                        <div>
-                            <div style={{ fontWeight: 600, fontSize: '14px', color: '#111827' }}>{label}</div>
-                            <div style={{ fontSize: '12px', color: '#6B7280' }}>{ativo ? `Envia após ${horas >= 1 ? `${horas}h` : '30 min'}` : 'Desativado'}</div>
-                        </div>
+                        <div><div style={{ fontWeight: 600, fontSize: '14px', color: '#111827' }}>{label}</div><div style={{ fontSize: '12px', color: '#6B7280' }}>{ativo ? `Envia após ${horas >= 1 ? `${horas}h` : '30 min'}` : 'Desativado'}</div></div>
                     </div>
                     <Toggle checked={ativo} onChange={v => setAutomacao({ ...automacao, [`${key}_ativo`]: v })} />
                 </div>
@@ -262,10 +218,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                         )}
                         <div style={{ marginTop: '12px', background: '#111827', borderRadius: '10px', padding: '10px 14px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
                             <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: cor, flexShrink: 0 }} />
-                            <div>
-                                <div style={{ fontSize: '12px', fontWeight: 600, color: '#fff' }}>{titulo || 'Título'}</div>
-                                <div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>{mensagem || 'Mensagem'}{passo === 3 && cupom ? ` Cupom: ${cupom}` : ''}</div>
-                            </div>
+                            <div><div style={{ fontSize: '12px', fontWeight: 600, color: '#fff' }}>{titulo || 'Título'}</div><div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>{mensagem || 'Mensagem'}{passo === 3 && cupom ? ` Cupom: ${cupom}` : ''}</div></div>
                         </div>
                     </div>
                 )}
@@ -276,7 +229,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
     return (
         <div className="animate-fade-in" style={{ marginTop: '20px' }}>
 
-            {/* CARDS DE MÉTRICAS */}
+            {/* ── CARDS DE MÉTRICAS ── */}
             <div className="stats-grid" style={{ marginBottom: '2rem' }}>
                 <div className="stat-card">
                     <div className="stat-icon">
@@ -318,25 +271,98 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                 </div>
             </div>
 
-            {/* DISTRIBUIÇÃO */}
-            {!loadingStats && (porDisp.length > 0 || porPais.length > 0) && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                    <div className="config-card" style={{ marginBottom: 0 }}>
-                        <div className="card-header" style={{ paddingBottom: '0.8rem', marginBottom: '1rem' }}>
-                            <h3 style={{ margin: 0, fontSize: '1rem' }}>📱 Por Dispositivo</h3>
-                        </div>
-                        {porDisp.map(d => (
-                            <div key={d.dispositivo} style={{ marginBottom: '12px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
-                                    <span>{dispIcons[d.dispositivo] ?? '📟'} {d.dispositivo}</span>
-                                    <span style={{ color: '#6B7280' }}>{d.count} ({d.pct}%)</span>
+            {/* ── BLOCO 1: SAÚDE DA BASE ── */}
+            {!loadingStats && totalSubscribers > 0 && (
+                <div className="config-card" style={{ marginBottom: '1.5rem' }}>
+                    <div className="card-header" style={{ paddingBottom: '0.8rem', marginBottom: '1.2rem' }}>
+                        <h3 style={{ margin: 0, fontSize: '1rem' }}>❤️ Saúde da Base de Push</h3>
+                        <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: '#6B7280' }}>Ativos vs Inativos (bloquearam ou desinstalaram)</p>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'center' }}>
+                        <div>
+                            {/* Barra Ativos */}
+                            <div style={{ marginBottom: '14px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '13px', fontWeight: 500 }}>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />
+                                        Ativos (podem receber push)
+                                    </span>
+                                    <span style={{ fontWeight: 700, color: '#111827' }}>{activeSubscribers.toLocaleString('pt-BR')} <span style={{ color: '#10B981' }}>({pctAtivos}%)</span></span>
                                 </div>
-                                <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '8px', overflow: 'hidden' }}>
-                                    <div style={{ width: `${d.pct}%`, background: dispColors[d.dispositivo] ?? '#4F46E5', height: '100%', borderRadius: '999px', transition: 'width 0.5s' }} />
+                                <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '10px', overflow: 'hidden' }}>
+                                    <div style={{ width: `${pctAtivos}%`, background: '#10B981', height: '100%', borderRadius: '999px', transition: 'width 0.6s ease' }} />
                                 </div>
                             </div>
-                        ))}
+                            {/* Barra Inativos */}
+                            <div style={{ marginBottom: '14px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '13px', fontWeight: 500 }}>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#EF4444', display: 'inline-block' }} />
+                                        Inativos (bloquearam/desinstalaram)
+                                    </span>
+                                    <span style={{ fontWeight: 700, color: '#111827' }}>{inativos.toLocaleString('pt-BR')} <span style={{ color: '#EF4444' }}>({pctInativos}%)</span></span>
+                                </div>
+                                <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '10px', overflow: 'hidden' }}>
+                                    <div style={{ width: `${pctInativos}%`, background: '#EF4444', height: '100%', borderRadius: '999px', transition: 'width 0.6s ease' }} />
+                                </div>
+                            </div>
+                            <div style={{ padding: '10px 14px', background: pctAtivos >= 70 ? '#f0fdf4' : '#fef3c7', border: `1px solid ${pctAtivos >= 70 ? '#86efac' : '#fde68a'}`, borderRadius: '8px', fontSize: '12px', color: pctAtivos >= 70 ? '#166534' : '#92400e' }}>
+                                {pctAtivos >= 70 ? '✅ Base saudável — mais de 70% ativos' : pctAtivos >= 40 ? '⚠️ Base razoável — considere reativar inativos' : '🚨 Base comprometida — muitos usuários bloquearam'}
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            <div className="stat-card" style={{ margin: 0, padding: '14px 16px' }}>
+                                <div className="stat-info">
+                                    <h3 style={{ fontSize: '0.8rem' }}>Total Cadastrado</h3>
+                                    <p style={{ fontSize: '1.5rem', margin: '4px 0' }}>{totalSubscribers.toLocaleString('pt-BR')}</p>
+                                    <span style={{ fontSize: '11px', color: '#6B7280' }}>Todos que já deram permissão</span>
+                                </div>
+                            </div>
+                            {melhorHorario && (
+                                <div className="stat-card" style={{ margin: 0, padding: '14px 16px' }}>
+                                    <div className="stat-info">
+                                        <h3 style={{ fontSize: '0.8rem' }}>⏰ Melhor Horário</h3>
+                                        <p style={{ fontSize: '1.5rem', margin: '4px 0' }}>{melhorHorario}</p>
+                                        <span style={{ fontSize: '11px', color: '#6B7280' }}>Baseado nas aberturas anteriores</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
+                </div>
+            )}
+
+            {/* ── DISTRIBUIÇÃO + BLOCO 2: PLATAFORMAS COM CLIQUES ── */}
+            {!loadingStats && (porDisp.length > 0 || porPais.length > 0) && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                    {/* Dispositivos com cliques por plataforma */}
+                    <div className="config-card" style={{ marginBottom: 0 }}>
+                        <div className="card-header" style={{ paddingBottom: '0.8rem', marginBottom: '1rem' }}>
+                            <h3 style={{ margin: 0, fontSize: '1rem' }}>📱 Plataformas — Cliques Reais</h3>
+                            <p style={{ margin: '4px 0 0', fontSize: '0.8rem', color: '#6B7280' }}>Distribuição de cliques por dispositivo</p>
+                        </div>
+                        {porDisp.map(d => {
+                            // Calcula cliques estimados por plataforma com base nas notifs
+                            const totalCliquesGeral = notifs.reduce((acc, n) => acc + n.opened, 0);
+                            const cliquesEstimados = Math.round(totalCliquesGeral * (d.pct / 100));
+                            return (
+                                <div key={d.dispositivo} style={{ marginBottom: '14px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px', fontWeight: 500 }}>
+                                        <span>{dispIcons[d.dispositivo] ?? '📟'} {d.dispositivo}</span>
+                                        <span style={{ color: '#6B7280' }}>
+                                            {d.count} subs ({d.pct}%)
+                                            {cliquesEstimados > 0 && <span style={{ marginLeft: '6px', color: '#059669', fontWeight: 600 }}>· {cliquesEstimados} cliques</span>}
+                                        </span>
+                                    </div>
+                                    <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '8px', overflow: 'hidden' }}>
+                                        <div style={{ width: `${d.pct}%`, background: dispColors[d.dispositivo] ?? '#4F46E5', height: '100%', borderRadius: '999px', transition: 'width 0.5s' }} />
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        {notifs.length === 0 && <p style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '8px' }}>Cliques disponíveis após enviar campanhas</p>}
+                    </div>
+                    {/* Países */}
                     <div className="config-card" style={{ marginBottom: 0 }}>
                         <div className="card-header" style={{ paddingBottom: '0.8rem', marginBottom: '1rem' }}>
                             <h3 style={{ margin: 0, fontSize: '1rem' }}>🌍 Por País</h3>
@@ -353,13 +379,12 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                         <div style={{ width: `${p.pct}%`, background: '#4F46E5', height: '100%', borderRadius: '999px', transition: 'width 0.5s' }} />
                                     </div>
                                 </div>
-                            ))
-                        }
+                            ))}
                     </div>
                 </div>
             )}
 
-            {/* TABS */}
+            {/* ── TABS ── */}
             <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
                 {(['campanhas', 'automacoes'] as const).map(tab => (
                     <button key={tab} onClick={() => setActiveTab(tab)} style={{ padding: '8px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: 600, background: activeTab === tab ? '#111827' : '#F3F4F6', color: activeTab === tab ? '#fff' : '#6B7280', transition: 'all 0.2s' }}>
@@ -368,7 +393,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                 ))}
             </div>
 
-            {/* ABA CAMPANHAS */}
+            {/* ── ABA CAMPANHAS ── */}
             {activeTab === 'campanhas' && (
                 <>
                     <div className="config-card">
@@ -376,8 +401,6 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             <h2 style={{ margin: 0 }}>📢 Criar Nova Campanha</h2>
                             <p style={{ color: '#666' }}>Envie notificações push para seus clientes.</p>
                         </div>
-
-                        {/* Alcance + segmentação */}
                         <div style={{ background: '#F3F4F6', padding: '15px', borderRadius: '8px', margin: '20px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <span style={{ fontSize: '20px' }}>👥</span>
@@ -391,7 +414,6 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                 🎯 {showSegmentation ? 'Ocultar' : 'Segmentar'}
                             </button>
                         </div>
-
                         {showSegmentation && (
                             <div className="animate-fade-in" style={{ background: '#F9FAFB', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', marginBottom: '20px' }}>
                                 <h4 style={{ margin: '0 0 14px', fontSize: '14px', color: '#374151' }}>🎯 Filtros de Segmentação</h4>
@@ -440,21 +462,16 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                         <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '5px' }}>🧠 Intelligent Delivery</label>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px', border: `1px solid ${pushForm.intelligent_delivery ? '#818CF8' : '#d1d5db'}`, borderRadius: '6px', background: pushForm.intelligent_delivery ? '#EEF2FF' : 'white', cursor: 'pointer' }} onClick={() => setPushForm({ ...pushForm, intelligent_delivery: !pushForm.intelligent_delivery })}>
                                             <Toggle checked={pushForm.intelligent_delivery ?? false} onChange={v => setPushForm({ ...pushForm, intelligent_delivery: v })} />
-                                            <span style={{ fontSize: '12px', color: pushForm.intelligent_delivery ? '#4F46E5' : '#6B7280' }}>
-                                                {pushForm.intelligent_delivery ? 'Ativo — entrega no horário ideal' : 'Desativado'}
-                                            </span>
+                                            <span style={{ fontSize: '12px', color: pushForm.intelligent_delivery ? '#4F46E5' : '#6B7280' }}>{pushForm.intelligent_delivery ? 'Ativo — entrega no horário ideal' : 'Desativado'}</span>
                                         </div>
                                         <small style={{ fontSize: '10px', color: '#6B7280' }}>IA entrega quando cada usuário costuma abrir o celular</small>
                                     </div>
                                 </div>
                                 {(pushForm.filter_device || pushForm.filter_country || pushForm.send_after || pushForm.filter_behavior) && (
-                                    <button onClick={() => setPushForm({ ...pushForm, filter_device: undefined, filter_country: undefined, send_after: undefined, filter_behavior: undefined })} style={{ marginTop: '10px', background: 'none', border: 'none', color: '#DC2626', fontSize: '12px', cursor: 'pointer', padding: 0 }}>
-                                        ✕ Limpar filtros
-                                    </button>
+                                    <button onClick={() => setPushForm({ ...pushForm, filter_device: undefined, filter_country: undefined, send_after: undefined, filter_behavior: undefined })} style={{ marginTop: '10px', background: 'none', border: 'none', color: '#DC2626', fontSize: '12px', cursor: 'pointer', padding: 0 }}>✕ Limpar filtros</button>
                                 )}
                             </div>
                         )}
-
                         <div className="form-group">
                             <label>Título</label>
                             <input type="text" value={pushForm.title} onChange={e => setPushForm({ ...pushForm, title: e.target.value })} maxLength={50} placeholder="Ex: Oferta Relâmpago!" />
@@ -469,61 +486,29 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             <label>Link (Opcional)</label>
                             <input type="text" value={pushForm.url} onChange={e => setPushForm({ ...pushForm, url: e.target.value })} placeholder="https://..." />
                         </div>
-
-                        {/* ✅ RICH PUSH — Campo de imagem */}
                         <div className="form-group">
                             <label>🖼️ Imagem do Push (Rich Push — opcional)</label>
-                            <input
-                                type="text"
-                                value={pushForm.image_url ?? ''}
-                                onChange={e => setPushForm({ ...pushForm, image_url: e.target.value || undefined })}
-                                placeholder="https://... (banner de promoção, foto do produto)"
-                            />
+                            <input type="text" value={pushForm.image_url ?? ''} onChange={e => setPushForm({ ...pushForm, image_url: e.target.value || undefined })} placeholder="https://... (banner de promoção, foto do produto)" />
                             <small>Aparece como imagem grande na notificação (Android + Chrome). Aumenta o CTR em até 50%.</small>
                         </div>
-
-                        {/* ✅ ACTION BUTTONS */}
                         <div style={{ background: '#F9FAFB', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', marginBottom: '16px' }}>
-                            <div style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '12px' }}>
-                                🔘 Botões de Ação (opcional) <span style={{ fontWeight: 400, color: '#6B7280' }}>— aparecem embaixo da notificação</span>
-                            </div>
+                            <div style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '12px' }}>🔘 Botões de Ação (opcional) <span style={{ fontWeight: 400, color: '#6B7280' }}>— aparecem embaixo da notificação</span></div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
-                                <div>
-                                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Botão 1 — Texto</label>
-                                    <input type="text" value={pushForm.btn1_text ?? ''} onChange={e => setPushForm({ ...pushForm, btn1_text: e.target.value || undefined })} placeholder="Ex: 🛒 Comprar Agora" maxLength={30} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} />
-                                </div>
-                                <div>
-                                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Botão 1 — Link</label>
-                                    <input type="text" value={pushForm.btn1_url ?? ''} onChange={e => setPushForm({ ...pushForm, btn1_url: e.target.value || undefined })} placeholder="https://... (vazio = link principal)" style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} />
-                                </div>
+                                <div><label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Botão 1 — Texto</label><input type="text" value={pushForm.btn1_text ?? ''} onChange={e => setPushForm({ ...pushForm, btn1_text: e.target.value || undefined })} placeholder="Ex: 🛒 Comprar Agora" maxLength={30} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} /></div>
+                                <div><label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Botão 1 — Link</label><input type="text" value={pushForm.btn1_url ?? ''} onChange={e => setPushForm({ ...pushForm, btn1_url: e.target.value || undefined })} placeholder="https://..." style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} /></div>
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                                <div>
-                                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Botão 2 — Texto</label>
-                                    <input type="text" value={pushForm.btn2_text ?? ''} onChange={e => setPushForm({ ...pushForm, btn2_text: e.target.value || undefined })} placeholder="Ex: 🎁 Pegar Cupom" maxLength={30} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} />
-                                </div>
-                                <div>
-                                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Botão 2 — Link</label>
-                                    <input type="text" value={pushForm.btn2_url ?? ''} onChange={e => setPushForm({ ...pushForm, btn2_url: e.target.value || undefined })} placeholder="https://... (vazio = link principal)" style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} />
-                                </div>
+                                <div><label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Botão 2 — Texto</label><input type="text" value={pushForm.btn2_text ?? ''} onChange={e => setPushForm({ ...pushForm, btn2_text: e.target.value || undefined })} placeholder="Ex: 🎁 Pegar Cupom" maxLength={30} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} /></div>
+                                <div><label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Botão 2 — Link</label><input type="text" value={pushForm.btn2_url ?? ''} onChange={e => setPushForm({ ...pushForm, btn2_url: e.target.value || undefined })} placeholder="https://..." style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} /></div>
                             </div>
                         </div>
-
-                        {/* Preview Rich Push */}
                         {(pushForm.title || pushForm.message) && (
                             <div style={{ background: '#111827', borderRadius: '12px', padding: '12px 14px', marginBottom: '16px' }}>
                                 <div style={{ fontSize: '10px', color: '#6B7280', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Preview da notificação</div>
-                                {pushForm.image_url && (
-                                    <div style={{ width: '100%', height: '120px', borderRadius: '8px', marginBottom: '10px', overflow: 'hidden', background: '#1f2937' }}>
-                                        <img src={pushForm.image_url} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                                    </div>
-                                )}
+                                {pushForm.image_url && <div style={{ width: '100%', height: '120px', borderRadius: '8px', marginBottom: '10px', overflow: 'hidden', background: '#1f2937' }}><img src={pushForm.image_url} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} /></div>}
                                 <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
                                     <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#4F46E5', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>🔔</div>
-                                    <div>
-                                        <div style={{ fontSize: '13px', fontWeight: 600, color: '#fff' }}>{pushForm.title || 'Título da notificação'}</div>
-                                        <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>{pushForm.message || 'Mensagem da notificação'}</div>
-                                    </div>
+                                    <div><div style={{ fontSize: '13px', fontWeight: 600, color: '#fff' }}>{pushForm.title || 'Título da notificação'}</div><div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>{pushForm.message || 'Mensagem da notificação'}</div></div>
                                 </div>
                                 {(pushForm.btn1_text || pushForm.btn2_text) && (
                                     <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
@@ -533,18 +518,17 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                 )}
                             </div>
                         )}
-
                         <button className="save-button" onClick={handleSendPush} disabled={sendingPush || !pushForm.title || !pushForm.message} style={{ background: sendingPush ? '#ccc' : '#4F46E5', width: '100%', marginTop: '10px' }}>
                             {sendingPush ? 'Enviando...' : pushForm.send_after ? `⏰ Agendar para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos` : `🚀 Enviar para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`}
                         </button>
                     </div>
 
-                    {/* HISTÓRICO */}
+                    {/* ── BLOCO 3: HISTÓRICO COM ROI ── */}
                     <div className="config-card" style={{ marginTop: '24px' }}>
                         <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
                                 <h3 style={{ margin: 0 }}>📜 Histórico de Campanhas</h3>
-                                <p style={{ margin: '4px 0 0', fontSize: '0.9rem', color: '#6B7280' }}>Métricas reais do OneSignal</p>
+                                <p style={{ margin: '4px 0 0', fontSize: '0.9rem', color: '#6B7280' }}>Métricas reais do OneSignal{ticketMedio > 0 ? ' + ROI estimado' : ''}</p>
                             </div>
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <div style={{ display: 'flex', background: '#F3F4F6', borderRadius: '8px', padding: '3px', gap: '2px' }}>
@@ -570,28 +554,42 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                                 <th style={{ padding: '12px', textAlign: 'right' }}>Abertos</th>
                                                 <th style={{ padding: '12px', textAlign: 'right' }}>Falhos</th>
                                                 <th style={{ padding: '12px', textAlign: 'right' }}>Taxa</th>
+                                                {ticketMedio > 0 && <th style={{ padding: '12px', textAlign: 'right' }}>ROI Est.</th>}
                                             </tr></thead>
-                                            <tbody>{notifs.map(n => (
-                                                <tr key={n.id} style={{ borderBottom: '1px solid #eee' }}>
-                                                    <td style={{ padding: '12px', whiteSpace: 'nowrap', color: '#555', fontSize: '12px' }}>{formatUnix(n.created_at)}</td>
-                                                    <td style={{ padding: '12px' }}>
-                                                        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                                                            {n.image_url && (
-                                                                <img src={n.image_url} alt="" style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover', flexShrink: 0 }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                                                            )}
-                                                            <div>
-                                                                <div style={{ fontWeight: 'bold', fontSize: '13px' }}>{n.title}</div>
-                                                                <div style={{ fontSize: '12px', color: '#666' }}>{n.message}</div>
+                                            <tbody>{notifs.map(n => {
+                                                // ROI estimado: abertos * taxa de conversão média * ticket médio
+                                                const taxaConv = stats?.taxa_conversao?.app ?? 0;
+                                                const roiEstimado = ticketMedio > 0 ? Math.round(n.opened * (taxaConv / 100) * ticketMedio) : 0;
+                                                return (
+                                                    <tr key={n.id} style={{ borderBottom: '1px solid #eee' }}>
+                                                        <td style={{ padding: '12px', whiteSpace: 'nowrap', color: '#555', fontSize: '12px' }}>{formatUnix(n.created_at)}</td>
+                                                        <td style={{ padding: '12px' }}>
+                                                            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                                                                {n.image_url && <img src={n.image_url} alt="" style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover', flexShrink: 0 }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />}
+                                                                <div><div style={{ fontWeight: 'bold', fontSize: '13px' }}>{n.title}</div><div style={{ fontSize: '12px', color: '#666' }}>{n.message}</div></div>
                                                             </div>
-                                                        </div>
-                                                    </td>
-                                                    <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold', color: '#4F46E5' }}>{n.sent.toLocaleString('pt-BR')}</td>
-                                                    <td style={{ padding: '12px', textAlign: 'right', color: '#059669' }}>{n.opened.toLocaleString('pt-BR')}</td>
-                                                    <td style={{ padding: '12px', textAlign: 'right', color: '#DC2626' }}>{n.failed.toLocaleString('pt-BR')}</td>
-                                                    <td style={{ padding: '12px', textAlign: 'right' }}><span style={{ background: n.taxa_abertura >= 10 ? '#dcfce7' : '#f3f4f6', color: n.taxa_abertura >= 10 ? '#166534' : '#6B7280', padding: '3px 8px', borderRadius: '999px', fontSize: '12px', fontWeight: 600 }}>{n.taxa_abertura}%</span></td>
-                                                </tr>
-                                            ))}</tbody>
+                                                        </td>
+                                                        <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold', color: '#4F46E5' }}>{n.sent.toLocaleString('pt-BR')}</td>
+                                                        <td style={{ padding: '12px', textAlign: 'right', color: '#059669' }}>{n.opened.toLocaleString('pt-BR')}</td>
+                                                        <td style={{ padding: '12px', textAlign: 'right', color: '#DC2626' }}>{n.failed.toLocaleString('pt-BR')}</td>
+                                                        <td style={{ padding: '12px', textAlign: 'right' }}><span style={{ background: n.taxa_abertura >= 10 ? '#dcfce7' : '#f3f4f6', color: n.taxa_abertura >= 10 ? '#166534' : '#6B7280', padding: '3px 8px', borderRadius: '999px', fontSize: '12px', fontWeight: 600 }}>{n.taxa_abertura}%</span></td>
+                                                        {ticketMedio > 0 && (
+                                                            <td style={{ padding: '12px', textAlign: 'right' }}>
+                                                                {roiEstimado > 0
+                                                                    ? <span style={{ background: '#dcfce7', color: '#166534', padding: '3px 8px', borderRadius: '999px', fontSize: '12px', fontWeight: 600 }}>~{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(roiEstimado)}</span>
+                                                                    : <span style={{ color: '#9CA3AF', fontSize: '12px' }}>—</span>
+                                                                }
+                                                            </td>
+                                                        )}
+                                                    </tr>
+                                                );
+                                            })}</tbody>
                                         </table>
+                                        {ticketMedio > 0 && (
+                                            <p style={{ fontSize: '11px', color: '#9CA3AF', padding: '8px 12px', margin: 0 }}>
+                                                * ROI estimado: abertos × taxa de conversão ({stats?.taxa_conversao?.app ?? 0}%) × ticket médio ({new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(ticketMedio)})
+                                            </p>
+                                        )}
                                     </div>
                         )}
 
@@ -615,7 +613,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                 </>
             )}
 
-            {/* ABA AUTOMAÇÕES */}
+            {/* ── ABA AUTOMAÇÕES ── */}
             {activeTab === 'automacoes' && (
                 <div className="config-card">
                     <div className="card-header">
@@ -624,9 +622,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                     </div>
                     <div style={{ background: '#EEF2FF', border: '1px solid #C7D2FE', borderRadius: '10px', padding: '14px 16px', marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                         <span style={{ fontSize: '20px' }}>💡</span>
-                        <div style={{ fontSize: '13px', color: '#3730A3', lineHeight: '1.5' }}>
-                            <strong>Como funciona:</strong> Quando um cliente adiciona itens ao carrinho e sai sem comprar, o sistema aguarda o tempo configurado e envia a notificação automaticamente.
-                        </div>
+                        <div style={{ fontSize: '13px', color: '#3730A3', lineHeight: '1.5' }}><strong>Como funciona:</strong> Quando um cliente adiciona itens ao carrinho e sai sem comprar, o sistema aguarda o tempo configurado e envia a notificação automaticamente.</div>
                     </div>
                     {loadingAutomacao ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Carregando...</p> : (
                         <>
