@@ -57,7 +57,6 @@ interface AutomacaoConfig {
     passo2_ativo: boolean; passo2_horas: number; passo2_titulo: string; passo2_mensagem: string;
     passo3_ativo: boolean; passo3_horas: number; passo3_titulo: string; passo3_mensagem: string;
     passo3_cupom?: string;
-    // Novos
     produto_visitado_ativo: boolean;
     produto_visitado_horas: number;
     produto_visitado_titulo: string;
@@ -67,6 +66,103 @@ interface AutomacaoConfig {
     inativo_titulo: string;
     inativo_mensagem: string;
 }
+
+// ── NOVO: Tipos de objetivo ──────────────────────────────────────────────────
+type ObjetivoCampanha = 'venda' | 'carrinho' | 'reativar' | 'engajamento' | null;
+
+interface ObjetivoConfig {
+    id: ObjetivoCampanha;
+    icon: string;
+    label: string;
+    desc: string;
+    cor: string;
+    corBg: string;
+    corBorder: string;
+    funil: 'fundo' | 'meio' | 'topo';
+    funilLabel: string;
+    segmento: string;
+    templates: Array<{ label: string; title: string; msg: string }>;
+}
+
+const OBJETIVOS: ObjetivoConfig[] = [
+    {
+        id: 'venda',
+        icon: '💰',
+        label: 'Gerar Venda',
+        desc: 'Ofertas e promoções para converter agora',
+        cor: '#059669',
+        corBg: '#f0fdf4',
+        corBorder: '#86efac',
+        funil: 'fundo',
+        funilLabel: 'Fundo de funil',
+        segmento: '',
+        templates: [
+            { label: 'Black Friday', title: 'Black Friday chegou!', msg: 'Ate 70% OFF so hoje. Aproveite antes que acabe!' },
+            { label: 'Frete Gratis', title: 'Frete GRATIS hoje!', msg: 'Aproveite frete gratis em todos os pedidos. So hoje!' },
+            { label: 'Desconto VIP', title: 'Oferta exclusiva para voce!', msg: 'Como cliente especial, preparamos 15% OFF. Use o cupom VIP15.' },
+            { label: 'Flash Sale', title: 'Oferta relampago! ⚡', msg: 'So nas proximas 2 horas: 20% OFF em tudo. Corre!' },
+        ],
+    },
+    {
+        id: 'carrinho',
+        icon: '🛒',
+        label: 'Recuperar Carrinho',
+        desc: 'Resgatar clientes que abandonaram',
+        cor: '#d97706',
+        corBg: '#fffbeb',
+        corBorder: '#fde68a',
+        funil: 'meio',
+        funilLabel: 'Meio de funil',
+        segmento: 'non_buyers',
+        templates: [
+            { label: 'Carrinho', title: 'Seu carrinho te espera!', msg: 'Voce deixou itens no carrinho. Finalize agora com frete gratis.' },
+            { label: 'Estoque', title: 'Ultimas unidades!', msg: 'O produto no seu carrinho esta acabando. Garanta o seu agora.' },
+            { label: 'Cupom', title: 'Presente especial para voce 🎁', msg: 'Seu carrinho ainda esta salvo! Use VOLTA10 e ganhe 10% OFF.' },
+        ],
+    },
+    {
+        id: 'reativar',
+        icon: '🔄',
+        label: 'Reativar Cliente',
+        desc: 'Trazer de volta quem sumiu',
+        cor: '#7c3aed',
+        corBg: '#f5f3ff',
+        corBorder: '#c4b5fd',
+        funil: 'topo',
+        funilLabel: 'Topo de funil',
+        segmento: 'buyers',
+        templates: [
+            { label: 'Saudades', title: 'Saudades de voce!', msg: 'Faz um tempo que nao te vemos. Temos novidades esperando por voce.' },
+            { label: 'Novidades', title: 'Novidades chegaram! 🆕', msg: 'Produtos novos que voce vai amar acabaram de chegar. Confira!' },
+            { label: 'VIP', title: 'Voce e especial para nos 💜', msg: 'Como cliente VIP, preparamos algo exclusivo. Clique para ver.' },
+        ],
+    },
+    {
+        id: 'engajamento',
+        icon: '📣',
+        label: 'Engajamento',
+        desc: 'Visitas, conteúdo e lembretes',
+        cor: '#2563eb',
+        corBg: '#eff6ff',
+        corBorder: '#bfdbfe',
+        funil: 'topo',
+        funilLabel: 'Topo de funil',
+        segmento: '',
+        templates: [
+            { label: 'Novidade', title: 'Novidade no App! 🎉', msg: 'Temos uma novidade especial esperando por voce. Clique e descubra.' },
+            { label: 'Lembrete', title: 'Ja visitou nossa loja hoje?', msg: 'Confira os destaques do dia e aproveite as melhores ofertas.' },
+            { label: 'Evento', title: 'Evento especial amanha! ⏰', msg: 'Nao perca nossa liquidacao relampago amanha as 10h. Marque na agenda!' },
+        ],
+    },
+];
+
+const FUNIL_COLORS: Record<string, string> = {
+    fundo: '#059669',
+    meio: '#d97706',
+    topo: '#2563eb',
+};
+
+// ────────────────────────────────────────────────────────────────────────────
 
 const AUTOMACAO_DEFAULT: AutomacaoConfig = {
     passo1_ativo: true, passo1_horas: 1,
@@ -126,6 +222,109 @@ function CardSection({ title, subtitle }: { title: string; subtitle?: string }) 
     );
 }
 
+// ── NOVO: Componente do seletor de objetivo ──────────────────────────────────
+function SeletorObjetivo({
+    objetivo,
+    onSelect,
+}: {
+    objetivo: ObjetivoCampanha;
+    onSelect: (obj: ObjetivoConfig) => void;
+}) {
+    return (
+        <div style={{ marginBottom: '24px' }}>
+            <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>
+                🎯 Qual o objetivo desta campanha?
+            </div>
+            <div style={{ fontSize: '12px', color: '#6B7280', marginBottom: '14px' }}>
+                Selecione para receber templates e segmentação automáticos
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
+                {OBJETIVOS.map(obj => {
+                    const ativo = objetivo === obj.id;
+                    return (
+                        <button
+                            key={obj.id}
+                            onClick={() => onSelect(obj)}
+                            style={{
+                                padding: '14px 10px',
+                                borderRadius: '12px',
+                                border: `2px solid ${ativo ? obj.cor : '#E5E7EB'}`,
+                                background: ativo ? obj.corBg : '#fff',
+                                cursor: 'pointer',
+                                textAlign: 'left',
+                                transition: 'all 0.2s',
+                                position: 'relative',
+                                boxShadow: ativo ? `0 0 0 3px ${obj.cor}20` : 'none',
+                            }}
+                        >
+                            {ativo && (
+                                <span style={{
+                                    position: 'absolute', top: '8px', right: '8px',
+                                    width: '16px', height: '16px', borderRadius: '50%',
+                                    background: obj.cor, display: 'flex', alignItems: 'center',
+                                    justifyContent: 'center', fontSize: '9px', color: '#fff', fontWeight: 700,
+                                }}>✓</span>
+                            )}
+                            <div style={{ fontSize: '22px', marginBottom: '6px' }}>{obj.icon}</div>
+                            <div style={{ fontSize: '13px', fontWeight: 700, color: ativo ? obj.cor : '#111827', marginBottom: '2px' }}>{obj.label}</div>
+                            <div style={{ fontSize: '11px', color: '#6B7280', lineHeight: 1.4 }}>{obj.desc}</div>
+                            <div style={{
+                                marginTop: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                padding: '2px 8px', borderRadius: '999px',
+                                background: ativo ? obj.cor : '#F3F4F6',
+                                color: ativo ? '#fff' : '#6B7280',
+                                fontSize: '10px', fontWeight: 600, transition: 'all 0.2s',
+                            }}>
+                                <span style={{
+                                    width: '6px', height: '6px', borderRadius: '50%',
+                                    background: ativo ? '#fff' : FUNIL_COLORS[obj.funil],
+                                    display: 'inline-block',
+                                }} />
+                                {obj.funilLabel}
+                            </div>
+                        </button>
+                    );
+                })}
+            </div>
+
+            {/* Banner contextual quando objetivo selecionado */}
+            {objetivo && (() => {
+                const obj = OBJETIVOS.find(o => o.id === objetivo)!;
+                const dicas: Record<string, string> = {
+                    venda: 'Foco em urgência e escassez. Use emojis de tempo (⚡⏰) e deixe o CTA claro: "Comprar agora", "Pegar desconto".',
+                    carrinho: 'Lembre sem pressionar. Mencione os itens deixados e ofereça uma facilidade (frete grátis, cupom) como incentivo final.',
+                    reativar: 'Tom acolhedor. Mostre novidades relevantes ou benefício exclusivo. Evite parecer spam — 1 mensagem por ciclo.',
+                    engajamento: 'Conteúdo genuíno. Eventos, lançamentos e novidades têm melhor abertura quando enviados no melhor horário do público.',
+                };
+                return (
+                    <div style={{
+                        marginTop: '12px', padding: '12px 16px',
+                        background: obj.corBg, border: `1px solid ${obj.corBorder}`,
+                        borderRadius: '10px', display: 'flex', gap: '10px', alignItems: 'flex-start',
+                    }}>
+                        <span style={{ fontSize: '18px', flexShrink: 0 }}>💡</span>
+                        <div>
+                            <div style={{ fontSize: '12px', fontWeight: 700, color: obj.cor, marginBottom: '2px' }}>
+                                Dica para campanha de {obj.label}
+                            </div>
+                            <div style={{ fontSize: '12px', color: '#374151', lineHeight: 1.5 }}>
+                                {dicas[objetivo]}
+                                {obj.segmento && (
+                                    <span style={{ marginLeft: '4px' }}>
+                                        <strong>Segmentação automática aplicada:</strong>{' '}
+                                        {obj.segmento === 'buyers' ? 'só quem já comprou' : 'só quem nunca comprou'}.
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                );
+            })()}
+        </div>
+    );
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendPush, sendingPush, token, API_URL }: Props) {
     const [history, setHistory] = useState<PushHistoryItem[]>([]);
     const [loadingHistory, setLoadingHistory] = useState(false);
@@ -137,6 +336,37 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
     const [loadingAutomacao, setLoadingAutomacao] = useState(false);
     const [savingAutomacao, setSavingAutomacao] = useState(false);
     const [activeTab, setActiveTab] = useState<'campanhas' | 'automacoes'>('campanhas');
+
+    // ── NOVO: estado do objetivo ─────────────────────────────────────────────
+    const [objetivo, setObjetivo] = useState<ObjetivoCampanha>(null);
+
+    const handleSelecionarObjetivo = (obj: ObjetivoConfig) => {
+        // Se já estava selecionado, deseleciona (toggle)
+        if (objetivo === obj.id) {
+            setObjetivo(null);
+            return;
+        }
+        setObjetivo(obj.id);
+        // Aplica segmentação automática se definida no objetivo
+        if (obj.segmento) {
+            setPushForm({ ...pushForm, filter_behavior: obj.segmento });
+            setShowSegmentation(true);
+        } else {
+            setPushForm({ ...pushForm, filter_behavior: undefined });
+        }
+    };
+
+    const templatesAtivos = objetivo
+        ? OBJETIVOS.find(o => o.id === objetivo)?.templates ?? []
+        : [
+            { label: 'Black Friday', title: 'Black Friday chegou!', msg: 'Ate 70% OFF so hoje. Aproveite antes que acabe!' },
+            { label: 'Carrinho', title: 'Seu carrinho te espera!', msg: 'Voce deixou itens no carrinho. Finalize agora com frete gratis.' },
+            { label: 'Frete Gratis', title: 'Frete GRATIS hoje!', msg: 'Aproveite frete gratis em todos os pedidos. So hoje!' },
+            { label: 'Desconto VIP', title: 'Oferta exclusiva para voce!', msg: 'Como cliente especial, preparamos 15% OFF. Use o cupom VIP15.' },
+            { label: 'Estoque', title: 'Ultimas unidades!', msg: 'O produto que voce viu esta acabando. Garanta o seu agora.' },
+            { label: 'Saudades', title: 'Saudades de voce!', msg: 'Faz um tempo que nao te vemos. Temos novidades esperando por voce.' },
+        ];
+    // ────────────────────────────────────────────────────────────────────────
 
     const fetchHistory = () => {
         if (!token) return;
@@ -184,13 +414,11 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
     const dispColors: Record<string, string> = { Android: '#22c55e', iOS: '#3b82f6', Web: '#8b5cf6' };
     const dispIcons: Record<string, string> = { Android: '🤖', iOS: '🍎', Web: '🌐' };
 
-    // Saude da base
     const inativos = Math.max(0, totalSubscribers - activeSubscribers);
     const pctAtivos = totalSubscribers > 0 ? Math.round((activeSubscribers / totalSubscribers) * 100) : 0;
     const pctInativos = 100 - pctAtivos;
     const churnRate = totalSubscribers > 0 ? Math.round((inativos / totalSubscribers) * 100) : 0;
 
-    // Melhor horario
     const melhorHorario = (() => {
         if (notifs.length === 0) return null;
         const h: Record<number, number> = {};
@@ -202,7 +430,6 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
     const ticketMedio = stats?.ticket_medio?.app ?? 0;
     const taxaConvGlobal = stats?.taxa_conversao?.app ?? 0;
 
-    // Funil agregado
     const totalEnviados = notifs.reduce((a, n) => a + n.sent, 0);
     const totalConfirmados = notifs.reduce((a, n) => a + (n.confirmed_deliveries || 0), 0);
     const totalClicados = notifs.reduce((a, n) => a + n.opened, 0);
@@ -535,13 +762,22 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             <h2 style={{ margin: 0 }}>📢 Criar Nova Campanha</h2>
                             <p style={{ color: '#666' }}>Envie notificacoes push para seus clientes.</p>
                         </div>
-                        <div style={{ background: '#F3F4F6', padding: '15px', borderRadius: '8px', margin: '20px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+
+                        {/* ── NOVO: SELETOR DE OBJETIVO ── */}
+                        <div style={{ marginTop: '20px' }}>
+                            <SeletorObjetivo objetivo={objetivo} onSelect={handleSelecionarObjetivo} />
+                        </div>
+
+                        {/* Divisor visual */}
+                        <div style={{ borderTop: '1px solid #E5E7EB', margin: '4px 0 20px' }} />
+
+                        <div style={{ background: '#F3F4F6', padding: '15px', borderRadius: '8px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <span style={{ fontSize: '20px' }}>👥</span>
                                 <div>
                                     <strong>Alcance estimado:</strong>{' '}
                                     <span style={{ color: '#4F46E5', fontWeight: 'bold' }}>{alcanceEstimado().toLocaleString('pt-BR')} dispositivos</span>
-                                    {(pushForm.filter_device || pushForm.filter_country) && <span style={{ fontSize: '12px', color: '#6B7280', marginLeft: '8px' }}>(filtro ativo)</span>}
+                                    {(pushForm.filter_device || pushForm.filter_country || pushForm.filter_behavior) && <span style={{ fontSize: '12px', color: '#6B7280', marginLeft: '8px' }}>(filtro ativo)</span>}
                                 </div>
                             </div>
                             <button onClick={() => setShowSegmentation(!showSegmentation)} style={{ background: showSegmentation ? '#EEF2FF' : '#fff', border: '1px solid #d1d5db', borderRadius: '8px', padding: '6px 14px', cursor: 'pointer', fontSize: '13px', fontWeight: 500, color: showSegmentation ? '#4F46E5' : '#374151' }}>
@@ -559,7 +795,11 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                             <option value="buyers">💰 So quem JA comprou (VIPs)</option>
                                             <option value="non_buyers">👻 So quem NUNCA comprou</option>
                                         </select>
-                                        <small style={{ fontSize: '10px', color: '#6B7280' }}>Baseado nas tags do app</small>
+                                        <small style={{ fontSize: '10px', color: '#6B7280' }}>
+                                            {objetivo && OBJETIVOS.find(o => o.id === objetivo)?.segmento
+                                                ? '✅ Aplicado automaticamente pelo objetivo'
+                                                : 'Baseado nas tags do app'}
+                                        </small>
                                     </div>
                                     <div>
                                         <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '5px' }}>📱 Dispositivo</label>
@@ -612,28 +852,31 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             <small>{pushForm.title.length}/50 — use <code style={{ background: '#F3F4F6', padding: '1px 4px', borderRadius: '3px' }}>{'{{first_name}}'}</code> para personalizar</small>
                         </div>
 
-                        {/* ── TEMPLATES DE COPY ── */}
+                        {/* ── TEMPLATES (dinâmicos pelo objetivo) ── */}
                         <div style={{ marginBottom: '16px' }}>
-                            <div style={{ fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>📝 Templates prontos — clique para usar</div>
+                            <div style={{ fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>
+                                📝 {objetivo ? `Templates para ${OBJETIVOS.find(o => o.id === objetivo)?.label}` : 'Templates prontos'} — clique para usar
+                            </div>
                             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                                {[
-                                    { label: 'Black Friday', title: 'Black Friday chegou!', msg: 'Ate 70% OFF so hoje. Aproveite antes que acabe!' },
-                                    { label: 'Carrinho', title: 'Seu carrinho te espera!', msg: 'Voce deixou itens no carrinho. Finalize agora com frete gratis.' },
-                                    { label: 'Frete Gratis', title: 'Frete GRATIS hoje!', msg: 'Aproveite frete gratis em todos os pedidos. So hoje!' },
-                                    { label: 'Desconto VIP', title: 'Oferta exclusiva para voce!', msg: 'Como cliente especial, preparamos 15% OFF. Use o cupom VIP15.' },
-                                    { label: 'Estoque', title: 'Ultimas unidades!', msg: 'O produto que voce viu esta acabando. Garanta o seu agora.' },
-                                    { label: 'Saudades', title: 'Saudades de voce!', msg: 'Faz um tempo que nao te vemos. Temos novidades esperando por voce.' },
-                                ].map(t => (
-                                    <button
-                                        key={t.label}
-                                        onClick={() => setPushForm({ ...pushForm, title: t.title, message: t.msg })}
-                                        style={{ padding: '5px 12px', borderRadius: '999px', border: '1px solid #d1d5db', background: '#F9FAFB', fontSize: '12px', cursor: 'pointer', color: '#374151', fontWeight: 500, transition: 'all 0.15s' }}
-                                        onMouseOver={e => (e.currentTarget.style.background = '#EEF2FF')}
-                                        onMouseOut={e => (e.currentTarget.style.background = '#F9FAFB')}
-                                    >
-                                        {t.label}
-                                    </button>
-                                ))}
+                                {templatesAtivos.map(t => {
+                                    const objConfig = objetivo ? OBJETIVOS.find(o => o.id === objetivo) : null;
+                                    return (
+                                        <button
+                                            key={t.label}
+                                            onClick={() => setPushForm({ ...pushForm, title: t.title, message: t.msg })}
+                                            style={{
+                                                padding: '5px 12px', borderRadius: '999px',
+                                                border: `1px solid ${objConfig ? objConfig.corBorder : '#d1d5db'}`,
+                                                background: objConfig ? objConfig.corBg : '#F9FAFB',
+                                                fontSize: '12px', cursor: 'pointer',
+                                                color: objConfig ? objConfig.cor : '#374151',
+                                                fontWeight: 500, transition: 'all 0.15s',
+                                            }}
+                                        >
+                                            {t.label}
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
 
@@ -667,17 +910,13 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                         <div style={{ marginBottom: '16px' }}>
                             <div style={{ fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '10px' }}>👁️ Preview nas plataformas</div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-
-                                {/* Preview Android */}
                                 <div>
                                     <div style={{ fontSize: '11px', color: '#6B7280', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>🤖 Android</div>
                                     <div style={{ background: '#1a1a2e', borderRadius: '16px', padding: '10px', border: '3px solid #333' }}>
-                                        {/* Barra de status */}
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', padding: '0 4px' }}>
                                             <span style={{ fontSize: '9px', color: '#aaa' }}>12:30</span>
                                             <span style={{ fontSize: '9px', color: '#aaa' }}>🔋 📶</span>
                                         </div>
-                                        {/* Notificacao */}
                                         <div style={{ background: '#2d2d2d', borderRadius: '10px', padding: '10px', overflow: 'hidden' }}>
                                             {pushForm.image_url && (
                                                 <div style={{ width: '100%', height: '70px', borderRadius: '6px', marginBottom: '8px', overflow: 'hidden', background: '#3d3d3d' }}>
@@ -685,7 +924,9 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                                 </div>
                                             )}
                                             <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                                                <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: '#4F46E5', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>🔔</div>
+                                                <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: objetivo ? OBJETIVOS.find(o => o.id === objetivo)?.cor ?? '#4F46E5' : '#4F46E5', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
+                                                    {objetivo ? OBJETIVOS.find(o => o.id === objetivo)?.icon : '🔔'}
+                                                </div>
                                                 <div style={{ flex: 1, minWidth: 0 }}>
                                                     <div style={{ fontSize: '12px', fontWeight: 700, color: '#fff', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                                         {pushForm.title || 'Titulo da notificacao'}
@@ -704,20 +945,18 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                         </div>
                                     </div>
                                 </div>
-
-                                {/* Preview Desktop */}
                                 <div>
                                     <div style={{ fontSize: '11px', color: '#6B7280', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>🖥️ Desktop (Chrome / Windows)</div>
                                     <div style={{ background: '#f1f1f1', borderRadius: '12px', padding: '10px', border: '1px solid #ddd', position: 'relative' }}>
-                                        {/* Barra superior */}
                                         <div style={{ display: 'flex', gap: '4px', marginBottom: '8px' }}>
                                             <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ff5f57' }} />
                                             <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#febc2e' }} />
                                             <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#28c840' }} />
                                         </div>
-                                        {/* Notificacao Desktop estilo Windows/Mac */}
                                         <div style={{ background: '#fff', borderRadius: '8px', padding: '10px 12px', boxShadow: '0 2px 12px rgba(0,0,0,0.15)', display: 'flex', gap: '10px', alignItems: 'flex-start', position: 'relative' }}>
-                                            <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: '#4F46E5', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>🔔</div>
+                                            <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: objetivo ? OBJETIVOS.find(o => o.id === objetivo)?.cor ?? '#4F46E5' : '#4F46E5', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>
+                                                {objetivo ? OBJETIVOS.find(o => o.id === objetivo)?.icon : '🔔'}
+                                            </div>
                                             <div style={{ flex: 1, minWidth: 0 }}>
                                                 <div style={{ fontSize: '12px', fontWeight: 700, color: '#111827', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                                     {pushForm.title || 'Titulo da notificacao'}
@@ -735,9 +974,9 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
+
                         {/* ── CONTROLE DE FREQUENCIA ── */}
                         <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: '8px', padding: '12px 14px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
@@ -762,8 +1001,27 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             </div>
                         </div>
 
-                        <button className="save-button" onClick={handleSendPush} disabled={sendingPush || !pushForm.title || !pushForm.message} style={{ background: sendingPush ? '#ccc' : '#4F46E5', width: '100%', marginTop: '10px' }}>
-                            {sendingPush ? 'Enviando...' : pushForm.send_after ? `⏰ Agendar para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos` : `🚀 Enviar para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`}
+                        {/* ── BOTÃO DE ENVIO com cor do objetivo ── */}
+                        <button
+                            className="save-button"
+                            onClick={handleSendPush}
+                            disabled={sendingPush || !pushForm.title || !pushForm.message}
+                            style={{
+                                background: sendingPush ? '#ccc' : objetivo
+                                    ? OBJETIVOS.find(o => o.id === objetivo)?.cor ?? '#4F46E5'
+                                    : '#4F46E5',
+                                width: '100%',
+                                marginTop: '10px',
+                                transition: 'background 0.3s',
+                            }}
+                        >
+                            {sendingPush
+                                ? 'Enviando...'
+                                : pushForm.send_after
+                                    ? `⏰ Agendar para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`
+                                    : objetivo
+                                        ? `${OBJETIVOS.find(o => o.id === objetivo)?.icon} Enviar campanha de ${OBJETIVOS.find(o => o.id === objetivo)?.label} para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`
+                                        : `🚀 Enviar para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`}
                         </button>
                     </div>
 
@@ -866,7 +1124,6 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             {renderPassoCard(2, automacao.passo2_ativo, automacao.passo2_horas, automacao.passo2_titulo, automacao.passo2_mensagem)}
                             {renderPassoCard(3, automacao.passo3_ativo, automacao.passo3_horas, automacao.passo3_titulo, automacao.passo3_mensagem, automacao.passo3_cupom)}
 
-                            {/* ── PRODUTO VISITADO ── */}
                             <div style={{ borderTop: '1px solid #E5E7EB', paddingTop: '20px', marginTop: '4px', marginBottom: '16px' }}>
                                 <div style={{ fontSize: '13px', fontWeight: 700, color: '#374151', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <span>🛍️</span> Produto Visitado
@@ -908,7 +1165,6 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                 )}
                             </div>
 
-                            {/* ── CLIENTE INATIVO ── */}
                             <div style={{ borderTop: '1px solid #E5E7EB', paddingTop: '20px', marginTop: '4px', marginBottom: '16px' }}>
                                 <div style={{ fontSize: '13px', fontWeight: 700, color: '#374151', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <span>😴</span> Cliente Inativo
