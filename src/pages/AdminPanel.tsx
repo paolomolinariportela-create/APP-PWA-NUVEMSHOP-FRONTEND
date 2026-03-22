@@ -68,6 +68,7 @@ interface PushCampaign {
   btn1_url?: string;
   btn2_text?: string;
   btn2_url?: string;
+  filter_behavior?: string;
   filter_device?: string;
   filter_country?: string;
   send_after?: string;
@@ -129,6 +130,7 @@ export default function AdminPanel() {
     image_url: undefined,
     btn1_text: undefined, btn1_url: undefined,
     btn2_text: undefined, btn2_url: undefined,
+    filter_behavior: undefined,
     filter_device: undefined,
     filter_country: undefined,
     send_after: undefined,
@@ -256,6 +258,7 @@ export default function AdminPanel() {
           image_url: undefined,
           btn1_text: undefined, btn1_url: undefined,
           btn2_text: undefined, btn2_url: undefined,
+          filter_behavior: undefined,
           filter_device: undefined, filter_country: undefined, send_after: undefined,
         });
       } else {
