@@ -594,6 +594,32 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             <input type="text" value={pushForm.title} onChange={e => setPushForm({ ...pushForm, title: e.target.value })} maxLength={50} placeholder="Ex: Oferta Relampago!" />
                             <small>{pushForm.title.length}/50 — use <code style={{ background: '#F3F4F6', padding: '1px 4px', borderRadius: '3px' }}>{'{{first_name}}'}</code> para personalizar</small>
                         </div>
+
+                        {/* ── TEMPLATES DE COPY ── */}
+                        <div style={{ marginBottom: '16px' }}>
+                            <div style={{ fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>📝 Templates prontos — clique para usar</div>
+                            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                                {[
+                                    { label: 'Black Friday', title: 'Black Friday chegou!', msg: 'Ate 70% OFF so hoje. Aproveite antes que acabe!' },
+                                    { label: 'Carrinho', title: 'Seu carrinho te espera!', msg: 'Voce deixou itens no carrinho. Finalize agora com frete gratis.' },
+                                    { label: 'Frete Gratis', title: 'Frete GRATIS hoje!', msg: 'Aproveite frete gratis em todos os pedidos. So hoje!' },
+                                    { label: 'Desconto VIP', title: 'Oferta exclusiva para voce!', msg: 'Como cliente especial, preparamos 15% OFF. Use o cupom VIP15.' },
+                                    { label: 'Estoque', title: 'Ultimas unidades!', msg: 'O produto que voce viu esta acabando. Garanta o seu agora.' },
+                                    { label: 'Saudades', title: 'Saudades de voce!', msg: 'Faz um tempo que nao te vemos. Temos novidades esperando por voce.' },
+                                ].map(t => (
+                                    <button
+                                        key={t.label}
+                                        onClick={() => setPushForm({ ...pushForm, title: t.title, message: t.msg })}
+                                        style={{ padding: '5px 12px', borderRadius: '999px', border: '1px solid #d1d5db', background: '#F9FAFB', fontSize: '12px', cursor: 'pointer', color: '#374151', fontWeight: 500, transition: 'all 0.15s' }}
+                                        onMouseOver={e => (e.currentTarget.style.background = '#EEF2FF')}
+                                        onMouseOut={e => (e.currentTarget.style.background = '#F9FAFB')}
+                                    >
+                                        {t.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
                         <div className="form-group">
                             <label>Mensagem</label>
                             <input type="text" value={pushForm.message} onChange={e => setPushForm({ ...pushForm, message: e.target.value })} maxLength={120} placeholder="Ex: 10% OFF hoje por tempo limitado!" />
@@ -619,22 +645,106 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                 <div><label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Botao 2 — Link</label><input type="text" value={pushForm.btn2_url ?? ''} onChange={e => setPushForm({ ...pushForm, btn2_url: e.target.value || undefined })} placeholder="https://..." style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} /></div>
                             </div>
                         </div>
-                        {(pushForm.title || pushForm.message) && (
-                            <div style={{ background: '#111827', borderRadius: '12px', padding: '12px 14px', marginBottom: '16px' }}>
-                                <div style={{ fontSize: '10px', color: '#6B7280', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Preview da notificacao</div>
-                                {pushForm.image_url && <div style={{ width: '100%', height: '120px', borderRadius: '8px', marginBottom: '10px', overflow: 'hidden', background: '#1f2937' }}><img src={pushForm.image_url} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} /></div>}
-                                <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#4F46E5', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>🔔</div>
-                                    <div><div style={{ fontSize: '13px', fontWeight: 600, color: '#fff' }}>{pushForm.title || 'Titulo da notificacao'}</div><div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>{pushForm.message || 'Mensagem da notificacao'}</div></div>
-                                </div>
-                                {(pushForm.btn1_text || pushForm.btn2_text) && (
-                                    <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
-                                        {pushForm.btn1_text && <span style={{ background: '#4F46E5', color: '#fff', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 600 }}>{pushForm.btn1_text}</span>}
-                                        {pushForm.btn2_text && <span style={{ background: '#374151', color: '#fff', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 600 }}>{pushForm.btn2_text}</span>}
+
+                        {/* ── PREVIEW ANDROID + DESKTOP ── */}
+                        <div style={{ marginBottom: '16px' }}>
+                            <div style={{ fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '10px' }}>👁️ Preview nas plataformas</div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+
+                                {/* Preview Android */}
+                                <div>
+                                    <div style={{ fontSize: '11px', color: '#6B7280', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>🤖 Android</div>
+                                    <div style={{ background: '#1a1a2e', borderRadius: '16px', padding: '10px', border: '3px solid #333' }}>
+                                        {/* Barra de status */}
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', padding: '0 4px' }}>
+                                            <span style={{ fontSize: '9px', color: '#aaa' }}>12:30</span>
+                                            <span style={{ fontSize: '9px', color: '#aaa' }}>🔋 📶</span>
+                                        </div>
+                                        {/* Notificacao */}
+                                        <div style={{ background: '#2d2d2d', borderRadius: '10px', padding: '10px', overflow: 'hidden' }}>
+                                            {pushForm.image_url && (
+                                                <div style={{ width: '100%', height: '70px', borderRadius: '6px', marginBottom: '8px', overflow: 'hidden', background: '#3d3d3d' }}>
+                                                    <img src={pushForm.image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                                </div>
+                                            )}
+                                            <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                                                <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: '#4F46E5', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>🔔</div>
+                                                <div style={{ flex: 1, minWidth: 0 }}>
+                                                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#fff', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                        {pushForm.title || 'Titulo da notificacao'}
+                                                    </div>
+                                                    <div style={{ fontSize: '11px', color: '#9CA3AF', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                                                        {pushForm.message || 'Mensagem da notificacao'}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {(pushForm.btn1_text || pushForm.btn2_text) && (
+                                                <div style={{ display: 'flex', gap: '6px', marginTop: '8px', borderTop: '1px solid #444', paddingTop: '8px' }}>
+                                                    {pushForm.btn1_text && <span style={{ background: '#374151', color: '#fff', padding: '3px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 600 }}>{pushForm.btn1_text}</span>}
+                                                    {pushForm.btn2_text && <span style={{ background: '#374151', color: '#fff', padding: '3px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 600 }}>{pushForm.btn2_text}</span>}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                )}
+                                </div>
+
+                                {/* Preview Desktop */}
+                                <div>
+                                    <div style={{ fontSize: '11px', color: '#6B7280', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>🖥️ Desktop (Chrome / Windows)</div>
+                                    <div style={{ background: '#f1f1f1', borderRadius: '12px', padding: '10px', border: '1px solid #ddd', position: 'relative' }}>
+                                        {/* Barra superior */}
+                                        <div style={{ display: 'flex', gap: '4px', marginBottom: '8px' }}>
+                                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ff5f57' }} />
+                                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#febc2e' }} />
+                                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#28c840' }} />
+                                        </div>
+                                        {/* Notificacao Desktop estilo Windows/Mac */}
+                                        <div style={{ background: '#fff', borderRadius: '8px', padding: '10px 12px', boxShadow: '0 2px 12px rgba(0,0,0,0.15)', display: 'flex', gap: '10px', alignItems: 'flex-start', position: 'relative' }}>
+                                            <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: '#4F46E5', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>🔔</div>
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                <div style={{ fontSize: '12px', fontWeight: 700, color: '#111827', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                    {pushForm.title || 'Titulo da notificacao'}
+                                                </div>
+                                                <div style={{ fontSize: '11px', color: '#6B7280', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                                                    {pushForm.message || 'Mensagem da notificacao'}
+                                                </div>
+                                                {pushForm.image_url && (
+                                                    <div style={{ marginTop: '6px', width: '100%', height: '50px', borderRadius: '4px', overflow: 'hidden', background: '#f3f4f6' }}>
+                                                        <img src={pushForm.image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <span style={{ position: 'absolute', top: '8px', right: '8px', fontSize: '10px', color: '#9CA3AF' }}>agora</span>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
-                        )}
+                        </div>
+                        {/* ── CONTROLE DE FREQUENCIA ── */}
+                        <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: '8px', padding: '12px 14px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+                                <span style={{ fontSize: '18px' }}>🔔</span>
+                                <div>
+                                    <div style={{ fontSize: '13px', fontWeight: 600, color: '#92400E' }}>Controle de Frequencia</div>
+                                    <div style={{ fontSize: '11px', color: '#B45309' }}>Limita quantos pushs cada usuario recebe por dia (evita bloqueio)</div>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                                <select
+                                    value={(pushForm as any).frequency_limit ?? ''}
+                                    onChange={e => setPushForm({ ...pushForm, ...(e.target.value ? { frequency_limit: parseInt(e.target.value) } : { frequency_limit: undefined }) } as any)}
+                                    style={{ padding: '6px 10px', border: '1px solid #FED7AA', borderRadius: '6px', background: 'white', fontSize: '13px', color: '#374151' }}
+                                >
+                                    <option value="">Sem limite</option>
+                                    <option value="1">Max 1 por dia</option>
+                                    <option value="2">Max 2 por dia</option>
+                                    <option value="3">Max 3 por dia</option>
+                                    <option value="5">Max 5 por semana</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <button className="save-button" onClick={handleSendPush} disabled={sendingPush || !pushForm.title || !pushForm.message} style={{ background: sendingPush ? '#ccc' : '#4F46E5', width: '100%', marginTop: '10px' }}>
                             {sendingPush ? 'Enviando...' : pushForm.send_after ? `⏰ Agendar para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos` : `🚀 Enviar para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`}
                         </button>
