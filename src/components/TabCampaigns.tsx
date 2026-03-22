@@ -76,6 +76,32 @@ interface JornadaResumo {
 }
 // ────────────────────────────────────────────────────────────────────────────
 
+// ── Interfaces Score ─────────────────────────────────────────────────────────
+interface ScoreVisitor {
+    visitor_id: string;
+    ultima_visita: string;
+    comprador: boolean;
+    carrinho_ativo: boolean;
+}
+
+interface ScoreGrupo {
+    id: string;
+    label: string;
+    cor: string;
+    corBg: string;
+    desc: string;
+    count: number;
+    pct: number;
+    segmento_os: string;
+    visitors: ScoreVisitor[];
+}
+
+interface ScoreData {
+    total_visitors: number;
+    grupos: ScoreGrupo[];
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 interface PushHistoryItem {
     id: number;
     title: string;
@@ -920,6 +946,181 @@ function JornadaTab({ token, API_URL, brl }: { token: string | null; API_URL: st
 }
 // ────────────────────────────────────────────────────────────────────────────
 
+// ── Componente: Score de Usuários ────────────────────────────────────────────
+function ScoreTab({
+    token, API_URL,
+    onSegmentar,
+}: {
+    token: string | null;
+    API_URL: string;
+    onSegmentar: (segmento: string, label: string) => void;
+}) {
+    const [data, setData] = useState<ScoreData | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [grupoAberto, setGrupoAberto] = useState<string | null>(null);
+
+    const fetchScores = () => {
+        if (!token) return;
+        setLoading(true);
+        fetch(`${API_URL}/analytics/scores`, { headers: { Authorization: `Bearer ${token}` } })
+            .then(r => r.json())
+            .then(d => setData(d))
+            .catch(() => {})
+            .finally(() => setLoading(false));
+    };
+
+    useEffect(() => { fetchScores(); }, [token]);
+
+    const formatDate = (s: string) => {
+        try {
+            const d = new Date(s);
+            const diff = Math.round((Date.now() - d.getTime()) / 86400000);
+            if (diff === 0) return 'hoje';
+            if (diff === 1) return 'ontem';
+            return `há ${diff} dias`;
+        } catch { return s; }
+    };
+
+    if (loading) return (
+        <div style={{ textAlign: 'center', padding: '50px', color: '#6B7280' }}>
+            <div style={{ fontSize: '32px', marginBottom: '10px' }}>⚡</div>
+            <div>Calculando scores...</div>
+        </div>
+    );
+
+    if (!data || data.total_visitors === 0) return (
+        <div style={{ textAlign: 'center', padding: '50px', color: '#6B7280' }}>
+            <div style={{ fontSize: '40px', marginBottom: '12px' }}>🎯</div>
+            <div style={{ fontWeight: 700, fontSize: '15px', color: '#111827', marginBottom: '8px' }}>Nenhum visitor ainda</div>
+            <div style={{ fontSize: '13px' }}>Os scores aparecem assim que os primeiros usuários acessarem a loja pelo app.</div>
+        </div>
+    );
+
+    return (
+        <div>
+            {/* Header com total */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <div>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>🎯 Score de Usuários</div>
+                    <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '2px' }}>
+                        {data.total_visitors.toLocaleString('pt-BR')} visitors classificados por comportamento
+                    </div>
+                </div>
+                <button onClick={fetchScores} style={{ background: 'none', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '6px 12px', cursor: 'pointer', fontSize: '12px', color: '#374151' }}>
+                    🔄 Atualizar
+                </button>
+            </div>
+
+            {/* Barra de distribuição visual */}
+            <div style={{ display: 'flex', borderRadius: '10px', overflow: 'hidden', height: '12px', marginBottom: '20px' }}>
+                {data.grupos.filter(g => g.count > 0).map(g => (
+                    <div
+                        key={g.id}
+                        title={`${g.label}: ${g.count} (${g.pct}%)`}
+                        style={{ width: `${g.pct}%`, background: g.cor, transition: 'width 0.6s' }}
+                    />
+                ))}
+            </div>
+
+            {/* Cards de grupos */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {data.grupos.map(g => {
+                    const aberto = grupoAberto === g.id;
+                    return (
+                        <div key={g.id} style={{ border: `2px solid ${g.count > 0 ? g.cor + '40' : '#E5E7EB'}`, borderRadius: '12px', overflow: 'hidden', opacity: g.count === 0 ? 0.5 : 1 }}>
+                            {/* Header do grupo */}
+                            <div
+                                onClick={() => g.count > 0 && setGrupoAberto(aberto ? null : g.id)}
+                                style={{
+                                    padding: '14px 16px', background: aberto ? g.corBg : '#fff',
+                                    cursor: g.count > 0 ? 'pointer' : 'default',
+                                    display: 'flex', alignItems: 'center', gap: '12px',
+                                    transition: 'background 0.2s',
+                                }}
+                            >
+                                {/* Ícone + label */}
+                                <div style={{ flex: 1 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+                                        <span style={{ fontSize: '16px', fontWeight: 700, color: g.cor }}>{g.label}</span>
+                                        <span style={{ background: g.corBg, color: g.cor, border: `1px solid ${g.cor}30`, padding: '2px 10px', borderRadius: '999px', fontSize: '12px', fontWeight: 700 }}>
+                                            {g.count.toLocaleString('pt-BR')} visitors
+                                        </span>
+                                        <span style={{ fontSize: '12px', color: '#9CA3AF' }}>{g.pct}%</span>
+                                    </div>
+                                    <div style={{ fontSize: '12px', color: '#6B7280' }}>{g.desc}</div>
+                                </div>
+
+                                {/* Barra de proporção */}
+                                <div style={{ width: '100px', flexShrink: 0 }}>
+                                    <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '6px', overflow: 'hidden' }}>
+                                        <div style={{ width: `${g.pct}%`, background: g.cor, height: '100%', borderRadius: '999px', transition: 'width 0.6s' }} />
+                                    </div>
+                                </div>
+
+                                {/* Botão de segmentar */}
+                                {g.count > 0 && (
+                                    <button
+                                        onClick={e => { e.stopPropagation(); onSegmentar(g.segmento_os, g.label); }}
+                                        style={{
+                                            padding: '6px 12px', borderRadius: '8px', border: `1px solid ${g.cor}`,
+                                            background: 'white', color: g.cor, fontSize: '12px', fontWeight: 600,
+                                            cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+                                            transition: 'all 0.2s',
+                                        }}
+                                        onMouseOver={e => { e.currentTarget.style.background = g.corBg; }}
+                                        onMouseOut={e => { e.currentTarget.style.background = 'white'; }}
+                                    >
+                                        📢 Enviar push
+                                    </button>
+                                )}
+
+                                {g.count > 0 && (
+                                    <span style={{ color: '#9CA3AF', fontSize: '14px', flexShrink: 0 }}>{aberto ? '▲' : '▼'}</span>
+                                )}
+                            </div>
+
+                            {/* Lista de visitors expandida */}
+                            {aberto && g.visitors.length > 0 && (
+                                <div style={{ borderTop: `1px solid ${g.cor}20`, background: g.corBg }}>
+                                    <div style={{ padding: '10px 16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                        {g.visitors.map((v, i) => (
+                                            <div key={i} style={{ background: '#fff', borderRadius: '8px', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: g.cor, flexShrink: 0 }} />
+                                                <div style={{ flex: 1, fontFamily: 'monospace', fontSize: '11px', color: '#374151' }}>
+                                                    {v.visitor_id.substring(0, 20)}…
+                                                </div>
+                                                <div style={{ fontSize: '11px', color: '#6B7280' }}>
+                                                    {formatDate(v.ultima_visita)}
+                                                </div>
+                                                <div style={{ display: 'flex', gap: '4px' }}>
+                                                    {v.comprador && <span style={{ background: '#dcfce7', color: '#166534', padding: '1px 6px', borderRadius: '999px', fontSize: '10px', fontWeight: 600 }}>💰</span>}
+                                                    {v.carrinho_ativo && <span style={{ background: '#fef3c7', color: '#92400e', padding: '1px 6px', borderRadius: '999px', fontSize: '10px', fontWeight: 600 }}>🛒</span>}
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {g.count > g.visitors.length && (
+                                            <div style={{ textAlign: 'center', fontSize: '11px', color: '#9CA3AF', padding: '4px' }}>
+                                                + {g.count - g.visitors.length} visitors não exibidos
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* Legenda */}
+            <div style={{ marginTop: '16px', padding: '12px 16px', background: '#F9FAFB', borderRadius: '10px', fontSize: '11px', color: '#6B7280', lineHeight: 1.6 }}>
+                <strong style={{ color: '#374151' }}>Como funciona:</strong> O score é calculado com base nas visitas, compras e carrinhos reais do seu banco.
+                Clique em <strong>"📢 Enviar push"</strong> para criar uma campanha já segmentada para aquele grupo.
+            </div>
+        </div>
+    );
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 // ── Função: inferir etapa do funil pelo texto da campanha ───────────────────
 function inferirFunil(title: string, message: string): { label: string; color: string; bg: string; etapa: 'fundo' | 'meio' | 'topo' } {
     const texto = `${title} ${message}`.toLowerCase();
@@ -1234,7 +1435,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
     const [sendingAB, setSendingAB] = useState(false);
     const [abTests, setAbTests] = useState<ABTestItem[]>([]);
     const [loadingAB, setLoadingAB] = useState(false);
-    const [activeHistorySubTab, setActiveHistorySubTab] = useState<'onesignal' | 'ab' | 'jornada' | 'local'>('onesignal');
+    const [activeHistorySubTab, setActiveHistorySubTab] = useState<'onesignal' | 'ab' | 'jornada' | 'score' | 'local'>('onesignal');
     // ── NOVO: IA Gerador ─────────────────────────────────────────────────────
     const [showIAModal, setShowIAModal] = useState(false);
 
@@ -1337,6 +1538,19 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
             } : t));
         } catch { alert('Erro ao atualizar resultados.'); }
     };
+
+    // ── Score: pré-segmenta campanha pelo grupo clicado ──────────────────────
+    const handleSegmentarScore = (segmento: string, label: string) => {
+        setPushForm({ ...pushForm, filter_behavior: segmento || undefined });
+        setShowSegmentation(true);
+        setActiveTab('campanhas');
+        setActiveHistorySubTab('onesignal');
+        // Scroll suave até o formulário
+        setTimeout(() => {
+            document.querySelector('.config-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+    };
+    // ────────────────────────────────────────────────────────────────────────
     // ────────────────────────────────────────────────────────────────────────
     const saveAutomacao = async () => {
         if (!token) return;
@@ -1992,9 +2206,9 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             </div>
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <div style={{ display: 'flex', background: '#F3F4F6', borderRadius: '8px', padding: '3px', gap: '2px' }}>
-                                    {(['onesignal', 'ab', 'jornada', 'local'] as const).map(tab => (
+                                    {(['onesignal', 'ab', 'jornada', 'score', 'local'] as const).map(tab => (
                                         <button key={tab} onClick={() => setActiveHistorySubTab(tab)} style={{ padding: '5px 12px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 500, background: activeHistorySubTab === tab ? '#fff' : 'transparent', color: activeHistorySubTab === tab ? '#111827' : '#6B7280', boxShadow: activeHistorySubTab === tab ? '0 1px 3px rgba(0,0,0,0.1)' : 'none', whiteSpace: 'nowrap' }}>
-                                            {tab === 'onesignal' ? 'OneSignal' : tab === 'ab' ? '🧪 A/B' : tab === 'jornada' ? '🗺️ Jornada' : 'Local'}
+                                            {tab === 'onesignal' ? 'OneSignal' : tab === 'ab' ? '🧪 A/B' : tab === 'jornada' ? '🗺️ Jornada' : tab === 'score' ? '🎯 Score' : 'Local'}
                                         </button>
                                     ))}
                                 </div>
@@ -2078,6 +2292,11 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                         {activeHistorySubTab === 'jornada' && (
                             <div style={{ padding: '8px 0' }}>
                                 <JornadaTab token={token} API_URL={API_URL} brl={brl} />
+                            </div>
+                        )}
+                        {activeHistorySubTab === 'score' && (
+                            <div style={{ padding: '8px 0' }}>
+                                <ScoreTab token={token} API_URL={API_URL} onSegmentar={handleSegmentarScore} />
                             </div>
                         )}
                         {activeHistorySubTab === 'local' && (
