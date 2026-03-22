@@ -130,11 +130,16 @@ const Badge = ({ color, bg, border, children }: { color: string; bg: string; bor
   </span>
 );
 
-const ActionBtn = ({ primary, onClick, children }: { primary?: boolean; onClick?: () => void; children: React.ReactNode }) => (
-  <button onClick={onClick} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', border: primary ? 'none' : `1px solid ${C.neutralBorder}`, background: primary ? C.brand : C.white, color: primary ? C.white : C.textMid, transition: 'all 0.15s' }}>
-    {children}
-  </button>
-);
+const ActionBtn = ({ primary, onClick, children, contextColor }: { primary?: boolean; onClick?: () => void; children: React.ReactNode; contextColor?: string }) => {
+  const bg = primary ? (contextColor ?? C.dark) : C.white;
+  const color = primary ? C.white : (contextColor ?? C.textMid);
+  const border = primary ? 'none' : `1px solid ${C.neutralBorder}`;
+  return (
+    <button onClick={onClick} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', border, background: bg, color, transition: 'all 0.15s' }}>
+      {children}
+    </button>
+  );
+};
 
 // ─── INTERFACES ───────────────────────────────────────────────────────────────
 interface DashboardStats {
@@ -365,7 +370,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
         {/* Ações */}
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
           {diag.acoes.map((acao, i) => (
-            <ActionBtn key={i} primary={i === 0} onClick={onNavigateCampanhas}>
+            <ActionBtn key={i} primary={i === 0} onClick={onNavigateCampanhas} contextColor={paleta.text}>
               {acao.icon} {acao.label}
             </ActionBtn>
           ))}
@@ -448,7 +453,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
         <div className="stat-card" style={{ borderLeft: `3px solid ${C.success}` }}>
           <div className="stat-icon green" style={{ color: C.success }}>{Icon.revenue}</div>
           <div className="stat-info">
-            <h3>Receita App</h3>
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Receita app</h3>
             <p>{brl(receita)}</p>
             <span className="stat-growth" style={{ color: C.success, fontWeight: 500 }}>{vendas} pedidos realizados</span>
             <div className="card-meta-text">Meta: {brl(metaReceita)}</div>
@@ -459,10 +464,10 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
         <div className="stat-card">
           <div className="stat-icon" style={{ color: C.brand }}>{Icon.ticket}</div>
           <div className="stat-info">
-            <h3>Ticket Médio</h3>
-            <div className="ticket-main-row">
-              <span className="ticket-main-label" style={{ color: C.brand, fontWeight: 600 }}>App</span>
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Ticket médio</h3>
+            <div className="ticket-main-row" style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
               <span className="ticket-main-value">{brl(ticketApp)}</span>
+              <Badge color={C.brand} bg={C.brandLight} border={C.brandLight}>App</Badge>
             </div>
           </div>
         </div>
@@ -471,7 +476,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
         <div className="stat-card">
           <div className="stat-icon purple" style={{ color: C.brand }}>{Icon.mobile}</div>
           <div className="stat-info">
-            <h3>Instalações Ativas</h3>
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Instalações ativas</h3>
             <p>{instalacoes}</p>
             <span className="stat-growth" style={{ color: temOsData ? C.brand : C.textSoft, fontWeight: 500 }}>
               {temOsData ? 'Push habilitado — dados em tempo real' : 'Base de clientes fiéis'}
@@ -484,7 +489,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
         <div className="stat-card">
           <div className="stat-icon" style={{ color: crescimento7d > 0 ? C.success : C.neutralMid }}>{Icon.trending}</div>
           <div className="stat-info">
-            <h3>Crescimento do App</h3>
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Crescimento do app</h3>
             <p style={{ color: crescimento7d > 0 ? C.success : C.text }}>+{crescimento7d}%</p>
             <span className="stat-growth" style={{ color: C.textSoft }}>vs. últimos 7 dias</span>
           </div>
@@ -494,7 +499,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
         <div className="stat-card">
           <div className="stat-icon blue" style={{ color: C.brand }}>{Icon.users}</div>
           <div className="stat-info">
-            <h3>Clientes Convertidos</h3>
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Clientes convertidos</h3>
             <p>{temOsData && compradoresOS > 0 ? compradoresOS : clientesRec}</p>
             {temOsData && compradoresOS > 0 ? (
               <>
@@ -518,7 +523,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
         <div className="stat-card">
           <div className="stat-icon" style={{ color: C.brand }}>{Icon.eye}</div>
           <div className="stat-info">
-            <h3>Páginas Visualizadas</h3>
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Páginas visualizadas</h3>
             <p>{pageviews.toLocaleString()}</p>
             <div style={{ fontSize: '12px', color: C.textMid, marginTop: '6px', fontWeight: 500 }}>
               Tempo médio: <strong>{tempoMedio}</strong>
@@ -531,20 +536,18 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
           <div className="stat-card">
             <div className="stat-icon" style={{ color: C.brand }}>{Icon.pages}</div>
             <div className="stat-info">
-              <h3>Top páginas do App</h3>
+              <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Top páginas do app</h3>
               <ul style={{ marginTop: '8px', paddingLeft: 0, listStyle: 'none', fontSize: '11px', color: C.textMid }}>
                 {topPaginasPwa.filter(p => p !== 'install').slice(0, 5).map((pagina, idx) => {
                   let label = pagina || '/';
-                  let badge: string | null = null;
-                  if (label === '/') { label = 'Página inicial'; badge = 'HOME'; }
-                  const display = label.length > 50 ? label.slice(0, 47) + '...' : label;
+                  const isHome = label === '/';
+                  if (isHome) label = 'Página inicial';
+                  const display = label.length > 40 ? label.slice(0, 37) + '...' : label;
                   return (
-                    <li key={pagina + idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '5px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1, minWidth: 0 }}>
-                        <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 16, height: 16, borderRadius: '3px', background: C.neutralBg, fontSize: '10px', color: C.textSoft, border: `1px solid ${C.neutralBorder}`, flexShrink: 0, fontWeight: 600 }}>{idx + 1}</span>
-                        <span title={label} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{display}</span>
-                      </div>
-                      {badge && <span style={{ marginLeft: '6px', fontSize: '9px', padding: '1px 5px', borderRadius: '3px', background: C.brandLight, color: C.brand, flexShrink: 0, fontWeight: 600 }}>{badge}</span>}
+                    <li key={pagina + idx} style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '5px' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 16, height: 16, borderRadius: '3px', background: C.neutralBg, fontSize: '10px', color: C.textSoft, border: `1px solid ${C.neutralBorder}`, flexShrink: 0, fontWeight: 600 }}>{idx + 1}</span>
+                      <span title={label} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>{display}</span>
+                      {isHome && <Badge color={C.brand} bg={C.brandLight} border={C.brandLight}>Home</Badge>}
                     </li>
                   );
                 })}
@@ -553,39 +556,41 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
           </div>
         )}
 
-        {/* Funil com botões e comparativo */}
+        {/* Funil */}
         <div className="stat-card" style={{ gridRow: 'span 2' }}>
           <div className="stat-info" style={{ width: '100%' }}>
-            <h3>Funil de Vendas</h3>
-            <div style={{ marginTop: '14px' }}>
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px', marginBottom: '14px', margin: '0 0 14px' }}>Funil de vendas</h3>
+            <div>
               {[
-                { label: '1. Visitas Únicas', val: funilVisitas, pct: 100, cor: C.neutralLight, bench: null, botao: null },
-                { label: '2. Carrinho', val: funilCarrinho, pct: taxaV2C, cor: funilCarrinho === 0 ? C.danger : '#60A5FA', bench: 10, botao: funilCarrinho === 0 ? 'Campanha de produto' : null },
+                { label: '1. Visitas únicas', val: funilVisitas, pct: 100, cor: C.neutralLight, bench: null as number | null, botao: null as string | null },
+                { label: '2. Carrinho', val: funilCarrinho, pct: taxaV2C, cor: funilCarrinho === 0 ? C.danger : '#60A5FA', bench: 10, botao: funilCarrinho === 0 ? 'Criar campanha' : null },
                 { label: '3. Checkout', val: funilCheckout, pct: taxaC2O, cor: funilCheckout === 0 ? C.danger : C.success, bench: mediaConv, botao: funilCarrinho > 0 && funilCheckout === 0 ? 'Recuperar carrinhos' : null },
               ].map((etapa, i) => (
-                <div key={i} style={{ marginBottom: etapa.botao ? '6px' : '12px' }}>
-                  <div className="bar-label">
+                <div key={i} style={{ marginBottom: '14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
                     <span style={{ fontSize: '12px', color: C.textMid }}>{etapa.label}</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <strong style={{ color: C.text }}>{etapa.val}</strong>
-                      {etapa.bench !== null && (
-                        <span style={{ fontSize: '10px', color: etapa.pct >= etapa.bench ? C.success : C.danger, fontWeight: 600 }}>
-                          {etapa.pct.toFixed(1)}% {etapa.pct >= etapa.bench ? '↑' : '↓'}
-                        </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      {etapa.botao && (
+                        <button onClick={onNavigateCampanhas} style={{ background: 'none', border: 'none', color: C.brand, fontSize: '11px', fontWeight: 600, cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                          {Icon.lightning} {etapa.botao}
+                        </button>
                       )}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <strong style={{ color: C.text, fontSize: '13px' }}>{etapa.val}</strong>
+                        {etapa.bench !== null && (
+                          <span style={{ fontSize: '10px', color: etapa.pct >= etapa.bench ? C.success : C.danger, fontWeight: 600 }}>
+                            {etapa.pct.toFixed(1)}%{etapa.pct >= etapa.bench ? ' ↑' : ' ↓'}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  <div className="bar-track">
-                    <div className="bar-fill" style={{ width: `${Math.min(etapa.pct, 100)}%`, background: etapa.cor }} />
+                  <div style={{ background: C.neutralBorder, borderRadius: '999px', height: '5px', overflow: 'hidden' }}>
+                    <div style={{ width: `${Math.min(etapa.pct, 100)}%`, background: etapa.cor, height: '100%', borderRadius: '999px', transition: 'width 0.4s ease' }} />
                   </div>
-                  {etapa.botao && (
-                    <button onClick={onNavigateCampanhas} style={{ marginTop: '4px', marginBottom: '6px', display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'none', border: `1px solid ${C.brand}`, color: C.brand, borderRadius: '5px', padding: '4px 10px', fontSize: '11px', cursor: 'pointer', fontWeight: 600 }}>
-                      {Icon.lightning} {etapa.botao}
-                    </button>
-                  )}
                 </div>
               ))}
-              <div style={{ marginTop: '10px', padding: '10px 12px', background: C.neutralBg, borderRadius: '6px', border: `1px solid ${C.neutralBorder}` }}>
+              <div style={{ padding: '10px 12px', background: C.neutralBg, borderRadius: '6px', border: `1px solid ${C.neutralBorder}` }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '12px' }}>
                   <span style={{ color: C.textSoft }}>Sua conversão</span>
                   <strong style={{ color: taxaConvApp >= mediaConv ? C.success : C.danger }}>{taxaConvApp}%</strong>
@@ -608,7 +613,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
         <div className="stat-card" style={{ borderLeft: `3px solid ${C.danger}` }}>
           <div className="stat-icon red" style={{ color: C.danger }}>{Icon.cart}</div>
           <div className="stat-info">
-            <h3>Carrinhos Abandonados</h3>
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Carrinhos abandonados</h3>
             <p>{brl(carrinhosValor)}</p>
             <div style={{ fontSize: '12px', color: C.textSoft, marginTop: '4px' }}>
               {temOsData && carrinhoOS > 0 ? (
@@ -617,7 +622,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
                 <>{carrinhosQtd} abandono{carrinhosQtd !== 1 ? 's' : ''} registrado{carrinhosQtd !== 1 ? 's' : ''}</>
               )}
             </div>
-            <button onClick={onNavigateCampanhas} style={{ marginTop: '8px', display: 'inline-flex', alignItems: 'center', gap: '6px', background: C.brand, color: C.white, border: 'none', borderRadius: '5px', padding: '6px 12px', fontSize: '11px', cursor: 'pointer', fontWeight: 600 }}>
+            <button onClick={onNavigateCampanhas} style={{ marginTop: '8px', display: 'inline-flex', alignItems: 'center', gap: '6px', background: C.dark, color: C.white, border: 'none', borderRadius: '5px', padding: '6px 12px', fontSize: '11px', cursor: 'pointer', fontWeight: 600 }}>
               {Icon.lightning} Recuperar agora
             </button>
           </div>
@@ -627,35 +632,35 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
         <div className="stat-card">
           <div className="stat-info" style={{ width: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <h3 style={{ margin: 0 }}>Taxa de Conversão</h3>
+              <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px', margin: 0 }}>Taxa de conversão</h3>
               <span style={{ color: C.brand, display: 'flex' }}>{Icon.conversion}</span>
             </div>
-            <div className="conversion-bar" style={{ marginBottom: '8px' }}>
-              <div className="bar-label">
-                <span style={{ fontSize: '12px', color: C.textMid }}>App</span>
+            <div style={{ marginBottom: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '12px' }}>
+                <span style={{ color: C.textMid }}>App</span>
                 <strong style={{ color: taxaConvApp >= mediaConv ? C.success : C.danger }}>{taxaConvApp}%</strong>
               </div>
-              <div className="bar-track">
-                <div className="bar-fill" style={{ width: `${Math.min(taxaConvApp, 100)}%`, background: taxaConvApp >= mediaConv ? C.success : C.danger }} />
+              <div style={{ background: C.neutralBorder, borderRadius: '999px', height: '5px', overflow: 'hidden' }}>
+                <div style={{ width: `${Math.min(taxaConvApp, 100)}%`, background: taxaConvApp >= mediaConv ? C.success : C.danger, height: '100%', borderRadius: '999px' }} />
               </div>
             </div>
-            <div className="conversion-bar">
-              <div className="bar-label">
-                <span style={{ fontSize: '12px', color: C.textSoft }}>Mercado</span>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '12px' }}>
+                <span style={{ color: C.textSoft }}>Mercado</span>
                 <strong style={{ color: C.neutralMid }}>{mediaConv}%</strong>
               </div>
-              <div className="bar-track">
-                <div className="bar-fill" style={{ width: `${mediaConv}%`, background: C.neutralBorder }} />
+              <div style={{ background: C.neutralBorder, borderRadius: '999px', height: '5px', overflow: 'hidden' }}>
+                <div style={{ width: `${mediaConv}%`, background: '#D1D5DB', height: '100%', borderRadius: '999px' }} />
               </div>
             </div>
-            <div style={{ marginTop: '8px' }}>
+            <div style={{ marginTop: '10px' }}>
               <Badge
                 color={taxaConvApp >= mediaConv ? C.success : C.danger}
                 bg={taxaConvApp >= mediaConv ? C.successBg : C.dangerBg}
                 border={taxaConvApp >= mediaConv ? C.successBorder : C.dangerBorder}
               >
                 {taxaConvApp >= mediaConv ? Icon.check : Icon.alert}
-                {taxaConvApp >= mediaConv ? `${(taxaConvApp - mediaConv).toFixed(1)}pp acima da média` : `${(mediaConv - taxaConvApp).toFixed(1)}pp abaixo da média`}
+                {taxaConvApp >= mediaConv ? `${(taxaConvApp - mediaConv).toFixed(1)}pp acima` : `${(mediaConv - taxaConvApp).toFixed(1)}pp abaixo`}
               </Badge>
             </div>
           </div>
