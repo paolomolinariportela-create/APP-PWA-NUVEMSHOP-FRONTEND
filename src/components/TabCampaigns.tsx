@@ -16,6 +16,37 @@ interface PushCampaign {
     send_after?: string;
 }
 
+// ── NOVO: Interfaces A/B ─────────────────────────────────────────────────────
+interface ABTestItem {
+    id: number;
+    title_a: string; message_a: string;
+    title_b: string; message_b: string;
+    sent_a: number; sent_b: number;
+    opened_a: number; opened_b: number;
+    ctr_a: number; ctr_b: number;
+    vencedor: string | null;
+    status: string;
+    created_at: string;
+}
+
+interface ABTestForm {
+    title_a: string; message_a: string;
+    title_b: string; message_b: string;
+    url: string;
+    image_url?: string;
+    filter_behavior?: string;
+    filter_device?: string;
+    filter_country?: string;
+    intelligent_delivery?: boolean;
+}
+
+const AB_FORM_DEFAULT: ABTestForm = {
+    title_a: '', message_a: '',
+    title_b: '', message_b: '',
+    url: '/',
+};
+// ────────────────────────────────────────────────────────────────────────────
+
 interface PushHistoryItem {
     id: number;
     title: string;
@@ -221,6 +252,194 @@ function CardSection({ title, subtitle }: { title: string; subtitle?: string }) 
         </div>
     );
 }
+
+// ── Componente: Modal de criação A/B ────────────────────────────────────────
+function ABTestModal({
+    form, setForm, onSend, sending, onClose, alcance,
+}: {
+    form: ABTestForm;
+    setForm: (f: ABTestForm) => void;
+    onSend: () => void;
+    sending: boolean;
+    onClose: () => void;
+    alcance: number;
+}) {
+    const metade = Math.round(alcance / 2);
+    const podeEnviar = form.title_a && form.message_a && form.title_b && form.message_b;
+
+    return (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={onClose}>
+            <div style={{ background: '#fff', borderRadius: '16px', width: '100%', maxWidth: '720px', maxHeight: '92vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }} onClick={e => e.stopPropagation()}>
+                {/* Header */}
+                <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid #E5E7EB', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                        <div style={{ fontSize: '16px', fontWeight: 700, color: '#111827' }}>🧪 Criar Teste A/B</div>
+                        <div style={{ fontSize: '13px', color: '#6B7280', marginTop: '2px' }}>
+                            A base será dividida ~50/50 — cada variante recebe ≈ <strong>{metade.toLocaleString('pt-BR')}</strong> dispositivos
+                        </div>
+                    </div>
+                    <button onClick={onClose} style={{ background: '#F3F4F6', border: 'none', borderRadius: '8px', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px' }}>×</button>
+                </div>
+
+                <div style={{ padding: '20px 24px' }}>
+                    {/* Como funciona */}
+                    <div style={{ background: '#EEF2FF', border: '1px solid #C7D2FE', borderRadius: '10px', padding: '12px 16px', marginBottom: '20px', display: 'flex', gap: '10px' }}>
+                        <span style={{ fontSize: '18px', flexShrink: 0 }}>💡</span>
+                        <div style={{ fontSize: '12px', color: '#3730A3', lineHeight: 1.6 }}>
+                            <strong>Como funciona:</strong> Enviamos a Variante A para metade da base e a Variante B para a outra metade.
+                            Após algumas horas, o sistema compara os CTRs e indica o vencedor automaticamente.
+                            Use para testar títulos, tons de voz ou chamadas para ação diferentes.
+                        </div>
+                    </div>
+
+                    {/* Grid A vs B */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                        {/* Variante A */}
+                        <div style={{ border: '2px solid #3b82f6', borderRadius: '12px', padding: '16px', background: '#eff6ff' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+                                <span style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#3b82f6', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px', flexShrink: 0 }}>A</span>
+                                <span style={{ fontSize: '13px', fontWeight: 700, color: '#1d4ed8' }}>Variante A</span>
+                                <span style={{ marginLeft: 'auto', fontSize: '11px', color: '#3b82f6', background: '#dbeafe', padding: '2px 8px', borderRadius: '999px' }}>≈{metade.toLocaleString('pt-BR')} dispositivos</span>
+                            </div>
+                            <div style={{ marginBottom: '10px' }}>
+                                <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Título</label>
+                                <input type="text" value={form.title_a} maxLength={50} onChange={e => setForm({ ...form, title_a: e.target.value })} placeholder="Ex: Oferta imperdível hoje!" style={{ width: '100%', padding: '8px', border: '1px solid #bfdbfe', borderRadius: '6px', fontSize: '13px', background: '#fff', boxSizing: 'border-box' }} />
+                                <small style={{ fontSize: '10px', color: '#6B7280' }}>{form.title_a.length}/50</small>
+                            </div>
+                            <div>
+                                <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Mensagem</label>
+                                <textarea value={form.message_a} maxLength={120} rows={3} onChange={e => setForm({ ...form, message_a: e.target.value })} placeholder="Ex: Até 50% OFF só hoje. Corre!" style={{ width: '100%', padding: '8px', border: '1px solid #bfdbfe', borderRadius: '6px', fontSize: '13px', background: '#fff', resize: 'vertical', boxSizing: 'border-box' }} />
+                                <small style={{ fontSize: '10px', color: '#6B7280' }}>{form.message_a.length}/120</small>
+                            </div>
+                            {/* Preview A */}
+                            {(form.title_a || form.message_a) && (
+                                <div style={{ marginTop: '10px', background: '#111827', borderRadius: '8px', padding: '8px 12px', display: 'flex', gap: '8px' }}>
+                                    <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: '#3b82f6', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}>🔔</div>
+                                    <div>
+                                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#fff' }}>{form.title_a || 'Título A'}</div>
+                                        <div style={{ fontSize: '10px', color: '#9CA3AF', marginTop: '1px' }}>{form.message_a || 'Mensagem A'}</div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Variante B */}
+                        <div style={{ border: '2px solid #10b981', borderRadius: '12px', padding: '16px', background: '#f0fdf4' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+                                <span style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#10b981', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px', flexShrink: 0 }}>B</span>
+                                <span style={{ fontSize: '13px', fontWeight: 700, color: '#059669' }}>Variante B</span>
+                                <span style={{ marginLeft: 'auto', fontSize: '11px', color: '#10b981', background: '#dcfce7', padding: '2px 8px', borderRadius: '999px' }}>≈{metade.toLocaleString('pt-BR')} dispositivos</span>
+                            </div>
+                            <div style={{ marginBottom: '10px' }}>
+                                <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Título</label>
+                                <input type="text" value={form.title_b} maxLength={50} onChange={e => setForm({ ...form, title_b: e.target.value })} placeholder="Ex: Não perca essa chance!" style={{ width: '100%', padding: '8px', border: '1px solid #bbf7d0', borderRadius: '6px', fontSize: '13px', background: '#fff', boxSizing: 'border-box' }} />
+                                <small style={{ fontSize: '10px', color: '#6B7280' }}>{form.title_b.length}/50</small>
+                            </div>
+                            <div>
+                                <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Mensagem</label>
+                                <textarea value={form.message_b} maxLength={120} rows={3} onChange={e => setForm({ ...form, message_b: e.target.value })} placeholder="Ex: Sua oferta especial expira em breve!" style={{ width: '100%', padding: '8px', border: '1px solid #bbf7d0', borderRadius: '6px', fontSize: '13px', background: '#fff', resize: 'vertical', boxSizing: 'border-box' }} />
+                                <small style={{ fontSize: '10px', color: '#6B7280' }}>{form.message_b.length}/120</small>
+                            </div>
+                            {(form.title_b || form.message_b) && (
+                                <div style={{ marginTop: '10px', background: '#111827', borderRadius: '8px', padding: '8px 12px', display: 'flex', gap: '8px' }}>
+                                    <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: '#10b981', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}>🔔</div>
+                                    <div>
+                                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#fff' }}>{form.title_b || 'Título B'}</div>
+                                        <div style={{ fontSize: '10px', color: '#9CA3AF', marginTop: '1px' }}>{form.message_b || 'Mensagem B'}</div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* URL comum */}
+                    <div style={{ marginBottom: '16px' }}>
+                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>🔗 Link (comum para A e B)</label>
+                        <input type="text" value={form.url} onChange={e => setForm({ ...form, url: e.target.value })} placeholder="https://..." style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px', boxSizing: 'border-box' }} />
+                    </div>
+
+                    {/* Aviso split */}
+                    <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: '8px', padding: '10px 14px', marginBottom: '16px', fontSize: '12px', color: '#92400E' }}>
+                        ⚠️ <strong>Importante:</strong> O split 50/50 é feito via filtro de session_count par/ímpar — uma boa aproximação para bases com mais de 50 inscritos.
+                        Para bases menores, os grupos podem ter leve desbalanceamento.
+                    </div>
+
+                    {/* Botão enviar */}
+                    <button
+                        onClick={onSend}
+                        disabled={sending || !podeEnviar}
+                        style={{ width: '100%', padding: '14px', borderRadius: '10px', border: 'none', cursor: podeEnviar && !sending ? 'pointer' : 'not-allowed', fontSize: '14px', fontWeight: 700, background: podeEnviar && !sending ? 'linear-gradient(135deg, #3b82f6, #10b981)' : '#E5E7EB', color: podeEnviar && !sending ? '#fff' : '#9CA3AF', transition: 'all 0.2s' }}
+                    >
+                        {sending ? '🧪 Enviando as duas variantes...' : `🧪 Disparar Teste A/B para ${alcance.toLocaleString('pt-BR')} dispositivos`}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ── Componente: Card de resultado A/B no histórico ───────────────────────────
+function ABResultCard({ test, onRefresh }: { test: ABTestItem; onRefresh: (id: number) => void }) {
+    const vencedor = test.vencedor;
+    const emAndamento = !vencedor && test.status === 'ativo';
+
+    const CardVariante = ({ variante, title, message, sent, opened, ctr, isVencedor }: {
+        variante: 'A' | 'B'; title: string; message: string;
+        sent: number; opened: number; ctr: number; isVencedor: boolean;
+    }) => {
+        const cor = variante === 'A' ? '#3b82f6' : '#10b981';
+        const corBg = variante === 'A' ? '#eff6ff' : '#f0fdf4';
+        const corBorder = variante === 'A' ? '#bfdbfe' : '#bbf7d0';
+        return (
+            <div style={{ border: `2px solid ${isVencedor ? cor : corBorder}`, borderRadius: '10px', padding: '12px', background: isVencedor ? corBg : '#fff', position: 'relative', flex: 1 }}>
+                {isVencedor && (
+                    <div style={{ position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)', background: cor, color: '#fff', fontSize: '10px', fontWeight: 700, padding: '2px 10px', borderRadius: '999px', whiteSpace: 'nowrap' }}>🏆 VENCEDOR</div>
+                )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                    <span style={{ width: '22px', height: '22px', borderRadius: '6px', background: cor, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '12px' }}>{variante}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: '12px', fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</div>
+                        <div style={{ fontSize: '11px', color: '#6B7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{message}</div>
+                    </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', textAlign: 'center' }}>
+                    {[{ label: 'Enviados', value: sent.toLocaleString('pt-BR'), color: '#4F46E5' }, { label: 'Abertos', value: opened.toLocaleString('pt-BR'), color: '#10B981' }, { label: 'CTR', value: `${ctr}%`, color: cor }].map((m, i) => (
+                        <div key={i} style={{ background: '#F9FAFB', borderRadius: '6px', padding: '6px 4px' }}>
+                            <div style={{ fontSize: '14px', fontWeight: 700, color: m.color }}>{m.value}</div>
+                            <div style={{ fontSize: '10px', color: '#9CA3AF' }}>{m.label}</div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
+    return (
+        <div style={{ border: '1px solid #E5E7EB', borderRadius: '12px', padding: '16px', marginBottom: '12px', background: '#fff' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '16px' }}>🧪</span>
+                    <div>
+                        <span style={{ fontSize: '13px', fontWeight: 700, color: '#111827' }}>Teste A/B #{test.id}</span>
+                        <span style={{ marginLeft: '8px', fontSize: '11px', color: '#6B7280' }}>{test.created_at ? new Date(test.created_at).toLocaleDateString('pt-BR') : ''}</span>
+                    </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {emAndamento && <span style={{ background: '#FEF3C7', color: '#92400E', padding: '2px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: 600 }}>⏳ Em andamento</span>}
+                    {vencedor === 'empate' && <span style={{ background: '#F3F4F6', color: '#374151', padding: '2px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: 600 }}>🤝 Empate</span>}
+                    {(vencedor === 'A' || vencedor === 'B') && <span style={{ background: '#DCFCE7', color: '#166534', padding: '2px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: 600 }}>🏆 Variante {vencedor} venceu</span>}
+                    <button onClick={() => onRefresh(test.id)} style={{ background: '#F3F4F6', border: 'none', borderRadius: '6px', padding: '4px 10px', cursor: 'pointer', fontSize: '12px', color: '#374151' }}>🔄 Atualizar</button>
+                </div>
+            </div>
+            <div style={{ display: 'flex', gap: '12px' }}>
+                <CardVariante variante="A" title={test.title_a} message={test.message_a} sent={test.sent_a} opened={test.opened_a} ctr={test.ctr_a} isVencedor={vencedor === 'A'} />
+                <div style={{ display: 'flex', alignItems: 'center', color: '#9CA3AF', fontSize: '18px', fontWeight: 700, flexShrink: 0 }}>vs</div>
+                <CardVariante variante="B" title={test.title_b} message={test.message_b} sent={test.sent_b} opened={test.opened_b} ctr={test.ctr_b} isVencedor={vencedor === 'B'} />
+            </div>
+        </div>
+    );
+}
+// ────────────────────────────────────────────────────────────────────────────
 
 // ── Função: inferir etapa do funil pelo texto da campanha ───────────────────
 function inferirFunil(title: string, message: string): { label: string; color: string; bg: string; etapa: 'fundo' | 'meio' | 'topo' } {
@@ -530,6 +749,13 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
     const [objetivo, setObjetivo] = useState<ObjetivoCampanha>(null);
     // ── NOVO: campanha selecionada para detalhe ──────────────────────────────
     const [campanhaDetalhe, setCampanhaDetalhe] = useState<OneSignalNotif | null>(null);
+    // ── NOVO: Teste A/B ──────────────────────────────────────────────────────
+    const [showABModal, setShowABModal] = useState(false);
+    const [abForm, setAbForm] = useState<ABTestForm>(AB_FORM_DEFAULT);
+    const [sendingAB, setSendingAB] = useState(false);
+    const [abTests, setAbTests] = useState<ABTestItem[]>([]);
+    const [loadingAB, setLoadingAB] = useState(false);
+    const [activeHistorySubTab, setActiveHistorySubTab] = useState<'onesignal' | 'ab' | 'local'>('onesignal');
 
     const handleSelecionarObjetivo = (obj: ObjetivoConfig) => {
         // Se já estava selecionado, deseleciona (toggle)
@@ -580,6 +806,57 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
             .then(r => r.json()).then(data => setAutomacao({ ...AUTOMACAO_DEFAULT, ...data }))
             .catch(() => {}).finally(() => setLoadingAutomacao(false));
     };
+
+    // ── NOVO: funções A/B ────────────────────────────────────────────────────
+    const fetchABTests = () => {
+        if (!token) return;
+        setLoadingAB(true);
+        fetch(`${API_URL}/push/ab-list`, { headers: { Authorization: `Bearer ${token}` } })
+            .then(r => r.json()).then(data => setAbTests(Array.isArray(data) ? data : []))
+            .catch(() => setAbTests([])).finally(() => setLoadingAB(false));
+    };
+
+    const handleSendAB = async () => {
+        if (!token) return;
+        setSendingAB(true);
+        try {
+            const res = await fetch(`${API_URL}/push/send-ab`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify(abForm),
+            });
+            const data = await res.json();
+            if (data.status === 'success' || data.status === 'partial_error') {
+                setShowABModal(false);
+                setAbForm(AB_FORM_DEFAULT);
+                setActiveHistorySubTab('ab');
+                fetchABTests();
+            } else {
+                alert('Erro ao enviar: ' + JSON.stringify(data));
+            }
+        } catch { alert('Erro de rede ao enviar A/B.'); }
+        finally { setSendingAB(false); }
+    };
+
+    const refreshABTest = async (id: number) => {
+        if (!token) return;
+        try {
+            const res = await fetch(`${API_URL}/push/ab-results/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+            const data = await res.json();
+            setAbTests(prev => prev.map(t => t.id === id ? {
+                ...t,
+                sent_a: data.variante_a?.sent ?? t.sent_a,
+                sent_b: data.variante_b?.sent ?? t.sent_b,
+                opened_a: data.variante_a?.opened ?? t.opened_a,
+                opened_b: data.variante_b?.opened ?? t.opened_b,
+                ctr_a: data.variante_a?.ctr ?? t.ctr_a,
+                ctr_b: data.variante_b?.ctr ?? t.ctr_b,
+                vencedor: data.vencedor ?? t.vencedor,
+                status: data.status ?? t.status,
+            } : t));
+        } catch { alert('Erro ao atualizar resultados.'); }
+    };
+    // ────────────────────────────────────────────────────────────────────────
     const saveAutomacao = async () => {
         if (!token) return;
         setSavingAutomacao(true);
@@ -589,7 +866,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
         } catch { alert('Erro ao salvar.'); } finally { setSavingAutomacao(false); }
     };
 
-    useEffect(() => { if (!sendingPush) { fetchHistory(); fetchOsStats(); fetchAutomacao(); } }, [token, sendingPush]);
+    useEffect(() => { if (!sendingPush) { fetchHistory(); fetchOsStats(); fetchAutomacao(); fetchABTests(); } }, [token, sendingPush]);
 
     const formatDate = (s: string) => { try { const d = new Date(s); return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' as ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); } catch { return s; } };
     const formatUnix = (ts: number) => { try { const d = new Date(ts * 1000); return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' as ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); } catch { return '—'; } };
@@ -1192,28 +1469,29 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             </div>
                         </div>
 
-                        {/* ── BOTÃO DE ENVIO com cor do objetivo ── */}
-                        <button
-                            className="save-button"
-                            onClick={handleSendPush}
-                            disabled={sendingPush || !pushForm.title || !pushForm.message}
-                            style={{
-                                background: sendingPush ? '#ccc' : objetivo
-                                    ? OBJETIVOS.find(o => o.id === objetivo)?.cor ?? '#4F46E5'
-                                    : '#4F46E5',
-                                width: '100%',
-                                marginTop: '10px',
-                                transition: 'background 0.3s',
-                            }}
-                        >
-                            {sendingPush
-                                ? 'Enviando...'
-                                : pushForm.send_after
+                        {/* ── BOTÃO DE ENVIO + A/B ── */}
+                        <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                            <button
+                                className="save-button"
+                                onClick={handleSendPush}
+                                disabled={sendingPush || !pushForm.title || !pushForm.message}
+                                style={{ background: sendingPush ? '#ccc' : objetivo ? OBJETIVOS.find(o => o.id === objetivo)?.cor ?? '#4F46E5' : '#4F46E5', flex: 1, transition: 'background 0.3s' }}
+                            >
+                                {sendingPush ? 'Enviando...' : pushForm.send_after
                                     ? `⏰ Agendar para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`
                                     : objetivo
                                         ? `${OBJETIVOS.find(o => o.id === objetivo)?.icon} Enviar campanha de ${OBJETIVOS.find(o => o.id === objetivo)?.label} para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`
                                         : `🚀 Enviar para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`}
-                        </button>
+                            </button>
+                            <button
+                                onClick={() => setShowABModal(true)}
+                                style={{ padding: '12px 16px', borderRadius: '8px', border: '2px solid #E5E7EB', background: '#fff', cursor: 'pointer', fontSize: '13px', fontWeight: 700, color: '#374151', whiteSpace: 'nowrap', transition: 'all 0.2s' }}
+                                onMouseOver={e => { e.currentTarget.style.borderColor = '#3b82f6'; e.currentTarget.style.color = '#3b82f6'; }}
+                                onMouseOut={e => { e.currentTarget.style.borderColor = '#E5E7EB'; e.currentTarget.style.color = '#374151'; }}
+                            >
+                                🧪 A/B
+                            </button>
+                        </div>
                     </div>
 
                     {/* ── HISTORICO COM ROI ── */}
@@ -1225,16 +1503,16 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             </div>
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <div style={{ display: 'flex', background: '#F3F4F6', borderRadius: '8px', padding: '3px', gap: '2px' }}>
-                                    {(['onesignal', 'local'] as const).map(tab => (
-                                        <button key={tab} onClick={() => setActiveHistoryTab(tab)} style={{ padding: '5px 12px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 500, background: activeHistoryTab === tab ? '#fff' : 'transparent', color: activeHistoryTab === tab ? '#111827' : '#6B7280', boxShadow: activeHistoryTab === tab ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
-                                            {tab === 'onesignal' ? 'OneSignal' : 'Local'}
+                                    {(['onesignal', 'ab', 'local'] as const).map(tab => (
+                                        <button key={tab} onClick={() => setActiveHistorySubTab(tab)} style={{ padding: '5px 12px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 500, background: activeHistorySubTab === tab ? '#fff' : 'transparent', color: activeHistorySubTab === tab ? '#111827' : '#6B7280', boxShadow: activeHistorySubTab === tab ? '0 1px 3px rgba(0,0,0,0.1)' : 'none', whiteSpace: 'nowrap' }}>
+                                            {tab === 'onesignal' ? 'OneSignal' : tab === 'ab' ? '🧪 Testes A/B' : 'Local'}
                                         </button>
                                     ))}
                                 </div>
-                                <button onClick={() => { fetchHistory(); fetchOsStats(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px' }}>🔄</button>
+                                <button onClick={() => { fetchHistory(); fetchOsStats(); fetchABTests(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px' }}>🔄</button>
                             </div>
                         </div>
-                        {activeHistoryTab === 'onesignal' && (
+                        {activeHistorySubTab === 'onesignal' && (
                             loadingStats ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Carregando...</p>
                                 : notifs.length === 0 ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Nenhuma campanha ainda.</p>
                                     : <div style={{ overflowX: 'auto' }}>
@@ -1292,7 +1570,23 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                         {ticketMedio > 0 && <p style={{ fontSize: '11px', color: '#9CA3AF', padding: '8px 12px', margin: 0 }}>* ROI estimado: abertos x {taxaConvGlobal}% conversao x {brl(ticketMedio)} ticket medio</p>}
                                     </div>
                         )}
-                        {activeHistoryTab === 'local' && (
+                        {activeHistorySubTab === 'ab' && (
+                            <div style={{ padding: '8px 0' }}>
+                                {loadingAB
+                                    ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Carregando...</p>
+                                    : abTests.length === 0
+                                        ? (
+                                            <div style={{ textAlign: 'center', padding: '32px 20px', color: '#6B7280' }}>
+                                                <div style={{ fontSize: '32px', marginBottom: '10px' }}>🧪</div>
+                                                <div style={{ fontWeight: 600, marginBottom: '6px' }}>Nenhum teste A/B ainda</div>
+                                                <div style={{ fontSize: '13px' }}>Clique no botão <strong>🧪 A/B</strong> ao lado do envio para criar seu primeiro teste.</div>
+                                            </div>
+                                        )
+                                        : abTests.map(t => <ABResultCard key={t.id} test={t} onRefresh={refreshABTest} />)
+                                }
+                            </div>
+                        )}
+                        {activeHistorySubTab === 'local' && (
                             loadingHistory ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Carregando...</p>
                                 : history.length === 0 ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Nenhuma campanha local.</p>
                                     : <div style={{ overflowX: 'auto' }}>
@@ -1421,6 +1715,18 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                         </>
                     )}
                 </div>
+            )}
+
+            {/* ── MODAL TESTE A/B ── */}
+            {showABModal && (
+                <ABTestModal
+                    form={abForm}
+                    setForm={setAbForm}
+                    onSend={handleSendAB}
+                    sending={sendingAB}
+                    onClose={() => setShowABModal(false)}
+                    alcance={alcanceEstimado()}
+                />
             )}
 
             {/* ── MODAL DETALHE DA CAMPANHA ── */}
