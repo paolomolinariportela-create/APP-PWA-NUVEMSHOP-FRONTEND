@@ -5,6 +5,10 @@ interface PushCampaign {
     message: string;
     url: string;
     image_url?: string;          // Rich Push
+    btn1_text?: string;          // Action Button 1
+    btn1_url?: string;
+    btn2_text?: string;          // Action Button 2
+    btn2_url?: string;
     filter_device?: string;
     filter_country?: string;
     send_after?: string;
@@ -455,6 +459,33 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             <small>Aparece como imagem grande na notificação (Android + Chrome). Aumenta o CTR em até 50%.</small>
                         </div>
 
+                        {/* ✅ ACTION BUTTONS */}
+                        <div style={{ background: '#F9FAFB', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', marginBottom: '16px' }}>
+                            <div style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '12px' }}>
+                                🔘 Botões de Ação (opcional) <span style={{ fontWeight: 400, color: '#6B7280' }}>— aparecem embaixo da notificação</span>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
+                                <div>
+                                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Botão 1 — Texto</label>
+                                    <input type="text" value={pushForm.btn1_text ?? ''} onChange={e => setPushForm({ ...pushForm, btn1_text: e.target.value || undefined })} placeholder="Ex: 🛒 Comprar Agora" maxLength={30} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} />
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Botão 1 — Link</label>
+                                    <input type="text" value={pushForm.btn1_url ?? ''} onChange={e => setPushForm({ ...pushForm, btn1_url: e.target.value || undefined })} placeholder="https://... (vazio = link principal)" style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} />
+                                </div>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                                <div>
+                                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Botão 2 — Texto</label>
+                                    <input type="text" value={pushForm.btn2_text ?? ''} onChange={e => setPushForm({ ...pushForm, btn2_text: e.target.value || undefined })} placeholder="Ex: 🎁 Pegar Cupom" maxLength={30} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} />
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Botão 2 — Link</label>
+                                    <input type="text" value={pushForm.btn2_url ?? ''} onChange={e => setPushForm({ ...pushForm, btn2_url: e.target.value || undefined })} placeholder="https://... (vazio = link principal)" style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} />
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Preview Rich Push */}
                         {(pushForm.title || pushForm.message) && (
                             <div style={{ background: '#111827', borderRadius: '12px', padding: '12px 14px', marginBottom: '16px' }}>
@@ -471,6 +502,12 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                         <div style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '2px' }}>{pushForm.message || 'Mensagem da notificação'}</div>
                                     </div>
                                 </div>
+                                {(pushForm.btn1_text || pushForm.btn2_text) && (
+                                    <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
+                                        {pushForm.btn1_text && <span style={{ background: '#4F46E5', color: '#fff', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 600 }}>{pushForm.btn1_text}</span>}
+                                        {pushForm.btn2_text && <span style={{ background: '#374151', color: '#fff', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 600 }}>{pushForm.btn2_text}</span>}
+                                    </div>
+                                )}
                             </div>
                         )}
 
