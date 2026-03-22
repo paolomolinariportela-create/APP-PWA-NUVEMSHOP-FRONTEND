@@ -354,7 +354,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
         {/* Causas */}
         {diag.causas.length > 0 && (
           <div style={{ marginBottom: '12px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 600, color: C.textMid, textTransform: 'uppercase' as const, letterSpacing: '0.06em', marginBottom: '6px' }}>Possíveis causas</div>
+            <div style={{ fontSize: '12px', fontWeight: 600, color: C.textMid, textTransform: 'uppercase' as const, letterSpacing: '0.06em', marginBottom: '6px' }}>Possíveis causas</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
               {diag.causas.map((c, i) => (
                 <span key={i} style={{ fontSize: '12px', color: C.textMid, background: C.white, padding: '3px 10px', borderRadius: '4px', border: `1px solid ${C.neutralBorder}` }}>{c}</span>
@@ -427,9 +427,9 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
             <span style={{ color: '#FCD34D', display: 'flex' }}>{Icon.dollar}</span>
             <span style={{ fontSize: '14px', fontWeight: 700, color: C.white }}>Projeção de receita</span>
-            <span style={{ fontSize: '11px', color: C.neutralLight }}>— {funilVisitas} visitas × {brl(ticketApp)} ticket médio</span>
+            <span style={{ fontSize: '12px', color: C.neutralLight }}>— {funilVisitas} visitas × {brl(ticketApp)} ticket médio</span>
           </div>
-          <div style={{ fontSize: '12px', color: C.neutralLight, marginBottom: '14px' }}>Se você converter esse tráfego:</div>
+          <div style={{ fontSize: '13px', color: C.neutralLight, marginBottom: '14px' }}>Se você converter esse tráfego:</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
             {projecoes.map((p, i) => (
               <div key={i} style={{ background: p.destaque ? C.brand : 'rgba(255,255,255,0.06)', borderRadius: '8px', padding: '14px 12px', textAlign: 'center' as const, border: p.destaque ? `1px solid ${C.brandMuted}` : '1px solid rgba(255,255,255,0.08)', position: 'relative' as const }}>
@@ -457,7 +457,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
         <div className="stat-card" style={{ borderLeft: `3px solid ${C.success}` }}>
           <div className="stat-icon green" style={{ color: C.success }}>{Icon.revenue}</div>
           <div className="stat-info">
-            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Receita app</h3>
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, fontSize: '14px' }}>Receita app</h3>
             <Num>{brl(receita)}</Num>
             <span className="stat-growth" style={{ color: C.success, fontWeight: 500 }}>{vendas} pedidos realizados</span>
             <div className="card-meta-text">Meta: {brl(metaReceita)}</div>
@@ -468,7 +468,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
         <div className="stat-card">
           <div className="stat-icon" style={{ color: C.brand }}>{Icon.ticket}</div>
           <div className="stat-info">
-            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Ticket médio</h3>
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, fontSize: '14px' }}>Ticket médio</h3>
             <div className="ticket-main-row" style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
               <span className="ticket-main-value">{brl(ticketApp)}</span>
               <Badge color={C.brand} bg={C.brandLight} border={C.brandLight}>App</Badge>
@@ -480,7 +480,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
         <div className="stat-card">
           <div className="stat-icon purple" style={{ color: C.brand }}>{Icon.mobile}</div>
           <div className="stat-info">
-            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Instalações ativas</h3>
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, fontSize: '14px' }}>Instalações ativas</h3>
             <Num>{instalacoes}</Num>
             <span className="stat-growth" style={{ color: temOsData ? C.brand : C.textSoft, fontWeight: 500 }}>
               {temOsData ? 'Push habilitado — dados em tempo real' : 'Base de clientes fiéis'}
@@ -493,7 +493,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
         <div className="stat-card">
           <div className="stat-icon" style={{ color: crescimento7d > 0 ? C.success : C.neutralMid }}>{Icon.trending}</div>
           <div className="stat-info">
-            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Crescimento do app</h3>
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, fontSize: '14px' }}>Crescimento do app</h3>
             <Num color={crescimento7d > 0 ? C.success : C.text}>+{crescimento7d}%</Num>
             <span className="stat-growth" style={{ color: C.textSoft }}>vs. últimos 7 dias</span>
           </div>
@@ -503,18 +503,18 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
         <div className="stat-card">
           <div className="stat-icon blue" style={{ color: C.brand }}>{Icon.users}</div>
           <div className="stat-info">
-            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Clientes convertidos</h3>
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, fontSize: '14px' }}>Clientes convertidos</h3>
             <Num>{temOsData && compradoresOS > 0 ? compradoresOS : clientesRec}</Num>
             {temOsData && compradoresOS > 0 ? (
               <>
-                <div style={{ fontSize: '12px', color: C.textMid, marginTop: '4px', fontWeight: 500 }}>
+                <div style={{ fontSize: '13px', color: C.textMid, marginTop: '4px', fontWeight: 500 }}>
                   {instalacoes > 0 ? Math.round((compradoresOS / instalacoes) * 100) : 0}% dos usuários com app já compraram
                 </div>
-                <div style={{ fontSize: '11px', color: C.textSoft, marginTop: '2px' }}>via OneSignal</div>
+                <div style={{ fontSize: '12px', color: C.textSoft, marginTop: '2px' }}>via OneSignal</div>
               </>
             ) : (
               <>
-                <div style={{ fontSize: '12px', color: C.textMid, marginTop: '4px', fontWeight: 500 }}>
+                <div style={{ fontSize: '13px', color: C.textMid, marginTop: '4px', fontWeight: 500 }}>
                   Taxa de recompra: {taxaRecompra}%
                 </div>
                 <div className="card-meta-text">Meta: {metaRec} clientes</div>
@@ -527,9 +527,9 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
         <div className="stat-card">
           <div className="stat-icon" style={{ color: C.brand }}>{Icon.eye}</div>
           <div className="stat-info">
-            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Páginas visualizadas</h3>
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, fontSize: '14px' }}>Páginas visualizadas</h3>
             <Num>{pageviews.toLocaleString()}</Num>
-            <div style={{ fontSize: '12px', color: C.textMid, marginTop: '6px', fontWeight: 500 }}>
+            <div style={{ fontSize: '13px', color: C.textMid, marginTop: '6px', fontWeight: 500 }}>
               Tempo médio: <strong>{tempoMedio}</strong>
             </div>
           </div>
@@ -540,8 +540,8 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
           <div className="stat-card">
             <div className="stat-icon" style={{ color: C.brand }}>{Icon.pages}</div>
             <div className="stat-info">
-              <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Top páginas do app</h3>
-              <ul style={{ marginTop: '8px', paddingLeft: 0, listStyle: 'none', fontSize: '11px', color: C.textMid }}>
+              <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, fontSize: '14px' }}>Top páginas do app</h3>
+              <ul style={{ marginTop: '8px', paddingLeft: 0, listStyle: 'none', fontSize: '13px', color: C.textMid }}>
                 {topPaginasPwa.filter(p => p !== 'install').slice(0, 5).map((pagina, idx) => {
                   let label = pagina || '/';
                   const isHome = label === '/';
@@ -563,7 +563,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
         {/* Funil */}
         <div className="stat-card" style={{ gridRow: 'span 2' }}>
           <div className="stat-info" style={{ width: '100%' }}>
-            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px', marginBottom: '14px', margin: '0 0 14px' }}>Funil de vendas</h3>
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, fontSize: '14px', margin: '0 0 14px' }}>Funil de vendas</h3>
             <div>
               {[
                 { label: '1. Visitas únicas', val: funilVisitas, pct: 100, cor: C.neutralLight, bench: null as number | null, botao: null as string | null },
@@ -572,10 +572,10 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
               ].map((etapa, i) => (
                 <div key={i} style={{ marginBottom: '14px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
-                    <span style={{ fontSize: '12px', color: C.textMid }}>{etapa.label}</span>
+                    <span style={{ fontSize: '13px', color: C.textMid }}>{etapa.label}</span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       {etapa.botao && (
-                        <button onClick={onNavigateCampanhas} style={{ background: 'none', border: 'none', color: C.brand, fontSize: '11px', fontWeight: 600, cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                        <button onClick={onNavigateCampanhas} style={{ background: 'none', border: 'none', color: C.brand, fontSize: '12px', fontWeight: 600, cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
                           {Icon.lightning} {etapa.botao}
                         </button>
                       )}
@@ -595,15 +595,15 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
                 </div>
               ))}
               <div style={{ padding: '10px 12px', background: C.neutralBg, borderRadius: '6px', border: `1px solid ${C.neutralBorder}` }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px' }}>
                   <span style={{ color: C.textSoft }}>Sua conversão</span>
                   <strong style={{ color: taxaConvApp >= mediaConv ? C.success : C.danger }}>{taxaConvApp}%</strong>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                   <span style={{ color: C.textSoft }}>Média do mercado</span>
                   <strong style={{ color: C.textSoft }}>{mediaConv}%</strong>
                 </div>
-                <div style={{ marginTop: '6px', fontSize: '11px', fontWeight: 600, color: taxaConvApp >= mediaConv ? C.success : C.danger }}>
+                <div style={{ marginTop: '6px', fontSize: '12px', fontWeight: 600, color: taxaConvApp >= mediaConv ? C.success : C.danger }}>
                   {taxaConvApp >= mediaConv
                     ? `${(taxaConvApp - mediaConv).toFixed(1)}pp acima da média`
                     : `${(mediaConv - taxaConvApp).toFixed(1)}pp abaixo da média`}
@@ -617,16 +617,16 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
         <div className="stat-card" style={{ borderLeft: `3px solid ${C.danger}` }}>
           <div className="stat-icon red" style={{ color: C.danger }}>{Icon.cart}</div>
           <div className="stat-info">
-            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Carrinhos abandonados</h3>
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, fontSize: '14px' }}>Carrinhos abandonados</h3>
             <Num>{brl(carrinhosValor)}</Num>
-            <div style={{ fontSize: '12px', color: C.textSoft, marginTop: '4px' }}>
+            <div style={{ fontSize: '13px', color: C.textSoft, marginTop: '4px' }}>
               {temOsData && carrinhoOS > 0 ? (
                 <><strong style={{ color: C.danger }}>{carrinhoOS}</strong> com carrinho ativo agora <span style={{ color: C.neutralLight }}>(OneSignal)</span></>
               ) : (
                 <>{carrinhosQtd} abandono{carrinhosQtd !== 1 ? 's' : ''} registrado{carrinhosQtd !== 1 ? 's' : ''}</>
               )}
             </div>
-            <button onClick={onNavigateCampanhas} style={{ marginTop: '8px', display: 'inline-flex', alignItems: 'center', gap: '6px', background: C.dark, color: C.white, border: 'none', borderRadius: '5px', padding: '6px 12px', fontSize: '11px', cursor: 'pointer', fontWeight: 600 }}>
+            <button onClick={onNavigateCampanhas} style={{ marginTop: '8px', display: 'inline-flex', alignItems: 'center', gap: '6px', background: C.dark, color: C.white, border: 'none', borderRadius: '5px', padding: '6px 12px', fontSize: '12px', cursor: 'pointer', fontWeight: 600 }}>
               {Icon.lightning} Recuperar agora
             </button>
           </div>
@@ -636,11 +636,11 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
         <div className="stat-card">
           <div className="stat-info" style={{ width: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px', margin: 0 }}>Taxa de conversão</h3>
+              <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, fontSize: '14px', margin: '0' }}>Taxa de conversão</h3>
               <span style={{ color: C.brand, display: 'flex' }}>{Icon.conversion}</span>
             </div>
             <div style={{ marginBottom: '8px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '13px' }}>
                 <span style={{ color: C.textMid }}>App</span>
                 <strong style={{ color: taxaConvApp >= mediaConv ? C.success : C.danger }}>{taxaConvApp}%</strong>
               </div>
@@ -649,7 +649,7 @@ export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
               </div>
             </div>
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '13px' }}>
                 <span style={{ color: C.textSoft }}>Mercado</span>
                 <strong style={{ color: C.neutralMid }}>{mediaConv}%</strong>
               </div>
