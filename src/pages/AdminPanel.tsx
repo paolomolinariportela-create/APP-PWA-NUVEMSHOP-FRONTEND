@@ -313,7 +313,7 @@ export default function AdminPanel() {
       </header>
 
       <main className="dashboard-content">
-        {activeTab === "dashboard" && <TabDashboard stats={stats} />}
+        {activeTab === "dashboard" && <TabDashboard stats={stats} onNavigateCampanhas={() => setActiveTab("campanhas")} />}
         {activeTab === "config" && (
           <TabConfig config={config} setConfig={setConfig} handleSave={handleSave} saving={saving} loading={loading} storeUrl={storeUrl} />
         )}
