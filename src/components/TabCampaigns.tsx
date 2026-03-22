@@ -470,12 +470,225 @@ function ABResultCard({ test, onRefresh }: { test: ABTestItem; onRefresh: (id: n
 }
 // ────────────────────────────────────────────────────────────────────────────
 
-// ── Componente: Aba de Jornada do Usuário ────────────────────────────────────
+// ── Componente: Modal de geração de mensagem com IA ─────────────────────────
+function IAGerarModal({
+    objetivo,
+    mediaAbertura,
+    onAplicar,
+    onClose,
+}: {
+    objetivo: ObjetivoCampanha;
+    mediaAbertura: number;
+    onAplicar: (title: string, message: string) => void;
+    onClose: () => void;
+}) {
+    const [produto, setProduto] = useState('');
+    const [contexto, setContexto] = useState('');
+    const [tom, setTom] = useState<'urgente' | 'amigavel' | 'exclusivo'>('urgente');
+    const [gerando, setGerando] = useState(false);
+    const [resultado, setResultado] = useState<{ titulo: string; mensagem: string } | null>(null);
+    const [erro, setErro] = useState('');
+
+    const objConfig = objetivo ? OBJETIVOS.find(o => o.id === objetivo) : null;
+
+    const gerarMensagem = async () => {
+        setGerando(true);
+        setErro('');
+        setResultado(null);
+
+        const toms: Record<string, string> = {
+            urgente: 'urgente e com senso de escassez (tempo limitado, estoque acabando)',
+            amigavel: 'amigável, acolhedor e próximo, como um amigo que está avisando',
+            exclusivo: 'exclusivo e VIP, como se fosse uma oferta só para aquele cliente',
+        };
+
+        const prompt = `Você é um especialista em marketing de push notifications para e-commerce brasileiro.
+
+Gere uma notificação push de alta conversão com:
+- Objetivo: ${objConfig ? objConfig.label : 'Engajamento geral'}
+- Etapa do funil: ${objConfig ? objConfig.funilLabel : 'Topo'}
+- Tom: ${toms[tom]}
+${produto ? `- Produto/contexto: ${produto}` : ''}
+${contexto ? `- Informação extra: ${contexto}` : ''}
+- CTR médio atual da loja: ${mediaAbertura}% (média do setor: 5-10%)
+
+Regras obrigatórias:
+- Título: máximo 50 caracteres, impactante, pode usar 1 emoji
+- Mensagem: máximo 120 caracteres, clara e com CTA direto
+- Linguagem: português brasileiro informal
+- NÃO use aspas no início/fim
+- NÃO use palavras genéricas como "incrível" ou "fantástico"
+
+Responda APENAS em JSON válido, sem markdown, sem explicações:
+{"titulo": "...", "mensagem": "..."}`;
+
+        try {
+            const response = await fetch('https://api.anthropic.com/v1/messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: 'claude-sonnet-4-20250514',
+                    max_tokens: 200,
+                    messages: [{ role: 'user', content: prompt }],
+                }),
+            });
+
+            const data = await response.json();
+            const text = data.content?.[0]?.text ?? '';
+            const clean = text.replace(/```json|```/g, '').trim();
+            const parsed = JSON.parse(clean);
+
+            if (parsed.titulo && parsed.mensagem) {
+                setResultado({ titulo: parsed.titulo, mensagem: parsed.mensagem });
+            } else {
+                setErro('Resposta inesperada da IA. Tente novamente.');
+            }
+        } catch (e) {
+            setErro('Erro ao conectar com a IA. Verifique sua conexão.');
+        } finally {
+            setGerando(false);
+        }
+    };
+
+    return (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={onClose}>
+            <div style={{ background: '#fff', borderRadius: '16px', width: '100%', maxWidth: '520px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
+
+                {/* Header */}
+                <div style={{ padding: '20px 24px 16px', background: 'linear-gradient(135deg, #4F46E5, #7C3AED)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                        <div style={{ fontSize: '16px', fontWeight: 700, color: '#fff' }}>🧠 Gerar mensagem com IA</div>
+                        <div style={{ fontSize: '12px', color: '#C4B5FD', marginTop: '2px' }}>
+                            {objConfig ? `Otimizado para: ${objConfig.label} · ${objConfig.funilLabel}` : 'Informe o contexto para gerar'}
+                        </div>
+                    </div>
+                    <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '8px', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px', color: '#fff' }}>×</button>
+                </div>
+
+                <div style={{ padding: '20px 24px' }}>
+                    {/* Campos de contexto */}
+                    <div style={{ marginBottom: '14px' }}>
+                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '5px' }}>
+                            🛍️ Produto ou promoção (opcional)
+                        </label>
+                        <input
+                            type="text"
+                            value={produto}
+                            onChange={e => setProduto(e.target.value)}
+                            placeholder="Ex: Tênis Nike Air Max, Desconto 20%, Frete grátis..."
+                            style={{ width: '100%', padding: '9px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '13px', boxSizing: 'border-box' }}
+                        />
+                    </div>
+
+                    <div style={{ marginBottom: '14px' }}>
+                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '5px' }}>
+                            📝 Contexto extra (opcional)
+                        </label>
+                        <input
+                            type="text"
+                            value={contexto}
+                            onChange={e => setContexto(e.target.value)}
+                            placeholder="Ex: Só até meia-noite, Cupom SAVE10, Últimas 3 unidades..."
+                            style={{ width: '100%', padding: '9px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '13px', boxSizing: 'border-box' }}
+                        />
+                    </div>
+
+                    {/* Tom */}
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '8px' }}>🎭 Tom da mensagem</label>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            {([
+                                { id: 'urgente', label: '⚡ Urgente', desc: 'Escassez e tempo' },
+                                { id: 'amigavel', label: '😊 Amigável', desc: 'Próximo e acolhedor' },
+                                { id: 'exclusivo', label: '👑 Exclusivo', desc: 'VIP e especial' },
+                            ] as const).map(t => (
+                                <button
+                                    key={t.id}
+                                    onClick={() => setTom(t.id)}
+                                    style={{
+                                        flex: 1, padding: '10px 8px', borderRadius: '8px', cursor: 'pointer',
+                                        border: `2px solid ${tom === t.id ? '#4F46E5' : '#E5E7EB'}`,
+                                        background: tom === t.id ? '#EEF2FF' : '#fff',
+                                        textAlign: 'center',
+                                    }}
+                                >
+                                    <div style={{ fontSize: '12px', fontWeight: 700, color: tom === t.id ? '#4F46E5' : '#374151' }}>{t.label}</div>
+                                    <div style={{ fontSize: '10px', color: '#6B7280', marginTop: '2px' }}>{t.desc}</div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Botão gerar */}
+                    <button
+                        onClick={gerarMensagem}
+                        disabled={gerando}
+                        style={{
+                            width: '100%', padding: '13px', borderRadius: '10px', border: 'none',
+                            background: gerando ? '#E5E7EB' : 'linear-gradient(135deg, #4F46E5, #7C3AED)',
+                            color: gerando ? '#9CA3AF' : '#fff', fontSize: '14px', fontWeight: 700,
+                            cursor: gerando ? 'not-allowed' : 'pointer', marginBottom: '16px',
+                        }}
+                    >
+                        {gerando ? '🧠 Gerando...' : '✨ Gerar mensagem agora'}
+                    </button>
+
+                    {/* Erro */}
+                    {erro && (
+                        <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '8px', padding: '10px 14px', fontSize: '13px', color: '#DC2626', marginBottom: '12px' }}>
+                            ⚠️ {erro}
+                        </div>
+                    )}
+
+                    {/* Resultado */}
+                    {resultado && (
+                        <div style={{ border: '2px solid #4F46E5', borderRadius: '12px', overflow: 'hidden' }}>
+                            {/* Preview estilo push */}
+                            <div style={{ background: '#111827', padding: '14px 16px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: objConfig?.cor ?? '#4F46E5', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>
+                                    {objConfig?.icon ?? '🔔'}
+                                </div>
+                                <div>
+                                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#fff', marginBottom: '3px' }}>{resultado.titulo}</div>
+                                    <div style={{ fontSize: '12px', color: '#9CA3AF' }}>{resultado.mensagem}</div>
+                                </div>
+                            </div>
+                            {/* Métricas */}
+                            <div style={{ background: '#EEF2FF', padding: '10px 16px', display: 'flex', gap: '16px', fontSize: '11px', color: '#4338CA' }}>
+                                <span>📏 Título: {resultado.titulo.length}/50 chars</span>
+                                <span>📏 Mensagem: {resultado.mensagem.length}/120 chars</span>
+                            </div>
+                            {/* Botões de ação */}
+                            <div style={{ padding: '12px 16px', display: 'flex', gap: '8px' }}>
+                                <button
+                                    onClick={() => { onAplicar(resultado.titulo, resultado.mensagem); onClose(); }}
+                                    style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: '#4F46E5', color: '#fff', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}
+                                >
+                                    ✅ Usar esta mensagem
+                                </button>
+                                <button
+                                    onClick={gerarMensagem}
+                                    disabled={gerando}
+                                    style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #d1d5db', background: '#fff', color: '#374151', fontSize: '13px', cursor: 'pointer' }}
+                                >
+                                    🔄 Gerar outra
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
+// ────────────────────────────────────────────────────────────────────────────
+
+// ── Componente: Aba de Jornada Visual ────────────────────────────────────────
 function JornadaTab({ token, API_URL, brl }: { token: string | null; API_URL: string; brl: (v: number) => string }) {
     const [jornada, setJornada] = useState<JornadaNotif[]>([]);
     const [resumo, setResumo] = useState<JornadaResumo | null>(null);
     const [loading, setLoading] = useState(false);
-    const [expandido, setExpandido] = useState<string | null>(null);
+    const [notifSelecionada, setNotifSelecionada] = useState<JornadaNotif | null>(null);
 
     const fetchJornada = () => {
         if (!token) return;
@@ -485,6 +698,7 @@ function JornadaTab({ token, API_URL, brl }: { token: string | null; API_URL: st
             .then(data => {
                 setJornada(data.jornada ?? []);
                 setResumo(data.resumo ?? null);
+                if (data.jornada?.length > 0) setNotifSelecionada(data.jornada[0]);
             })
             .catch(() => {})
             .finally(() => setLoading(false));
@@ -499,144 +713,206 @@ function JornadaTab({ token, API_URL, brl }: { token: string | null; API_URL: st
         } catch { return s; }
     };
 
-    if (loading) return <p style={{ textAlign: 'center', padding: '40px', color: '#888' }}>Carregando jornada...</p>;
+    if (loading) return (
+        <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <div style={{ fontSize: '32px', marginBottom: '12px', animation: 'spin 1s linear infinite' }}>🗺️</div>
+            <div style={{ color: '#6B7280', fontSize: '14px' }}>Carregando jornada...</div>
+        </div>
+    );
 
     if (!jornada.length) return (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: '#6B7280' }}>
-            <div style={{ fontSize: '40px', marginBottom: '12px' }}>🗺️</div>
-            <div style={{ fontWeight: 600, fontSize: '15px', marginBottom: '6px' }}>Nenhuma jornada registrada ainda</div>
-            <div style={{ fontSize: '13px', lineHeight: 1.5 }}>
-                A jornada aparece quando um usuário clica em um push e acessa a loja.<br />
+        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#6B7280' }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🗺️</div>
+            <div style={{ fontWeight: 700, fontSize: '16px', color: '#111827', marginBottom: '8px' }}>Nenhuma jornada registrada ainda</div>
+            <div style={{ fontSize: '13px', lineHeight: 1.6, maxWidth: '340px', margin: '0 auto' }}>
+                A jornada aparece quando um usuário clica em um push e acessa a loja.
                 Os cliques são detectados automaticamente pelo loader.
             </div>
         </div>
     );
 
+    const n = notifSelecionada;
+    const convertidos = n?.subscribers.filter(s => s.converted) ?? [];
+    const naoConvertidos = n?.subscribers.filter(s => !s.converted) ?? [];
+
+    // Etapas do fluxo
+    const etapas = n ? [
+        { icon: '📤', label: 'Enviados', valor: n.enviados, cor: '#4F46E5', bg: '#EEF2FF', desc: 'notificações disparadas' },
+        { icon: '👆', label: 'Clicaram', valor: n.cliques, cor: '#3b82f6', bg: '#EFF6FF', desc: `CTR ${n.taxa_conversao}%` },
+        { icon: '🛒', label: 'Compraram', valor: n.convertidos, cor: '#10B981', bg: '#F0FDF4', desc: n.receita_atribuida > 0 ? brl(n.receita_atribuida) : 'sem conversão' },
+    ] : [];
+
+    const pctClique = n && n.enviados > 0 ? Math.round((n.cliques / n.enviados) * 100) : 0;
+    const pctConv = n && n.cliques > 0 ? Math.round((n.convertidos / n.cliques) * 100) : 0;
+
     return (
         <div>
-            {/* Cards de resumo */}
+            {/* Cards de resumo global */}
             {resumo && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '20px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '20px' }}>
                     {[
-                        { icon: '👆', label: 'Total de Cliques', value: resumo.total_cliques.toLocaleString('pt-BR'), color: '#4F46E5' },
+                        { icon: '👆', label: 'Total Cliques', value: resumo.total_cliques.toLocaleString('pt-BR'), color: '#4F46E5' },
                         { icon: '💰', label: 'Convertidos', value: resumo.total_convertidos.toLocaleString('pt-BR'), color: '#10B981' },
-                        { icon: '📊', label: 'Taxa de Conversão', value: `${resumo.taxa_conversao}%`, color: '#f59e0b' },
+                        { icon: '📊', label: 'Taxa Conv.', value: `${resumo.taxa_conversao}%`, color: '#f59e0b' },
                         { icon: '💵', label: 'Receita Atribuída', value: brl(resumo.receita_atribuida), color: '#059669' },
                     ].map((card, i) => (
-                        <div key={i} style={{ background: '#F9FAFB', border: `2px solid ${card.color}20`, borderRadius: '12px', padding: '14px', textAlign: 'center' }}>
-                            <div style={{ fontSize: '22px', marginBottom: '4px' }}>{card.icon}</div>
-                            <div style={{ fontSize: '20px', fontWeight: 700, color: card.color }}>{card.value}</div>
-                            <div style={{ fontSize: '11px', color: '#6B7280', marginTop: '2px' }}>{card.label}</div>
+                        <div key={i} style={{ background: '#F9FAFB', border: `2px solid ${card.color}20`, borderRadius: '10px', padding: '12px', textAlign: 'center' }}>
+                            <div style={{ fontSize: '20px', marginBottom: '4px' }}>{card.icon}</div>
+                            <div style={{ fontSize: '18px', fontWeight: 700, color: card.color }}>{card.value}</div>
+                            <div style={{ fontSize: '10px', color: '#6B7280', marginTop: '2px' }}>{card.label}</div>
                         </div>
                     ))}
                 </div>
             )}
 
-            {/* Explicação */}
-            <div style={{ background: '#EEF2FF', border: '1px solid #C7D2FE', borderRadius: '10px', padding: '12px 16px', marginBottom: '16px', display: 'flex', gap: '10px' }}>
-                <span style={{ fontSize: '18px', flexShrink: 0 }}>💡</span>
-                <div style={{ fontSize: '12px', color: '#3730A3', lineHeight: 1.6 }}>
-                    <strong>Como funciona:</strong> Cada vez que um usuário clica em um push e acessa a loja, o sistema registra o clique. Se ele comprar em seguida, a venda é atribuída àquela notificação e você vê a receita gerada diretamente por cada campanha.
+            <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '16px' }}>
+                {/* Lista lateral de campanhas */}
+                <div>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>
+                        Campanhas com cliques
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        {jornada.map(j => {
+                            const ativa = notifSelecionada?.notif_id === j.notif_id;
+                            return (
+                                <button
+                                    key={j.notif_id}
+                                    onClick={() => setNotifSelecionada(j)}
+                                    style={{
+                                        padding: '10px 12px', borderRadius: '10px', border: 'none', textAlign: 'left', cursor: 'pointer',
+                                        background: ativa ? '#111827' : '#F9FAFB',
+                                        boxShadow: ativa ? '0 2px 8px rgba(0,0,0,0.2)' : 'none',
+                                        transition: 'all 0.2s',
+                                    }}
+                                >
+                                    <div style={{ fontSize: '12px', fontWeight: 700, color: ativa ? '#fff' : '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: '4px' }}>
+                                        {j.titulo || '—'}
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '11px', color: ativa ? '#9CA3AF' : '#6B7280' }}>
+                                            👆 {j.cliques}
+                                        </span>
+                                        {j.convertidos > 0 && (
+                                            <span style={{ background: ativa ? '#10B98130' : '#dcfce7', color: ativa ? '#6ee7b7' : '#166534', padding: '1px 6px', borderRadius: '999px', fontSize: '10px', fontWeight: 600 }}>
+                                                ✅ {j.convertidos} compras
+                                            </span>
+                                        )}
+                                    </div>
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
 
-            {/* Lista de notificações com jornada */}
-            {jornada.map(n => {
-                const aberto = expandido === n.notif_id;
-                const temConversao = n.convertidos > 0;
-                return (
-                    <div key={n.notif_id} style={{ border: `1px solid ${temConversao ? '#86efac' : '#E5E7EB'}`, borderRadius: '12px', marginBottom: '12px', overflow: 'hidden' }}>
-                        {/* Header da notificação */}
-                        <div
-                            onClick={() => setExpandido(aberto ? null : n.notif_id)}
-                            style={{ padding: '14px 16px', background: temConversao ? '#f0fdf4' : '#F9FAFB', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}
-                        >
-                            {/* Funil visual */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-                                {[
-                                    { icon: '📤', label: n.enviados > 0 ? n.enviados.toLocaleString('pt-BR') : '—', color: '#4F46E5', title: 'Enviados' },
-                                    { icon: '👆', label: n.cliques.toLocaleString('pt-BR'), color: '#3b82f6', title: 'Cliques' },
-                                    { icon: '💰', label: n.convertidos.toLocaleString('pt-BR'), color: '#10B981', title: 'Compras' },
-                                ].map((step, i) => (
-                                    <React.Fragment key={i}>
-                                        {i > 0 && <span style={{ color: '#9CA3AF', fontSize: '12px' }}>›</span>}
-                                        <div style={{ textAlign: 'center' }}>
-                                            <div style={{ fontSize: '10px', color: '#9CA3AF' }}>{step.title}</div>
-                                            <div style={{ fontSize: '13px', fontWeight: 700, color: step.color }}>{step.label}</div>
+                {/* Área principal — fluxo visual */}
+                {n && (
+                    <div>
+                        {/* Header da campanha selecionada */}
+                        <div style={{ background: '#111827', borderRadius: '12px', padding: '14px 18px', marginBottom: '16px' }}>
+                            <div style={{ fontSize: '13px', fontWeight: 700, color: '#fff', marginBottom: '2px' }}>{n.titulo}</div>
+                            <div style={{ fontSize: '11px', color: '#9CA3AF' }}>{n.mensagem}</div>
+                        </div>
+
+                        {/* Fluxo visual horizontal */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0', marginBottom: '20px' }}>
+                            {etapas.map((e, i) => (
+                                <React.Fragment key={i}>
+                                    {/* Card da etapa */}
+                                    <div style={{ flex: 1, background: e.bg, border: `2px solid ${e.cor}30`, borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
+                                        <div style={{ fontSize: '28px', marginBottom: '8px' }}>{e.icon}</div>
+                                        <div style={{ fontSize: '26px', fontWeight: 800, color: e.cor, marginBottom: '4px' }}>
+                                            {e.valor > 0 ? e.valor.toLocaleString('pt-BR') : '—'}
                                         </div>
-                                    </React.Fragment>
-                                ))}
-                            </div>
+                                        <div style={{ fontSize: '12px', fontWeight: 700, color: '#374151', marginBottom: '2px' }}>{e.label}</div>
+                                        <div style={{ fontSize: '11px', color: '#6B7280' }}>{e.desc}</div>
+                                    </div>
 
-                            {/* Título e métricas */}
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontWeight: 700, fontSize: '13px', color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.titulo || '—'}</div>
-                                <div style={{ fontSize: '11px', color: '#6B7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{n.mensagem}</div>
-                            </div>
+                                    {/* Seta com % de conversão entre etapas */}
+                                    {i < etapas.length - 1 && (
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 8px', flexShrink: 0 }}>
+                                            <div style={{ fontSize: '11px', fontWeight: 700, color: i === 0 ? '#3b82f6' : '#10B981', marginBottom: '4px' }}>
+                                                {i === 0 ? `${pctClique}%` : `${pctConv}%`}
+                                            </div>
+                                            <div style={{ fontSize: '20px', color: '#9CA3AF' }}>→</div>
+                                        </div>
+                                    )}
+                                </React.Fragment>
+                            ))}
+                        </div>
 
-                            {/* Badges */}
-                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexShrink: 0 }}>
-                                <span style={{ background: '#dbeafe', color: '#1d4ed8', padding: '2px 8px', borderRadius: '999px', fontSize: '11px', fontWeight: 600 }}>
-                                    CTR {n.taxa_conversao}%
-                                </span>
-                                {temConversao && (
-                                    <span style={{ background: '#dcfce7', color: '#166534', padding: '2px 8px', borderRadius: '999px', fontSize: '11px', fontWeight: 600 }}>
-                                        {brl(n.receita_atribuida)}
-                                    </span>
-                                )}
-                                <span style={{ color: '#9CA3AF', fontSize: '16px' }}>{aberto ? '▲' : '▼'}</span>
+                        {/* Barra de perda visual */}
+                        <div style={{ background: '#F9FAFB', borderRadius: '12px', padding: '14px 16px', marginBottom: '16px' }}>
+                            <div style={{ fontSize: '12px', fontWeight: 700, color: '#374151', marginBottom: '10px' }}>📉 Onde os usuários saíram</div>
+                            <div style={{ marginBottom: '8px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#6B7280', marginBottom: '4px' }}>
+                                    <span>Enviados → Cliques</span>
+                                    <span style={{ fontWeight: 600, color: pctClique >= 5 ? '#10B981' : '#EF4444' }}>{pctClique}% clicaram</span>
+                                </div>
+                                <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '8px', overflow: 'hidden' }}>
+                                    <div style={{ width: `${pctClique}%`, background: '#3b82f6', height: '100%', borderRadius: '999px', transition: 'width 0.8s' }} />
+                                </div>
+                            </div>
+                            <div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#6B7280', marginBottom: '4px' }}>
+                                    <span>Cliques → Compras</span>
+                                    <span style={{ fontWeight: 600, color: pctConv >= 10 ? '#10B981' : '#f59e0b' }}>{pctConv}% compraram</span>
+                                </div>
+                                <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '8px', overflow: 'hidden' }}>
+                                    <div style={{ width: `${pctConv}%`, background: '#10B981', height: '100%', borderRadius: '999px', transition: 'width 0.8s' }} />
+                                </div>
                             </div>
                         </div>
 
-                        {/* Tabela de subscribers expandida */}
-                        {aberto && (
-                            <div style={{ borderTop: '1px solid #E5E7EB' }}>
-                                {n.subscribers.length === 0 ? (
-                                    <p style={{ textAlign: 'center', padding: '16px', color: '#888', fontSize: '13px' }}>Sem dados de subscribers.</p>
+                        {/* Subscribers divididos em convertidos vs não */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                            {/* Convertidos */}
+                            <div style={{ background: '#F0FDF4', border: '1px solid #86efac', borderRadius: '12px', padding: '14px' }}>
+                                <div style={{ fontSize: '12px', fontWeight: 700, color: '#166534', marginBottom: '10px' }}>
+                                    ✅ Compraram ({convertidos.length})
+                                </div>
+                                {convertidos.length === 0 ? (
+                                    <div style={{ fontSize: '12px', color: '#6B7280', textAlign: 'center', padding: '10px 0' }}>Nenhuma conversão</div>
                                 ) : (
-                                    <div style={{ overflowX: 'auto' }}>
-                                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
-                                            <thead>
-                                                <tr style={{ background: '#F9FAFB', color: '#6B7280', textAlign: 'left' }}>
-                                                    <th style={{ padding: '10px 14px' }}>Visitor ID</th>
-                                                    <th style={{ padding: '10px 14px' }}>Clicou em</th>
-                                                    <th style={{ padding: '10px 14px', textAlign: 'center' }}>Comprou?</th>
-                                                    <th style={{ padding: '10px 14px' }}>Converteu em</th>
-                                                    <th style={{ padding: '10px 14px', textAlign: 'right' }}>Receita</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {n.subscribers.map((s, i) => (
-                                                    <tr key={i} style={{ borderTop: '1px solid #F3F4F6', background: s.converted ? '#f0fdf4' : 'white' }}>
-                                                        <td style={{ padding: '10px 14px', fontFamily: 'monospace', color: '#374151', fontSize: '11px' }}>
-                                                            {s.visitor_id.substring(0, 16)}...
-                                                        </td>
-                                                        <td style={{ padding: '10px 14px', color: '#6B7280' }}>{formatDate(s.clicked_at)}</td>
-                                                        <td style={{ padding: '10px 14px', textAlign: 'center' }}>
-                                                            {s.converted
-                                                                ? <span style={{ background: '#dcfce7', color: '#166534', padding: '2px 8px', borderRadius: '999px', fontWeight: 600 }}>✅ Sim</span>
-                                                                : <span style={{ background: '#F3F4F6', color: '#9CA3AF', padding: '2px 8px', borderRadius: '999px' }}>— Não</span>
-                                                            }
-                                                        </td>
-                                                        <td style={{ padding: '10px 14px', color: '#6B7280' }}>
-                                                            {s.converted_at ? formatDate(s.converted_at) : '—'}
-                                                        </td>
-                                                        <td style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 600, color: s.revenue ? '#059669' : '#9CA3AF' }}>
-                                                            {s.revenue ? brl(s.revenue) : '—'}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '180px', overflowY: 'auto' }}>
+                                        {convertidos.map((s, i) => (
+                                            <div key={i} style={{ background: '#fff', borderRadius: '8px', padding: '8px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <div>
+                                                    <div style={{ fontSize: '10px', fontFamily: 'monospace', color: '#374151' }}>{s.visitor_id.substring(0, 14)}…</div>
+                                                    <div style={{ fontSize: '10px', color: '#6B7280' }}>{formatDate(s.clicked_at)}</div>
+                                                </div>
+                                                {s.revenue && (
+                                                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#059669' }}>{brl(s.revenue)}</div>
+                                                )}
+                                            </div>
+                                        ))}
                                     </div>
                                 )}
                             </div>
-                        )}
-                    </div>
-                );
-            })}
 
-            <button onClick={fetchJornada} style={{ marginTop: '8px', background: 'none', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '8px 16px', cursor: 'pointer', fontSize: '13px', color: '#374151' }}>
+                            {/* Não convertidos */}
+                            <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: '12px', padding: '14px' }}>
+                                <div style={{ fontSize: '12px', fontWeight: 700, color: '#92400E', marginBottom: '10px' }}>
+                                    ⏳ Clicaram mas não compraram ({naoConvertidos.length})
+                                </div>
+                                {naoConvertidos.length === 0 ? (
+                                    <div style={{ fontSize: '12px', color: '#6B7280', textAlign: 'center', padding: '10px 0' }}>Todos converteram!</div>
+                                ) : (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '180px', overflowY: 'auto' }}>
+                                        {naoConvertidos.map((s, i) => (
+                                            <div key={i} style={{ background: '#fff', borderRadius: '8px', padding: '8px 10px' }}>
+                                                <div style={{ fontSize: '10px', fontFamily: 'monospace', color: '#374151' }}>{s.visitor_id.substring(0, 14)}…</div>
+                                                <div style={{ fontSize: '10px', color: '#6B7280' }}>{formatDate(s.clicked_at)}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            <button onClick={fetchJornada} style={{ marginTop: '16px', background: 'none', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '8px 16px', cursor: 'pointer', fontSize: '13px', color: '#374151' }}>
                 🔄 Atualizar jornada
             </button>
         </div>
@@ -959,6 +1235,8 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
     const [abTests, setAbTests] = useState<ABTestItem[]>([]);
     const [loadingAB, setLoadingAB] = useState(false);
     const [activeHistorySubTab, setActiveHistorySubTab] = useState<'onesignal' | 'ab' | 'jornada' | 'local'>('onesignal');
+    // ── NOVO: IA Gerador ─────────────────────────────────────────────────────
+    const [showIAModal, setShowIAModal] = useState(false);
 
     const handleSelecionarObjetivo = (obj: ObjetivoConfig) => {
         // Se já estava selecionado, deseleciona (toggle)
@@ -1518,7 +1796,15 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             </div>
                         )}
                         <div className="form-group">
-                            <label>Titulo</label>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                <label style={{ margin: 0 }}>Titulo</label>
+                                <button
+                                    onClick={() => setShowIAModal(true)}
+                                    style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '4px 12px', borderRadius: '999px', border: 'none', background: 'linear-gradient(135deg, #4F46E5, #7C3AED)', color: '#fff', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
+                                >
+                                    🧠 Gerar com IA
+                                </button>
+                            </div>
                             <input type="text" value={pushForm.title} onChange={e => setPushForm({ ...pushForm, title: e.target.value })} maxLength={50} placeholder="Ex: Oferta Relampago!" />
                             <small>{pushForm.title.length}/50 — use <code style={{ background: '#F3F4F6', padding: '1px 4px', borderRadius: '3px' }}>{'{{first_name}}'}</code> para personalizar</small>
                         </div>
