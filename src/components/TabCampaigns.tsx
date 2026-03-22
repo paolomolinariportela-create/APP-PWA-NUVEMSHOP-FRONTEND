@@ -9,6 +9,7 @@ interface PushCampaign {
     btn1_url?: string;
     btn2_text?: string;          // Action Button 2
     btn2_url?: string;
+    filter_behavior?: string;    // "buyers" | "non_buyers"
     filter_device?: string;
     filter_country?: string;
     send_after?: string;
@@ -393,7 +394,16 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                         {showSegmentation && (
                             <div className="animate-fade-in" style={{ background: '#F9FAFB', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', marginBottom: '20px' }}>
                                 <h4 style={{ margin: '0 0 14px', fontSize: '14px', color: '#374151' }}>🎯 Filtros de Segmentação</h4>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '12px' }}>
+                                    <div>
+                                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '5px' }}>💰 Comportamento</label>
+                                        <select value={pushForm.filter_behavior ?? ''} onChange={e => setPushForm({ ...pushForm, filter_behavior: e.target.value || undefined })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', background: 'white', fontSize: '13px' }}>
+                                            <option value="">🟢 Todos os inscritos</option>
+                                            <option value="buyers">💰 Só quem JÁ comprou (VIPs)</option>
+                                            <option value="non_buyers">👻 Só quem NUNCA comprou</option>
+                                        </select>
+                                        <small style={{ fontSize: '10px', color: '#6B7280' }}>Baseado nas tags do app</small>
+                                    </div>
                                     <div>
                                         <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '5px' }}>📱 Dispositivo</label>
                                         <select value={pushForm.filter_device ?? ''} onChange={e => setPushForm({ ...pushForm, filter_device: e.target.value || undefined })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', background: 'white', fontSize: '13px' }}>
@@ -424,8 +434,8 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                         <small style={{ fontSize: '10px', color: '#6B7280' }}>Vazio = envio imediato</small>
                                     </div>
                                 </div>
-                                {(pushForm.filter_device || pushForm.filter_country || pushForm.send_after) && (
-                                    <button onClick={() => setPushForm({ ...pushForm, filter_device: undefined, filter_country: undefined, send_after: undefined })} style={{ marginTop: '10px', background: 'none', border: 'none', color: '#DC2626', fontSize: '12px', cursor: 'pointer', padding: 0 }}>
+                                {(pushForm.filter_device || pushForm.filter_country || pushForm.send_after || pushForm.filter_behavior) && (
+                                    <button onClick={() => setPushForm({ ...pushForm, filter_device: undefined, filter_country: undefined, send_after: undefined, filter_behavior: undefined })} style={{ marginTop: '10px', background: 'none', border: 'none', color: '#DC2626', fontSize: '12px', cursor: 'pointer', padding: 0 }}>
                                         ✕ Limpar filtros
                                     </button>
                                 )}
