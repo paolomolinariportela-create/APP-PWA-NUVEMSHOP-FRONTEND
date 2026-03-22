@@ -325,6 +325,161 @@ function SeletorObjetivo({
 }
 // ────────────────────────────────────────────────────────────────────────────
 
+// ── Componente: Painel de Detalhes de uma Campanha ──────────────────────────
+function CampanhaDetalhe({
+    notif,
+    mediaAbertura,
+    ticketMedio,
+    taxaConvGlobal,
+    onClose,
+    brl,
+}: {
+    notif: OneSignalNotif;
+    mediaAbertura: number;
+    ticketMedio: number;
+    taxaConvGlobal: number;
+    onClose: () => void;
+    brl: (v: number) => string;
+}) {
+    const roi = ticketMedio > 0 ? Math.round(notif.opened * (taxaConvGlobal / 100) * ticketMedio) : 0;
+    const ctr = notif.sent > 0 ? ((notif.opened / notif.sent) * 100).toFixed(1) : '0';
+    const taxaEntrega = notif.sent > 0 ? Math.round((notif.confirmed_deliveries / notif.sent) * 100) : 0;
+    const convertidos = Math.round(notif.opened * (taxaConvGlobal / 100));
+    const vsMedia = notif.taxa_abertura - mediaAbertura;
+
+    const getBenchmarkBadge = (taxa: number) => {
+        if (taxa >= 10) return { label: 'Acima da Media', bg: '#dcfce7', color: '#166534', icon: '🔥' };
+        if (taxa >= 5) return { label: 'Na Media', bg: '#dbeafe', color: '#1d4ed8', icon: '✅' };
+        return { label: 'Precisa Melhorar', bg: '#fef3c7', color: '#92400e', icon: '⚠️' };
+    };
+    const badge = getBenchmarkBadge(notif.taxa_abertura);
+
+    const metricas = [
+        { icon: '📤', label: 'Enviados', value: notif.sent.toLocaleString('pt-BR'), sub: '100% da base', color: '#4F46E5' },
+        { icon: '📬', label: 'Entregues', value: notif.confirmed_deliveries.toLocaleString('pt-BR'), sub: `${taxaEntrega}% de entrega`, color: '#3b82f6' },
+        { icon: '👆', label: 'Abertos', value: notif.opened.toLocaleString('pt-BR'), sub: `CTR: ${ctr}%`, color: '#10B981' },
+        { icon: '❌', label: 'Falhos', value: notif.failed.toLocaleString('pt-BR'), sub: 'nao entregues', color: '#EF4444' },
+    ];
+
+    return (
+        <div style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
+            zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '20px',
+        }} onClick={onClose}>
+            <div style={{
+                background: '#fff', borderRadius: '16px', width: '100%', maxWidth: '640px',
+                maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            }} onClick={e => e.stopPropagation()}>
+                {/* Header */}
+                <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid #E5E7EB', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                        <div style={{ fontSize: '11px', color: '#6B7280', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Detalhes da Campanha</div>
+                        <div style={{ fontSize: '16px', fontWeight: 700, color: '#111827' }}>{notif.title}</div>
+                        <div style={{ fontSize: '13px', color: '#6B7280', marginTop: '2px' }}>{notif.message}</div>
+                    </div>
+                    <button onClick={onClose} style={{ background: '#F3F4F6', border: 'none', borderRadius: '8px', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px', flexShrink: 0, marginLeft: '12px' }}>×</button>
+                </div>
+
+                <div style={{ padding: '20px 24px' }}>
+                    {/* 4 métricas principais */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '20px' }}>
+                        {metricas.map((m, i) => (
+                            <div key={i} style={{ background: '#F9FAFB', border: `1px solid ${m.color}20`, borderRadius: '10px', padding: '12px 10px', textAlign: 'center' }}>
+                                <div style={{ fontSize: '18px', marginBottom: '4px' }}>{m.icon}</div>
+                                <div style={{ fontSize: '20px', fontWeight: 700, color: m.color }}>{m.value}</div>
+                                <div style={{ fontSize: '11px', fontWeight: 600, color: '#374151', marginBottom: '2px' }}>{m.label}</div>
+                                <div style={{ fontSize: '10px', color: '#9CA3AF' }}>{m.sub}</div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* CTR vs média */}
+                    <div style={{ background: '#F9FAFB', borderRadius: '12px', padding: '16px', marginBottom: '16px' }}>
+                        <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827', marginBottom: '12px' }}>📊 Taxa de Abertura vs Media Geral</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                            <div style={{ flex: 1 }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '12px' }}>
+                                    <span style={{ color: '#6B7280' }}>Esta campanha</span>
+                                    <span style={{ fontWeight: 700, color: badge.color }}>{notif.taxa_abertura}%</span>
+                                </div>
+                                <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '8px', overflow: 'hidden' }}>
+                                    <div style={{ width: `${Math.min(notif.taxa_abertura * 5, 100)}%`, background: badge.color, height: '100%', borderRadius: '999px' }} />
+                                </div>
+                            </div>
+                            <div style={{ flex: 1 }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '12px' }}>
+                                    <span style={{ color: '#6B7280' }}>Media geral</span>
+                                    <span style={{ fontWeight: 700, color: '#6B7280' }}>{mediaAbertura}%</span>
+                                </div>
+                                <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '8px', overflow: 'hidden' }}>
+                                    <div style={{ width: `${Math.min(mediaAbertura * 5, 100)}%`, background: '#9CA3AF', height: '100%', borderRadius: '999px' }} />
+                                </div>
+                            </div>
+                        </div>
+                        <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ background: badge.bg, color: badge.color, padding: '3px 10px', borderRadius: '999px', fontSize: '12px', fontWeight: 600 }}>
+                                {badge.icon} {badge.label}
+                            </span>
+                            {mediaAbertura > 0 && (
+                                <span style={{ fontSize: '12px', color: vsMedia >= 0 ? '#059669' : '#DC2626', fontWeight: 600 }}>
+                                    {vsMedia >= 0 ? `+${vsMedia.toFixed(1)}` : vsMedia.toFixed(1)}% vs sua media
+                                </span>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* ROI */}
+                    {ticketMedio > 0 && (
+                        <div style={{ background: roi > 0 ? '#f0fdf4' : '#F9FAFB', border: `1px solid ${roi > 0 ? '#86efac' : '#E5E7EB'}`, borderRadius: '12px', padding: '16px', marginBottom: '16px' }}>
+                            <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827', marginBottom: '12px' }}>💰 ROI Estimado</div>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', textAlign: 'center' }}>
+                                <div>
+                                    <div style={{ fontSize: '11px', color: '#6B7280', marginBottom: '4px' }}>Cliques</div>
+                                    <div style={{ fontSize: '18px', fontWeight: 700, color: '#10B981' }}>{notif.opened}</div>
+                                </div>
+                                <div>
+                                    <div style={{ fontSize: '11px', color: '#6B7280', marginBottom: '4px' }}>Convertidos est.</div>
+                                    <div style={{ fontSize: '18px', fontWeight: 700, color: '#f59e0b' }}>{convertidos}</div>
+                                </div>
+                                <div>
+                                    <div style={{ fontSize: '11px', color: '#6B7280', marginBottom: '4px' }}>Receita est.</div>
+                                    <div style={{ fontSize: '18px', fontWeight: 700, color: roi > 0 ? '#059669' : '#9CA3AF' }}>{roi > 0 ? brl(roi) : '—'}</div>
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '10px', fontSize: '11px', color: '#9CA3AF', textAlign: 'center' }}>
+                                {notif.opened} cliques × {taxaConvGlobal}% conv. × {brl(ticketMedio)} ticket médio
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Barra de progresso do funil */}
+                    <div style={{ background: '#F9FAFB', borderRadius: '12px', padding: '16px' }}>
+                        <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827', marginBottom: '14px' }}>🔔 Funil desta Campanha</div>
+                        {[
+                            { label: 'Enviados', value: notif.sent, pct: 100, color: '#4F46E5' },
+                            { label: 'Entregues', value: notif.confirmed_deliveries, pct: taxaEntrega, color: '#3b82f6' },
+                            { label: 'Abertos', value: notif.opened, pct: notif.sent > 0 ? Math.round((notif.opened / notif.sent) * 100) : 0, color: '#10B981' },
+                            ...(ticketMedio > 0 ? [{ label: 'Convertidos', value: convertidos, pct: notif.opened > 0 ? Math.round((convertidos / notif.opened) * 100) : 0, color: '#f59e0b' }] : []),
+                        ].map((step, i) => (
+                            <div key={i} style={{ marginBottom: '10px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '12px' }}>
+                                    <span style={{ color: '#374151', fontWeight: 500 }}>{step.label}</span>
+                                    <span style={{ color: step.color, fontWeight: 700 }}>{step.value.toLocaleString('pt-BR')} <span style={{ color: '#9CA3AF', fontWeight: 400 }}>({step.pct}%)</span></span>
+                                </div>
+                                <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '6px', overflow: 'hidden' }}>
+                                    <div style={{ width: `${step.pct}%`, background: step.color, height: '100%', borderRadius: '999px', transition: 'width 0.6s' }} />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendPush, sendingPush, token, API_URL }: Props) {
     const [history, setHistory] = useState<PushHistoryItem[]>([]);
     const [loadingHistory, setLoadingHistory] = useState(false);
@@ -339,6 +494,8 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
 
     // ── NOVO: estado do objetivo ─────────────────────────────────────────────
     const [objetivo, setObjetivo] = useState<ObjetivoCampanha>(null);
+    // ── NOVO: campanha selecionada para detalhe ──────────────────────────────
+    const [campanhaDetalhe, setCampanhaDetalhe] = useState<OneSignalNotif | null>(null);
 
     const handleSelecionarObjetivo = (obj: ObjetivoConfig) => {
         // Se já estava selecionado, deseleciona (toggle)
@@ -1056,12 +1213,13 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                                 <th style={{ padding: '12px', textAlign: 'right' }}>Falhos</th>
                                                 <th style={{ padding: '12px', textAlign: 'right' }}>Taxa</th>
                                                 {ticketMedio > 0 && <th style={{ padding: '12px', textAlign: 'right' }}>ROI Est.</th>}
+                                                <th style={{ padding: '12px', textAlign: 'center', fontSize: '11px', color: '#9CA3AF', fontWeight: 400 }}>👆 detalhe</th>
                                             </tr></thead>
                                             <tbody>{notifs.map(n => {
                                                 const roi = ticketMedio > 0 ? Math.round(n.opened * (taxaConvGlobal / 100) * ticketMedio) : 0;
                                                 const badge = getBenchmarkBadge(n.taxa_abertura);
                                                 return (
-                                                    <tr key={n.id} style={{ borderBottom: '1px solid #eee' }}>
+                                                    <tr key={n.id} onClick={() => setCampanhaDetalhe(n)} style={{ borderBottom: '1px solid #eee', cursor: 'pointer', transition: 'background 0.15s' }} onMouseOver={e => (e.currentTarget.style.background = '#F9FAFB')} onMouseOut={e => (e.currentTarget.style.background = 'transparent')}>
                                                         <td style={{ padding: '12px', whiteSpace: 'nowrap', color: '#555', fontSize: '12px' }}>{formatUnix(n.created_at)}</td>
                                                         <td style={{ padding: '12px' }}>
                                                             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
@@ -1080,6 +1238,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                                                 {roi > 0 ? <span style={{ background: '#dcfce7', color: '#166534', padding: '3px 8px', borderRadius: '999px', fontSize: '12px', fontWeight: 600 }}>~{brl(roi)}</span> : <span style={{ color: '#9CA3AF', fontSize: '12px' }}>—</span>}
                                                             </td>
                                                         )}
+                                                        <td style={{ padding: '12px', textAlign: 'center', color: '#9CA3AF' }}>›</td>
                                                     </tr>
                                                 );
                                             })}</tbody>
@@ -1216,6 +1375,18 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                         </>
                     )}
                 </div>
+            )}
+
+            {/* ── MODAL DETALHE DA CAMPANHA ── */}
+            {campanhaDetalhe && (
+                <CampanhaDetalhe
+                    notif={campanhaDetalhe}
+                    mediaAbertura={mediaAbertura}
+                    ticketMedio={ticketMedio}
+                    taxaConvGlobal={taxaConvGlobal}
+                    onClose={() => setCampanhaDetalhe(null)}
+                    brl={brl}
+                />
             )}
         </div>
     );
