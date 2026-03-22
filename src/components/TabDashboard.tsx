@@ -4,8 +4,14 @@ interface DashboardStats {
   receita: number;
   vendas: number;
   instalacoes: number;
+  instalacoes_banco?: number;
   crescimento_instalacoes_7d: number;
-  carrinhos_abandonados: { valor: number; qtd: number };
+  carrinhos_abandonados: {
+    valor: number;
+    qtd: number;
+    ativos_automacao?: number;
+    ativos_onesignal?: number;
+  };
   taxa_conversao: { app: number; site: number };
   visualizacoes: {
     pageviews: number;
@@ -14,7 +20,11 @@ interface DashboardStats {
     top_paginas_pwa?: string[];
   };
   funil: { visitas: number; carrinho: number; checkout: number };
-  recorrencia: { clientes_2x: number; taxa_recompra: number };
+  recorrencia: {
+    clientes_2x: number;
+    taxa_recompra: number;
+    compradores_onesignal?: number;
+  };
   ticket_medio: { app: number; site: number };
   visitas?: { app: number; site: number; total: number };
   extra_pwa?: {
@@ -23,171 +33,105 @@ interface DashboardStats {
     vendas_pwa: number;
     vendas_site: number;
   };
+  onesignal?: {
+    active_subscribers: number;
+    carrinho_ativo_count: number;
+    compradores_count: number;
+  };
 }
 
 interface Props {
   stats: DashboardStats;
+  onNavigateCampanhas?: () => void;
 }
 
-export default function TabDashboard({ stats }: Props) {
-  // valores seguros com fallback
+export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
   const receita = stats?.receita ?? 0;
   const vendas = stats?.vendas ?? 0;
-  const instalacoes = stats?.instalacoes ?? 0;
   const crescimento7d = stats?.crescimento_instalacoes_7d ?? 0;
-
   const carrinhosValor = stats?.carrinhos_abandonados?.valor ?? 0;
   const carrinhosQtd = stats?.carrinhos_abandonados?.qtd ?? 0;
-
   const ticketApp = stats?.ticket_medio?.app ?? 0;
-
   const taxaConvApp = stats?.taxa_conversao?.app ?? 0;
-
   const clientesRec = stats?.recorrencia?.clientes_2x ?? 0;
   const taxaRecompra = stats?.recorrencia?.taxa_recompra ?? 0;
-
   const pageviews = stats?.visualizacoes?.pageviews ?? 0;
   const tempoMedio = stats?.visualizacoes?.tempo_medio ?? "--";
   const topPaginasPwa = stats?.visualizacoes?.top_paginas_pwa ?? [];
-
   const funilVisitas = stats?.funil?.visitas ?? 0;
   const funilCarrinho = stats?.funil?.carrinho ?? 0;
   const funilCheckout = stats?.funil?.checkout ?? 0;
 
-  // meta dinâmica de instalações
-  const currentInstalls = instalacoes;
-  let metaInstalacoes: number;
+  // ✅ Dados OneSignal — com fallback para dados do banco
+  const osData = stats?.onesignal;
+  const instalacoes = osData?.active_subscribers || stats?.instalacoes || 0;
+  const carrinhoAtivoOS = osData?.carrinho_ativo_count ?? 0;
+  const compradoresOS = osData?.compradores_count ?? 0;
+  const temOsData = !!osData && osData.active_subscribers > 0;
 
-  if (currentInstalls < 100) {
-    metaInstalacoes = 100;
-  } else if (currentInstalls < 500) {
-    metaInstalacoes = 500;
-  } else if (currentInstalls < 1000) {
-    metaInstalacoes = 1000;
-  } else {
-    metaInstalacoes = Math.ceil(currentInstalls / 1000) * 1000;
-  }
+  // Metas dinâmicas
+  let metaInstalacoes = instalacoes < 100 ? 100 : instalacoes < 500 ? 500 : instalacoes < 1000 ? 1000 : Math.ceil(instalacoes / 1000) * 1000;
+  let metaReceita = receita < 500 ? 500 : receita < 1000 ? 1000 : receita < 5000 ? 5000 : Math.ceil(receita / 5000) * 5000;
+  let metaRecorrentes = clientesRec < 10 ? 10 : clientesRec < 50 ? 50 : clientesRec < 100 ? 100 : Math.ceil(clientesRec / 100) * 100;
 
-  // meta dinâmica de receita
-  let metaReceita: number;
-
-  if (receita < 500) {
-    metaReceita = 500;
-  } else if (receita < 1000) {
-    metaReceita = 1000;
-  } else if (receita < 5000) {
-    metaReceita = 5000;
-  } else {
-    metaReceita = Math.ceil(receita / 5000) * 5000;
-  }
-
-  // meta dinâmica de clientes recorrentes
-  let metaRecorrentes: number;
-
-  if (clientesRec < 10) {
-    metaRecorrentes = 10;
-  } else if (clientesRec < 50) {
-    metaRecorrentes = 50;
-  } else if (clientesRec < 100) {
-    metaRecorrentes = 100;
-  } else {
-    metaRecorrentes = Math.ceil(clientesRec / 100) * 100;
-  }
+  const brl = (v: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
 
   return (
     <section className="stats-grid animate-fade-in">
+
       {/* RECEITA APP */}
       <div className="stat-card" style={{ borderLeft: "4px solid #10B981" }}>
         <div className="stat-icon green">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              fill="currentColor"
-              d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zm0 2v8h16V8H4zm8 7a3 3 0 0 1-3-3h2a1 1 0 1 0 1-1 3 3 0 1 1 3-3h-2a1 1 0 1 0-1 1 3 3 0 0 1 0 6z"
-            />
-          </svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zm0 2v8h16V8H4zm8 7a3 3 0 0 1-3-3h2a1 1 0 1 0 1-1 3 3 0 1 1 3-3h-2a1 1 0 1 0-1 1 3 3 0 0 1 0 6z" /></svg>
         </div>
         <div className="stat-info">
           <h3>Receita App</h3>
-          <p>
-            {new Intl.NumberFormat("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            }).format(receita)}
-          </p>
-          <span className="stat-growth">
-            🔥 {vendas} pedidos realizados
-          </span>
-
-          <div className="card-meta-text">
-            🎯 Próxima meta:{" "}
-            {new Intl.NumberFormat("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            }).format(metaReceita)}
-          </div>
+          <p>{brl(receita)}</p>
+          <span className="stat-growth">🔥 {vendas} pedidos realizados</span>
+          <div className="card-meta-text">🎯 Próxima meta: {brl(metaReceita)}</div>
         </div>
       </div>
 
-      {/* TICKET MÉDIO – apenas APP */}
+      {/* TICKET MÉDIO */}
       <div className="stat-card">
         <div className="stat-icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              fill="currentColor"
-              d="M4 5h16a2 2 0 0 1 2 2v3h-2a2 2 0 1 0 0 4h2v3a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-3h2a2 2 0 1 0 0-4H2V7a2 2 0 0 1 2-2zm0 2v2h2a4 4 0 0 1 0 8H4v2h16v-2h-2a4 4 0 0 1 0-8h2V7H4z"
-            />
-          </svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 5h16a2 2 0 0 1 2 2v3h-2a2 2 0 1 0 0 4h2v3a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-3h2a2 2 0 1 0 0-4H2V7a2 2 0 0 1 2-2zm0 2v2h2a4 4 0 0 1 0 8H4v2h16v-2h-2a4 4 0 0 1 0-8h2V7H4z" /></svg>
         </div>
         <div className="stat-info">
           <h3>Ticket Médio</h3>
-
           <div className="ticket-main-row">
-            <span
-              className="ticket-main-label"
-              style={{ color: "#10B981", fontWeight: "bold" }}
-            >
-              APP
-            </span>
-            <span className="ticket-main-value">
-              {new Intl.NumberFormat("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              }).format(ticketApp)}
-            </span>
+            <span className="ticket-main-label" style={{ color: "#10B981", fontWeight: "bold" }}>APP</span>
+            <span className="ticket-main-value">{brl(ticketApp)}</span>
           </div>
         </div>
       </div>
 
-      {/* Instalações + Meta */}
+      {/* ✅ INSTALAÇÕES ATIVAS — dados do OneSignal */}
       <div className="stat-card">
         <div className="stat-icon purple">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              fill="currentColor"
-              d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 2v14h10V4H7zm5 15a1.25 1.25 0 1 1 0 2.5A1.25 1.25 0 0 1 12 19z"
-            />
-          </svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 2v14h10V4H7zm5 15a1.25 1.25 0 1 1 0 2.5A1.25 1.25 0 0 1 12 19z" /></svg>
         </div>
         <div className="stat-info">
           <h3>Instalações Ativas</h3>
           <p>{instalacoes}</p>
-          <span className="stat-growth">Base de clientes fiéis</span>
-
+          <span className="stat-growth">
+            {temOsData ? '🔔 Com notificações ativas' : 'Base de clientes fiéis'}
+          </span>
+          {temOsData && (
+            <div style={{ marginTop: '4px', fontSize: '11px', color: '#6B7280' }}>
+              via OneSignal — dados em tempo real
+            </div>
+          )}
           <div className="card-meta-text">
             🎯 Meta de Instalações: {instalacoes} / {metaInstalacoes}
           </div>
         </div>
       </div>
 
-      {/* Crescimento do App */}
+      {/* CRESCIMENTO DO APP */}
       <div className="stat-card">
         <div className="stat-icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              fill="currentColor"
-              d="M3 17v2h18v-2H3zm0-4 4-4 4 4 6-6 4 4v-3.5L17 4l-6 6-4-4-4 4V13z"
-            />
-          </svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 17v2h18v-2H3zm0-4 4-4 4 4 6-6 4 4v-3.5L17 4l-6 6-4-4-4 4V13z" /></svg>
         </div>
         <div className="stat-info">
           <h3>Crescimento do App</h3>
@@ -196,305 +140,143 @@ export default function TabDashboard({ stats }: Props) {
         </div>
       </div>
 
-      {/* Clientes recorrentes + meta */}
+      {/* ✅ CLIENTES CONVERTIDOS — dados do OneSignal */}
       <div className="stat-card">
         <div className="stat-icon blue">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              fill="currentColor"
-              d="M7 7h11V4l4 4-4 4V9H8a3 3 0 0 0 0 6h3v2H8a5 5 0 0 1 0-10zm10 10H6v3l-4-4 4-4v3h11a3 3 0 0 0 0-6h-3V7h3a5 5 0 0 1 0 10z"
-            />
-          </svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 7h11V4l4 4-4 4V9H8a3 3 0 0 0 0 6h3v2H8a5 5 0 0 1 0-10zm10 10H6v3l-4-4 4-4v3h11a3 3 0 0 0 0-6h-3V7h3a5 5 0 0 1 0 10z" /></svg>
         </div>
         <div className="stat-info">
-          <h3>Clientes Recorrentes</h3>
-          <p>{clientesRec}</p>
-          <div
-            style={{
-              fontSize: "0.95rem",
-              color: "#111827",
-              marginTop: "6px",
-              fontWeight: 500,
-            }}
-          >
-            Taxa de Recompra: <strong>{taxaRecompra}%</strong>
-          </div>
-          <div className="card-meta-text">
-            🎯 Próxima meta: {metaRecorrentes} clientes
-          </div>
+          <h3>Clientes Convertidos</h3>
+          {/* Mostra compradores do OneSignal se disponível, senão recorrentes do banco */}
+          <p>{temOsData && compradoresOS > 0 ? compradoresOS : clientesRec}</p>
+          {temOsData && compradoresOS > 0 ? (
+            <>
+              <div style={{ fontSize: '0.95rem', color: '#111827', marginTop: '6px', fontWeight: 500 }}>
+                Dos <strong>{instalacoes}</strong> usuários com app,{' '}
+                <strong style={{ color: '#10B981' }}>
+                  {instalacoes > 0 ? Math.round((compradoresOS / instalacoes) * 100) : 0}%
+                </strong> já compraram
+              </div>
+              <div style={{ fontSize: '11px', color: '#6B7280', marginTop: '2px' }}>
+                via OneSignal (tag fez_compra)
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={{ fontSize: '0.95rem', color: '#111827', marginTop: '6px', fontWeight: 500 }}>
+                Taxa de Recompra: <strong>{taxaRecompra}%</strong>
+              </div>
+              <div className="card-meta-text">🎯 Próxima meta: {metaRecorrentes} clientes</div>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Páginas visualizadas */}
+      {/* PÁGINAS VISUALIZADAS */}
       <div className="stat-card">
         <div className="stat-icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              fill="currentColor"
-              d="M12 5C7 5 3.73 8.11 2 12c1.73 3.89 5 7 10 7s8.27-3.11 10-7c-1.73-3.89-5-7-10-7zm0 2c3.04 0 5.64 1.96 7.19 5-1.55 3.04-4.15 5-7.19 5S6.36 15.04 4.81 12C6.36 8.96 8.96 7 12 7zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"
-            />
-          </svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 5C7 5 3.73 8.11 2 12c1.73 3.89 5 7 10 7s8.27-3.11 10-7c-1.73-3.89-5-7-10-7zm0 2c3.04 0 5.64 1.96 7.19 5-1.55 3.04-4.15 5-7.19 5S6.36 15.04 4.81 12C6.36 8.96 8.96 7 12 7zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" /></svg>
         </div>
         <div className="stat-info">
           <h3>Páginas Visualizadas</h3>
           <p>{pageviews.toLocaleString()}</p>
-          <div
-            style={{
-              marginTop: "10px",
-              fontSize: "0.95rem",
-              color: "#111827",
-              fontWeight: 500,
-            }}
-          >
+          <div style={{ marginTop: '10px', fontSize: '0.95rem', color: '#111827', fontWeight: 500 }}>
             ⏱️ Tempo médio: <strong>{tempoMedio}</strong>
           </div>
         </div>
       </div>
 
-      {/* Top páginas do App (PWA) */}
+      {/* TOP PÁGINAS DO APP */}
       {topPaginasPwa.length > 0 && (
         <div className="stat-card">
           <div className="stat-icon">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                fill="currentColor"
-                d="M16 3 8 11l3 3-5 5 1.5 1.5 5-5 3 3 8-8z"
-              />
-            </svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 3 8 11l3 3-5 5 1.5 1.5 5-5 3 3 8-8z" /></svg>
           </div>
           <div className="stat-info">
             <h3>Top páginas do App</h3>
-            <ul
-              style={{
-                marginTop: "8px",
-                paddingLeft: 0,
-                listStyle: "none",
-                fontSize: "11px",
-                color: "#374151",
-              }}
-            >
-              {topPaginasPwa
-                .filter((pagina) => pagina !== "install")
-                .slice(0, 5)
-                .map((pagina, idx) => {
-                  let label = pagina || "/";
-                  let badge: string | null = null;
-
-                  if (label === "/") {
-                    label = "Página inicial";
-                    badge = "HOME";
-                  }
-
-                  const display =
-                    label.length > 50 ? label.slice(0, 47) + "..." : label;
-
-                  return (
-                    <li
-                      key={pagina + idx}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "6px",
-                          flex: 1,
-                          minWidth: 0,
-                        }}
-                      >
-                        <span
-                          style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            width: 16,
-                            height: 16,
-                            borderRadius: "999px",
-                            background: "#E5E7EB",
-                            fontSize: "10px",
-                            color: "#374151",
-                            flexShrink: 0,
-                          }}
-                        >
-                          {idx + 1}
-                        </span>
-                        <span
-                          title={label}
-                          style={{
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          {display}
-                        </span>
-                      </div>
-                      {badge && (
-                        <span
-                          style={{
-                            marginLeft: "6px",
-                            fontSize: "9px",
-                            padding: "2px 6px",
-                            borderRadius: "999px",
-                            background: "#E0F2FE",
-                            color: "#0369A1",
-                            flexShrink: 0,
-                          }}
-                        >
-                          {badge}
-                        </span>
-                      )}
-                    </li>
-                  );
-                })}
+            <ul style={{ marginTop: '8px', paddingLeft: 0, listStyle: 'none', fontSize: '11px', color: '#374151' }}>
+              {topPaginasPwa.filter(p => p !== 'install').slice(0, 5).map((pagina, idx) => {
+                let label = pagina || '/';
+                let badge: string | null = null;
+                if (label === '/') { label = 'Página inicial'; badge = 'HOME'; }
+                const display = label.length > 50 ? label.slice(0, 47) + '...' : label;
+                return (
+                  <li key={pagina + idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1, minWidth: 0 }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 16, height: 16, borderRadius: '999px', background: '#E5E7EB', fontSize: '10px', color: '#374151', flexShrink: 0 }}>{idx + 1}</span>
+                      <span title={label} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{display}</span>
+                    </div>
+                    {badge && <span style={{ marginLeft: '6px', fontSize: '9px', padding: '2px 6px', borderRadius: '999px', background: '#E0F2FE', color: '#0369A1', flexShrink: 0 }}>{badge}</span>}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </div>
       )}
 
-      {/* Funil de vendas */}
-      <div className="stat-card" style={{ gridRow: "span 2" }}>
-        <div className="stat-info" style={{ width: "100%" }}>
+      {/* FUNIL DE VENDAS */}
+      <div className="stat-card" style={{ gridRow: 'span 2' }}>
+        <div className="stat-info" style={{ width: '100%' }}>
           <h3>Funil de Vendas 📉</h3>
-          <div style={{ marginTop: "15px" }}>
+          <div style={{ marginTop: '15px' }}>
             <div className="conversion-bar">
-              <div className="bar-label">
-                <span>1. Visitas Únicas</span>{" "}
-                <strong>{funilVisitas}</strong>
-              </div>
-              <div className="bar-track">
-                <div
-                  className="bar-fill"
-                  style={{ width: "100%", background: "#9CA3AF" }}
-                ></div>
-              </div>
+              <div className="bar-label"><span>1. Visitas Únicas</span> <strong>{funilVisitas}</strong></div>
+              <div className="bar-track"><div className="bar-fill" style={{ width: '100%', background: '#9CA3AF' }} /></div>
             </div>
-
             <div className="conversion-bar">
-              <div className="bar-label">
-                <span>2. Carrinho</span>{" "}
-                <strong>{funilCarrinho}</strong>
-              </div>
-              <div className="bar-track">
-                <div
-                  className="bar-fill"
-                  style={{
-                    width: `${
-                      (funilCarrinho / Math.max(funilVisitas, 1)) * 100
-                    }%`,
-                    background: "#60A5FA",
-                  }}
-                ></div>
-              </div>
+              <div className="bar-label"><span>2. Carrinho</span> <strong>{funilCarrinho}</strong></div>
+              <div className="bar-track"><div className="bar-fill" style={{ width: `${(funilCarrinho / Math.max(funilVisitas, 1)) * 100}%`, background: '#60A5FA' }} /></div>
             </div>
-
             <div className="conversion-bar">
-              <div className="bar-label">
-                <span>3. Checkout</span>{" "}
-                <strong>{funilCheckout}</strong>
-              </div>
-              <div className="bar-track">
-                <div
-                  className="bar-fill"
-                  style={{
-                    width: `${
-                      (funilCheckout / Math.max(funilVisitas, 1)) * 100
-                    }%`,
-                    background: "#10B981",
-                  }}
-                ></div>
-              </div>
+              <div className="bar-label"><span>3. Checkout</span> <strong>{funilCheckout}</strong></div>
+              <div className="bar-track"><div className="bar-fill" style={{ width: `${(funilCheckout / Math.max(funilVisitas, 1)) * 100}%`, background: '#10B981' }} /></div>
             </div>
-
-            <small
-              style={{
-                display: "block",
-                marginTop: "10px",
-                color: "#666",
-                fontSize: "10px",
-              }}
-            >
-              {taxaConvApp}% de conversão global do APP
-            </small>
+            <small style={{ display: 'block', marginTop: '10px', color: '#666', fontSize: '10px' }}>{taxaConvApp}% de conversão global do APP</small>
           </div>
         </div>
       </div>
 
-      {/* Carrinhos abandonados */}
-      <div className="stat-card" style={{ borderLeft: "4px solid #ef4444" }}>
+      {/* ✅ CARRINHOS ABANDONADOS — dados do OneSignal */}
+      <div className="stat-card" style={{ borderLeft: '4px solid #ef4444' }}>
         <div className="stat-icon red">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              fill="currentColor"
-              d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm10 2a2 2 0 1 0-4.001.001A2 2 0 0 0 17 20zM6.2 4l-.4-2H2v2h2l3.6 7.59-1.35 2.44A1 1 0 0 0 7.1 15H19v-2H8.42l.93-1.68L18.55 11a1 1 0 0 0 .92-.63L22 3h-2.09l-2.13 5H8.53L6.2 4z"
-            />
-          </svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm10 2a2 2 0 1 0-4.001.001A2 2 0 0 0 17 20zM6.2 4l-.4-2H2v2h2l3.6 7.59-1.35 2.44A1 1 0 0 0 7.1 15H19v-2H8.42l.93-1.68L18.55 11a1 1 0 0 0 .92-.63L22 3h-2.09l-2.13 5H8.53L6.2 4z" /></svg>
         </div>
         <div className="stat-info">
           <h3>Carrinhos Abandonados</h3>
-          <p>
-            {new Intl.NumberFormat("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            }).format(carrinhosValor)}
-          </p>
-
-          <div
-            style={{
-              marginTop: "4px",
-              fontSize: "11px",
-              color: "#555",
-            }}
-          >
-            {carrinhosQtd} carrinho
-            {carrinhosQtd === 1 ? "" : "s"} abandonado
-            {carrinhosQtd === 1 ? "" : "s"}
+          <p>{brl(carrinhosValor)}</p>
+          {/* Mostra contagem do OneSignal se disponível */}
+          <div style={{ marginTop: '4px', fontSize: '11px', color: '#555' }}>
+            {temOsData && carrinhoAtivoOS > 0 ? (
+              <>
+                <span style={{ fontWeight: 700, color: '#dc2626', fontSize: '13px' }}>{carrinhoAtivoOS}</span>
+                {' '}com carrinho ativo agora
+                <span style={{ marginLeft: '6px', fontSize: '10px', color: '#9CA3AF' }}>(OneSignal)</span>
+              </>
+            ) : (
+              <>{carrinhosQtd} carrinho{carrinhosQtd === 1 ? '' : 's'} abandonado{carrinhosQtd === 1 ? '' : 's'}</>
+            )}
           </div>
-
           <button
-            style={{
-              marginTop: "8px",
-              background: "#dc2626",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              padding: "6px 12px",
-              fontSize: "11px",
-              cursor: "pointer",
-              fontWeight: "bold",
-            }}
+            onClick={onNavigateCampanhas}
+            style={{ marginTop: '8px', background: '#dc2626', color: 'white', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '11px', cursor: 'pointer', fontWeight: 'bold' }}
           >
             🔔 RECUPERAR AGORA
           </button>
         </div>
       </div>
 
-      {/* Taxa de conversão – apenas APP */}
+      {/* TAXA DE CONVERSÃO */}
       <div className="stat-card">
-        <div className="stat-info" style={{ width: "100%" }}>
+        <div className="stat-info" style={{ width: '100%' }}>
           <h3>Taxa de Conversão 🏆</h3>
-
-          <div className="conversion-bar" style={{ marginBottom: "6px" }}>
-            <div className="bar-label">
-              <span>APP</span> <strong>{taxaConvApp}%</strong>
-            </div>
-            <div className="bar-track">
-              <div
-                className="bar-fill"
-                style={{
-                  width: `${Math.min(taxaConvApp, 100)}%`,
-                  background: "#10B981",
-                }}
-              ></div>
-            </div>
+          <div className="conversion-bar" style={{ marginBottom: '6px' }}>
+            <div className="bar-label"><span>APP</span> <strong>{taxaConvApp}%</strong></div>
+            <div className="bar-track"><div className="bar-fill" style={{ width: `${Math.min(taxaConvApp, 100)}%`, background: '#10B981' }} /></div>
           </div>
         </div>
       </div>
+
     </section>
   );
 }
