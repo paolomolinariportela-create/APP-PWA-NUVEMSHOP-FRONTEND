@@ -222,6 +222,31 @@ function CardSection({ title, subtitle }: { title: string; subtitle?: string }) 
     );
 }
 
+// ── Função: inferir etapa do funil pelo texto da campanha ───────────────────
+function inferirFunil(title: string, message: string): { label: string; color: string; bg: string; etapa: 'fundo' | 'meio' | 'topo' } {
+    const texto = `${title} ${message}`.toLowerCase();
+
+    const palavrasFundo = ['off', 'desconto', 'cupom', 'promo', 'oferta', 'comprar', 'compre', 'black', 'sale', 'frete', 'gratis', 'grátis', 'relampago', 'relâmpago', 'liquidacao', 'liquidação', 'flash', 'vip', '%'];
+    const palavrasMeio = ['carrinho', 'itens', 'deixou', 'esperando', 'estoque', 'acabando', 'garanta', 'finalize', 'voltou', 'salvo'];
+    const palavrasTopo = ['saudades', 'novidade', 'novidades', 'sumiu', 'tempo', 'vemos', 'reativação', 'reativacao', 'lembrete', 'visitou', 'viu', 'inativo', 'sumidos', 'evento', 'lançamento', 'lancamento'];
+
+    const scoreFundo = palavrasFundo.filter(p => texto.includes(p)).length;
+    const scoreMeio = palavrasMeio.filter(p => texto.includes(p)).length;
+    const scoreTopo = palavrasTopo.filter(p => texto.includes(p)).length;
+
+    if (scoreMeio >= scoreFundo && scoreMeio >= scoreTopo && scoreMeio > 0) {
+        return { label: 'Meio · Carrinho', color: '#d97706', bg: '#fffbeb', etapa: 'meio' };
+    }
+    if (scoreTopo > scoreFundo) {
+        return { label: 'Topo · Reativar', color: '#7c3aed', bg: '#f5f3ff', etapa: 'topo' };
+    }
+    if (scoreFundo > 0) {
+        return { label: 'Fundo · Venda', color: '#059669', bg: '#f0fdf4', etapa: 'fundo' };
+    }
+    return { label: 'Engajamento', color: '#2563eb', bg: '#eff6ff', etapa: 'topo' };
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 // ── NOVO: Componente do seletor de objetivo ──────────────────────────────────
 function SeletorObjetivo({
     objetivo,
@@ -377,6 +402,15 @@ function CampanhaDetalhe({
                         <div style={{ fontSize: '11px', color: '#6B7280', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Detalhes da Campanha</div>
                         <div style={{ fontSize: '16px', fontWeight: 700, color: '#111827' }}>{notif.title}</div>
                         <div style={{ fontSize: '13px', color: '#6B7280', marginTop: '2px' }}>{notif.message}</div>
+                        {(() => {
+                            const f = inferirFunil(notif.title, notif.message);
+                            return (
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '8px', padding: '3px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: 600, background: f.bg, color: f.color }}>
+                                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: f.color, display: 'inline-block' }} />
+                                    {f.label}
+                                </span>
+                            );
+                        })()}
                     </div>
                     <button onClick={onClose} style={{ background: '#F3F4F6', border: 'none', borderRadius: '8px', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px', flexShrink: 0, marginLeft: '12px' }}>×</button>
                 </div>
@@ -1208,6 +1242,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                             <thead><tr style={{ background: '#f9fafb', color: '#666', textAlign: 'left' }}>
                                                 <th style={{ padding: '12px' }}>Data</th>
                                                 <th style={{ padding: '12px' }}>Mensagem</th>
+                                                <th style={{ padding: '12px' }}>Funil</th>
                                                 <th style={{ padding: '12px', textAlign: 'right' }}>Enviados</th>
                                                 <th style={{ padding: '12px', textAlign: 'right' }}>Abertos</th>
                                                 <th style={{ padding: '12px', textAlign: 'right' }}>Falhos</th>
@@ -1218,6 +1253,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                             <tbody>{notifs.map(n => {
                                                 const roi = ticketMedio > 0 ? Math.round(n.opened * (taxaConvGlobal / 100) * ticketMedio) : 0;
                                                 const badge = getBenchmarkBadge(n.taxa_abertura);
+                                                const funil = inferirFunil(n.title, n.message);
                                                 return (
                                                     <tr key={n.id} onClick={() => setCampanhaDetalhe(n)} style={{ borderBottom: '1px solid #eee', cursor: 'pointer', transition: 'background 0.15s' }} onMouseOver={e => (e.currentTarget.style.background = '#F9FAFB')} onMouseOut={e => (e.currentTarget.style.background = 'transparent')}>
                                                         <td style={{ padding: '12px', whiteSpace: 'nowrap', color: '#555', fontSize: '12px' }}>{formatUnix(n.created_at)}</td>
@@ -1226,6 +1262,16 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                                                 {n.image_url && <img src={n.image_url} alt="" style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover', flexShrink: 0 }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />}
                                                                 <div><div style={{ fontWeight: 'bold', fontSize: '13px' }}>{n.title}</div><div style={{ fontSize: '12px', color: '#666' }}>{n.message}</div></div>
                                                             </div>
+                                                        </td>
+                                                        <td style={{ padding: '12px' }}>
+                                                            <span style={{
+                                                                display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                                                padding: '3px 8px', borderRadius: '999px', fontSize: '11px', fontWeight: 600,
+                                                                background: funil.bg, color: funil.color, whiteSpace: 'nowrap',
+                                                            }}>
+                                                                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: funil.color, display: 'inline-block' }} />
+                                                                {funil.label}
+                                                            </span>
                                                         </td>
                                                         <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold', color: '#4F46E5' }}>{n.sent.toLocaleString('pt-BR')}</td>
                                                         <td style={{ padding: '12px', textAlign: 'right', color: '#059669' }}>{n.opened.toLocaleString('pt-BR')}</td>
