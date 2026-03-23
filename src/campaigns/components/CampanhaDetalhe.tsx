@@ -47,10 +47,10 @@ export function CampanhaDetalhe({ notif, mediaAbertura, ticketMedio, taxaConvGlo
                 {/* Header */}
                 <div style={{ padding: '20px 24px 16px', borderBottom: `1px solid ${C.neutralBorder}`, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div>
-                        <div style={{ fontSize: '10px', color: C.neutralLight, marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Detalhes da campanha</div>
+                        <div style={{ fontSize: '13px', color: C.neutralLight, marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Detalhes da campanha</div>
                         <div style={{ fontSize: '15px', fontWeight: 700, color: C.text }}>{notif.title}</div>
                         <div style={{ fontSize: '13px', color: C.textSoft, marginTop: '2px' }}>{notif.message}</div>
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '8px', padding: '3px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: 600, background: funil.bg, color: funil.color }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '8px', padding: '3px 10px', borderRadius: '999px', fontSize: '13px', fontWeight: 600, background: funil.bg, color: funil.color }}>
                             <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: funil.color, display: 'inline-block' }} />
                             {funil.label}
                         </span>
@@ -64,23 +64,23 @@ export function CampanhaDetalhe({ notif, mediaAbertura, ticketMedio, taxaConvGlo
                         {metricas.map((m, i) => (
                             <div key={i} style={{ background: C.neutralBg, border: `1px solid ${m.color}15`, borderRadius: '10px', padding: '12px 8px', textAlign: 'center' }}>
                                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '5px', color: m.color }}>{m.icon}</div>
-                                <div style={{ fontSize: '18px', fontWeight: 700, color: m.color, letterSpacing: '-0.02em' }}>{m.value}</div>
-                                <div style={{ fontSize: '11px', fontWeight: 600, color: C.textMid, marginBottom: '1px' }}>{m.label}</div>
-                                <div style={{ fontSize: '10px', color: C.neutralLight }}>{m.sub}</div>
+                                <div style={{ fontSize: '22px', fontWeight: 700, color: m.color, letterSpacing: '-0.02em' }}>{m.value}</div>
+                                <div style={{ fontSize: '13px', fontWeight: 600, color: C.textMid, marginBottom: '1px' }}>{m.label}</div>
+                                <div style={{ fontSize: '13px', color: C.neutralLight }}>{m.sub}</div>
                             </div>
                         ))}
                     </div>
 
                     {/* CTR vs média */}
                     <div style={{ background: C.neutralBg, borderRadius: '10px', padding: '14px 16px', marginBottom: '14px' }}>
-                        <div style={{ fontSize: '12px', fontWeight: 600, color: C.textMid, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}>{Icon.chart} Taxa de abertura vs média geral</div>
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: C.textMid, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}>{Icon.chart} Taxa de abertura vs média geral</div>
                         <div style={{ display: 'flex', gap: '16px' }}>
                             {[
                                 { label: 'Esta campanha', value: notif.taxa_abertura, color: badge.color },
                                 { label: 'Média geral',   value: mediaAbertura,       color: C.neutralLight },
                             ].map((b, i) => (
                                 <div key={i} style={{ flex: 1 }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '12px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px' }}>
                                         <span style={{ color: C.textSoft }}>{b.label}</span>
                                         <span style={{ fontWeight: 700, color: b.color }}>{b.value}%</span>
                                     </div>
@@ -91,15 +91,15 @@ export function CampanhaDetalhe({ notif, mediaAbertura, ticketMedio, taxaConvGlo
                             ))}
                         </div>
                         <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span style={{ background: badge.bg, color: badge.color, padding: '3px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: 600 }}>{badge.icon} {badge.label}</span>
-                            {mediaAbertura > 0 && <span style={{ fontSize: '11px', color: vsMedia >= 0 ? C.success : C.danger, fontWeight: 600 }}>{vsMedia >= 0 ? `+${vsMedia.toFixed(1)}` : vsMedia.toFixed(1)}% vs sua média</span>}
+                            <span style={{ background: badge.bg, color: badge.color, padding: '3px 10px', borderRadius: '999px', fontSize: '13px', fontWeight: 600 }}>{badge.icon} {badge.label}</span>
+                            {mediaAbertura > 0 && <span style={{ fontSize: '13px', color: vsMedia >= 0 ? C.success : C.danger, fontWeight: 600 }}>{vsMedia >= 0 ? `+${vsMedia.toFixed(1)}` : vsMedia.toFixed(1)}% vs sua média</span>}
                         </div>
                     </div>
 
                     {/* ROI */}
                     {ticketMedio > 0 && (
                         <div style={{ background: roi > 0 ? C.successBg : C.neutralBg, border: `1px solid ${roi > 0 ? C.successBorder : C.neutralBorder}`, borderRadius: '10px', padding: '14px 16px', marginBottom: '14px' }}>
-                            <div style={{ fontSize: '12px', fontWeight: 600, color: C.textMid, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}>{Icon.dollar} ROI estimado</div>
+                            <div style={{ fontSize: '13px', fontWeight: 600, color: C.textMid, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}>{Icon.dollar} ROI estimado</div>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', textAlign: 'center' }}>
                                 {[
                                     { label: 'Cliques',         value: notif.opened,  color: C.success },
@@ -107,21 +107,21 @@ export function CampanhaDetalhe({ notif, mediaAbertura, ticketMedio, taxaConvGlo
                                     { label: 'Receita est.',    value: roi > 0 ? brl(roi) : '—', color: roi > 0 ? C.success : C.neutralLight },
                                 ].map((m, i) => (
                                     <div key={i}>
-                                        <div style={{ fontSize: '10px', color: C.textSoft, marginBottom: '3px' }}>{m.label}</div>
+                                        <div style={{ fontSize: '13px', color: C.textSoft, marginBottom: '3px' }}>{m.label}</div>
                                         <div style={{ fontSize: '17px', fontWeight: 700, color: m.color, letterSpacing: '-0.01em' }}>{typeof m.value === 'number' ? m.value : m.value}</div>
                                     </div>
                                 ))}
                             </div>
-                            <div style={{ marginTop: '8px', fontSize: '10px', color: C.neutralLight, textAlign: 'center' }}>{notif.opened} cliques × {taxaConvGlobal}% conv. × {brl(ticketMedio)} ticket médio</div>
+                            <div style={{ marginTop: '8px', fontSize: '13px', color: C.neutralLight, textAlign: 'center' }}>{notif.opened} cliques × {taxaConvGlobal}% conv. × {brl(ticketMedio)} ticket médio</div>
                         </div>
                     )}
 
                     {/* Funil */}
                     <div style={{ background: C.neutralBg, borderRadius: '10px', padding: '14px 16px' }}>
-                        <div style={{ fontSize: '12px', fontWeight: 600, color: C.textMid, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>{Icon.bell} Funil desta campanha</div>
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: C.textMid, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>{Icon.bell} Funil desta campanha</div>
                         {funilSteps.map((step, i) => (
                             <div key={i} style={{ marginBottom: '8px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px', fontSize: '12px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px', fontSize: '13px' }}>
                                     <span style={{ color: C.textMid, fontWeight: 500 }}>{step.label}</span>
                                     <span style={{ color: step.color, fontWeight: 600 }}>{step.value.toLocaleString('pt-BR')} <span style={{ color: C.neutralLight, fontWeight: 400 }}>({step.pct}%)</span></span>
                                 </div>
