@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { TabCampaignsProps, ObjetivoCampanha, OneSignalNotif, ABTestForm } from './types';
 
 // ─── Design ───────────────────────────────────────────────────────────────────
-import { C, Icon } from './design';
+import { C } from './design';
+import { Icon } from './icons';
 import { Badge, SectionHeader } from './components/UIComponents';
 
 // ─── Constantes ───────────────────────────────────────────────────────────────
