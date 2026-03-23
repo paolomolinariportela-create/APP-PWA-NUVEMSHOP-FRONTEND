@@ -67,8 +67,8 @@ export function JornadaTab({ token, API_URL, brl }: Props) {
                         { label: 'Receita Atribuída',  value: brl(resumo.receita_atribuida), color: C.success },
                     ].map((card, i) => (
                         <div key={i} style={{ background: C.neutralBg, border: `1px solid ${card.color}20`, borderRadius: '10px', padding: '12px', textAlign: 'center' }}>
-                            <div style={{ fontSize: '18px', fontWeight: 700, color: card.color, letterSpacing: '-0.02em' }}>{card.value}</div>
-                            <div style={{ fontSize: '10px', color: C.textSoft, marginTop: '2px' }}>{card.label}</div>
+                            <div style={{ fontSize: '22px', fontWeight: 700, color: card.color, letterSpacing: '-0.02em' }}>{card.value}</div>
+                            <div style={{ fontSize: '13px', color: C.textSoft, marginTop: '2px' }}>{card.label}</div>
                         </div>
                     ))}
                 </div>
@@ -77,16 +77,16 @@ export function JornadaTab({ token, API_URL, brl }: Props) {
             <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '16px' }}>
                 {/* Lista lateral */}
                 <div>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: C.neutralLight, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Campanhas com cliques</div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: C.neutralLight, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Campanhas com cliques</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         {jornada.map(j => {
                             const ativa = notifSelecionada?.notif_id === j.notif_id;
                             return (
                                 <button key={j.notif_id} onClick={() => setNotifSelecionada(j)} style={{ padding: '10px 12px', borderRadius: '8px', border: 'none', textAlign: 'left', cursor: 'pointer', background: ativa ? C.dark : C.neutralBg, boxShadow: ativa ? '0 2px 8px rgba(0,0,0,0.2)' : 'none', transition: 'all 0.2s' }}>
-                                    <div style={{ fontSize: '12px', fontWeight: 600, color: ativa ? '#fff' : C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: '3px' }}>{j.titulo || '—'}</div>
+                                    <div style={{ fontSize: '13px', fontWeight: 600, color: ativa ? '#fff' : C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: '3px' }}>{j.titulo || '—'}</div>
                                     <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                                        <span style={{ fontSize: '11px', color: ativa ? C.neutralLight : C.textSoft }}>{j.cliques} cliques</span>
-                                        {j.convertidos > 0 && <span style={{ background: ativa ? '#10B98130' : C.successBg, color: ativa ? '#6ee7b7' : C.success, padding: '1px 6px', borderRadius: '999px', fontSize: '10px', fontWeight: 600 }}>{j.convertidos} compras</span>}
+                                        <span style={{ fontSize: '13px', color: ativa ? C.neutralLight : C.textSoft }}>{j.cliques} cliques</span>
+                                        {j.convertidos > 0 && <span style={{ background: ativa ? '#10B98130' : C.successBg, color: ativa ? '#6ee7b7' : C.success, padding: '1px 6px', borderRadius: '999px', fontSize: '13px', fontWeight: 600 }}>{j.convertidos} compras</span>}
                                     </div>
                                 </button>
                             );
@@ -98,7 +98,7 @@ export function JornadaTab({ token, API_URL, brl }: Props) {
                     <div>
                         <div style={{ background: C.dark, borderRadius: '10px', padding: '12px 16px', marginBottom: '16px' }}>
                             <div style={{ fontSize: '13px', fontWeight: 600, color: '#fff', marginBottom: '2px' }}>{n.titulo}</div>
-                            <div style={{ fontSize: '11px', color: C.neutralLight }}>{n.mensagem}</div>
+                            <div style={{ fontSize: '13px', color: C.neutralLight }}>{n.mensagem}</div>
                         </div>
 
                         {/* Fluxo horizontal */}
@@ -107,12 +107,12 @@ export function JornadaTab({ token, API_URL, brl }: Props) {
                                 <React.Fragment key={i}>
                                     <div style={{ flex: 1, background: e.bg, border: `1px solid ${e.cor}30`, borderRadius: '10px', padding: '14px', textAlign: 'center' }}>
                                         <div style={{ fontSize: '22px', fontWeight: 800, color: e.cor, letterSpacing: '-0.02em', marginBottom: '2px' }}>{e.valor > 0 ? e.valor.toLocaleString('pt-BR') : '—'}</div>
-                                        <div style={{ fontSize: '11px', fontWeight: 600, color: C.textMid }}>{e.label}</div>
-                                        <div style={{ fontSize: '10px', color: C.textSoft }}>{e.desc}</div>
+                                        <div style={{ fontSize: '13px', fontWeight: 600, color: C.textMid }}>{e.label}</div>
+                                        <div style={{ fontSize: '13px', color: C.textSoft }}>{e.desc}</div>
                                     </div>
                                     {i < etapas.length - 1 && (
                                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 6px', flexShrink: 0 }}>
-                                            <div style={{ fontSize: '10px', fontWeight: 700, color: i === 0 ? '#3b82f6' : C.success }}>{i === 0 ? `${pctClique}%` : `${pctConv}%`}</div>
+                                            <div style={{ fontSize: '13px', fontWeight: 700, color: i === 0 ? '#3b82f6' : C.success }}>{i === 0 ? `${pctClique}%` : `${pctConv}%`}</div>
                                             <div style={{ fontSize: '16px', color: C.neutralLight }}>→</div>
                                         </div>
                                     )}
@@ -122,13 +122,13 @@ export function JornadaTab({ token, API_URL, brl }: Props) {
 
                         {/* Barras de perda */}
                         <div style={{ background: C.neutralBg, borderRadius: '10px', padding: '12px 14px', marginBottom: '14px' }}>
-                            <div style={{ fontSize: '12px', fontWeight: 600, color: C.textMid, marginBottom: '8px' }}>Onde os usuários saíram</div>
+                            <div style={{ fontSize: '13px', fontWeight: 600, color: C.textMid, marginBottom: '8px' }}>Onde os usuários saíram</div>
                             {[
                                 { label: 'Enviados → Cliques', pct: pctClique, cor: '#3b82f6', ok: pctClique >= 5 },
                                 { label: 'Cliques → Compras',  pct: pctConv,   cor: C.success,  ok: pctConv >= 10 },
                             ].map((b, i) => (
                                 <div key={i} style={{ marginBottom: i === 0 ? '8px' : '0' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: C.textSoft, marginBottom: '3px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: C.textSoft, marginBottom: '3px' }}>
                                         <span>{b.label}</span>
                                         <span style={{ fontWeight: 600, color: b.ok ? C.success : C.danger }}>{b.pct}%</span>
                                     </div>
@@ -142,29 +142,29 @@ export function JornadaTab({ token, API_URL, brl }: Props) {
                         {/* Convertidos vs não */}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                             <div style={{ background: C.successBg, border: `1px solid ${C.successBorder}`, borderRadius: '10px', padding: '12px' }}>
-                                <div style={{ fontSize: '12px', fontWeight: 600, color: C.success, marginBottom: '8px' }}>Compraram ({convertidos.length})</div>
-                                {convertidos.length === 0 ? <div style={{ fontSize: '12px', color: C.textSoft, textAlign: 'center', padding: '8px 0' }}>Nenhuma conversão</div> : (
+                                <div style={{ fontSize: '13px', fontWeight: 600, color: C.success, marginBottom: '8px' }}>Compraram ({convertidos.length})</div>
+                                {convertidos.length === 0 ? <div style={{ fontSize: '13px', color: C.textSoft, textAlign: 'center', padding: '8px 0' }}>Nenhuma conversão</div> : (
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxHeight: '160px', overflowY: 'auto' }}>
                                         {convertidos.map((s, i) => (
                                             <div key={i} style={{ background: '#fff', borderRadius: '6px', padding: '7px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                 <div>
-                                                    <div style={{ fontSize: '10px', fontFamily: 'monospace', color: C.textMid }}>{s.visitor_id.substring(0, 14)}…</div>
-                                                    <div style={{ fontSize: '10px', color: C.textSoft }}>{formatDate(s.clicked_at)}</div>
+                                                    <div style={{ fontSize: '13px', fontFamily: 'monospace', color: C.textMid }}>{s.visitor_id.substring(0, 14)}…</div>
+                                                    <div style={{ fontSize: '13px', color: C.textSoft }}>{formatDate(s.clicked_at)}</div>
                                                 </div>
-                                                {s.revenue && <div style={{ fontSize: '11px', fontWeight: 700, color: C.success }}>{brl(s.revenue)}</div>}
+                                                {s.revenue && <div style={{ fontSize: '13px', fontWeight: 700, color: C.success }}>{brl(s.revenue)}</div>}
                                             </div>
                                         ))}
                                     </div>
                                 )}
                             </div>
                             <div style={{ background: C.warningBg, border: `1px solid ${C.warningBorder}`, borderRadius: '10px', padding: '12px' }}>
-                                <div style={{ fontSize: '12px', fontWeight: 600, color: C.warning, marginBottom: '8px' }}>Não compraram ({naoConvertidos.length})</div>
-                                {naoConvertidos.length === 0 ? <div style={{ fontSize: '12px', color: C.textSoft, textAlign: 'center', padding: '8px 0' }}>Todos converteram!</div> : (
+                                <div style={{ fontSize: '13px', fontWeight: 600, color: C.warning, marginBottom: '8px' }}>Não compraram ({naoConvertidos.length})</div>
+                                {naoConvertidos.length === 0 ? <div style={{ fontSize: '13px', color: C.textSoft, textAlign: 'center', padding: '8px 0' }}>Todos converteram!</div> : (
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxHeight: '160px', overflowY: 'auto' }}>
                                         {naoConvertidos.map((s, i) => (
                                             <div key={i} style={{ background: '#fff', borderRadius: '6px', padding: '7px 10px' }}>
-                                                <div style={{ fontSize: '10px', fontFamily: 'monospace', color: C.textMid }}>{s.visitor_id.substring(0, 14)}…</div>
-                                                <div style={{ fontSize: '10px', color: C.textSoft }}>{formatDate(s.clicked_at)}</div>
+                                                <div style={{ fontSize: '13px', fontFamily: 'monospace', color: C.textMid }}>{s.visitor_id.substring(0, 14)}…</div>
+                                                <div style={{ fontSize: '13px', color: C.textSoft }}>{formatDate(s.clicked_at)}</div>
                                             </div>
                                         ))}
                                     </div>
@@ -175,7 +175,7 @@ export function JornadaTab({ token, API_URL, brl }: Props) {
                 )}
             </div>
 
-            <button onClick={fetchJornada} style={{ marginTop: '14px', background: 'none', border: `1px solid ${C.neutralBorder}`, borderRadius: '6px', padding: '7px 14px', cursor: 'pointer', fontSize: '12px', color: C.textMid, display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+            <button onClick={fetchJornada} style={{ marginTop: '14px', background: 'none', border: `1px solid ${C.neutralBorder}`, borderRadius: '6px', padding: '7px 14px', cursor: 'pointer', fontSize: '13px', color: C.textMid, display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                 {Icon.refresh} Atualizar jornada
             </button>
         </div>
