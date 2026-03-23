@@ -1,27 +1,75 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* === WIDGET CONFIG PANEL === */
+.config-root {
+  display: flex;
+  height: 100vh;
+  background: #0f0f23;
+  font-family: Inter, sans-serif;
+}
+
+.config-panel {
+  flex: 1;
+  padding: 32px;
+  overflow: auto;
+  background: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 100%);
+}
+
+.config-header h1 {
+  font-size: 28px;
+  color: #fff;
+  margin: 0 0 32px 0;
+  font-weight: 800;
+}
+
+.config-section {
+  background: #1a1a2e;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 1px solid #26263a;
+}
+
+.config-section h2 {
+  color: #fff;
+  margin: 0 0 16px 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  color: #94a3b8;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.toggle-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #10b981;
+}
+
+.preview-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .config-root {
+    flex-direction: column;
+  }
   
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-  margin: 0;
-  display: block; /* O padrão do Vite é flex, que quebra o layout */
-  min-width: 320px;
-  min-height: 100vh;
-  background-color: #F3F4F6; /* Cor de fundo cinza claro */
-}
-
-/* IMPORTANTE: Isso destrava a largura máxima */
-#root {
-  max-width: 100%;
-  margin: 0;
-  padding: 0;
-  text-align: left;
-  width: 100%;
+  .config-panel, .preview-panel {
+    height: 50vh;
+  }
+  
+  .config-panel {
+    padding: 16px;
+  }
 }
