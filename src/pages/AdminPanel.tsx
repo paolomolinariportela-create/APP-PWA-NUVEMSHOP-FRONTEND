@@ -4,7 +4,7 @@ import "../styles/AdminPanel.css";
 
 import TabDashboard from "../components/TabDashboard";
 import TabConfig from "../components/TabConfig";
-import TabCampaigns from "../components/TabCampaigns";
+import TabCampaigns from "../campaigns/TabCampaigns"; // ✅ novo caminho modular
 
 interface DashboardStats {
   receita: number;
@@ -58,7 +58,6 @@ interface AppConfig {
   onesignal_api_key?: string;
 }
 
-// ✅ Atualizado: image_url (Rich Push) + segmentação
 interface PushCampaign {
   title: string;
   message: string;
@@ -123,7 +122,6 @@ export default function AdminPanel() {
     onesignal_api_key: "",
   });
 
-  // ✅ Estado inicial com todos os campos
   const [pushForm, setPushForm] = useState<PushCampaign>({
     title: "",
     message: "",
@@ -237,7 +235,6 @@ export default function AdminPanel() {
     if (!token) return;
     if (!pushForm.title || !pushForm.message) { alert("Preencha tudo!"); return; }
 
-    // ✅ Confirmação diferenciada para agendamento
     const confirmMsg = pushForm.send_after
       ? `Agendar notificação para ${new Date(pushForm.send_after).toLocaleString("pt-BR")}?`
       : "Enviar notificação agora?";
@@ -254,7 +251,6 @@ export default function AdminPanel() {
       if (data.status === "success") {
         const msg = data.scheduled ? `⏰ Agendado com sucesso!` : `✅ Enviado para ${data.sent} pessoas.`;
         alert(msg);
-        // ✅ Reset completo incluindo image_url e segmentação
         setPushForm({
           title: "", message: "", url: "/",
           image_url: undefined,
@@ -313,7 +309,9 @@ export default function AdminPanel() {
       </header>
 
       <main className="dashboard-content">
-        {activeTab === "dashboard" && <TabDashboard stats={stats} onNavigateCampanhas={() => setActiveTab("campanhas")} />}
+        {activeTab === "dashboard" && (
+          <TabDashboard stats={stats} onNavigateCampanhas={() => setActiveTab("campanhas")} />
+        )}
         {activeTab === "config" && (
           <TabConfig config={config} setConfig={setConfig} handleSave={handleSave} saving={saving} loading={loading} storeUrl={storeUrl} />
         )}
