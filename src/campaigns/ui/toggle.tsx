@@ -1,4 +1,3 @@
-
 export function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
     return (
         <label style={{ position: 'relative', display: 'inline-block', width: '46px', height: '24px', flexShrink: 0 }}>
