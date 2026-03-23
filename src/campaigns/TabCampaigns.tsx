@@ -5,7 +5,7 @@ import { TabCampaignsProps, ObjetivoCampanha, OneSignalNotif, ABTestForm } from 
 
 // ─── Design ───────────────────────────────────────────────────────────────────
 import { C, Icon } from './design';
-import { Badge, SectionHeader } from './ui/index';
+import { Badge, SectionHeader } from './components/UIComponents';
 
 // ─── Constantes ───────────────────────────────────────────────────────────────
 import { OBJETIVOS, FLAG, PAIS_NOME, DISP_COLORS, TEMPLATES_DEFAULT, AB_FORM_DEFAULT } from './constants';
