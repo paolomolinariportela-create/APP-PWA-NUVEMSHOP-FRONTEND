@@ -129,7 +129,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             <div style={{ background: C.neutralBorder, borderRadius: '999px', height: '5px', overflow: 'hidden' }}>
                                 <div style={{ width: `${Math.min(activeSubscribers, 100)}%`, background: C.brand, height: '100%', borderRadius: '999px', transition: 'width 0.5s' }} />
                             </div>
-                            <span style={{ fontSize: '11px', color: C.neutralLight, marginTop: '4px', display: 'block' }}>Meta: {activeSubscribers} / 100</span>
+                            <span style={{ fontSize: '13px', color: C.neutralLight, marginTop: '4px', display: 'block' }}>Meta: {activeSubscribers} / 100</span>
                         </div>
                     </div>
                 </div>
@@ -141,7 +141,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                         <Badge color={taxaOptin >= 50 ? C.success : C.warning} bg={taxaOptin >= 50 ? C.successBg : C.warningBg} border={taxaOptin >= 50 ? C.successBorder : C.warningBorder}>
                             {taxaOptin >= 50 ? Icon.check : Icon.alert} {taxaOptin >= 50 ? 'Excelente' : 'Pode melhorar'}
                         </Badge>
-                        <span style={{ marginTop: '6px', display: 'block', fontSize: '11px', color: C.neutralLight }}>{osStats?.instalacoes ?? 0} instalações → {activeSubscribers} inscritos</span>
+                        <span style={{ marginTop: '6px', display: 'block', fontSize: '13px', color: C.neutralLight }}>{osStats?.instalacoes ?? 0} instalações → {activeSubscribers} inscritos</span>
                     </div>
                 </div>
                 <div className="stat-card">
@@ -150,7 +150,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                         <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, fontSize: '14px' }}>Taxa de abertura média</h3>
                         <p style={{ letterSpacing: '-0.02em' }}>{loadingStats ? '—' : `${mediaAbertura}%`}</p>
                         {mediaAbertura > 0 && (() => { const b = getBenchmarkBadge(mediaAbertura); return <Badge color={b.color} bg={b.bg} border={b.bg}>{b.icon} {b.label}</Badge>; })()}
-                        <span style={{ marginTop: '6px', display: 'block', fontSize: '11px', color: C.neutralLight }}>Média do setor: 5–10%</span>
+                        <span style={{ marginTop: '6px', display: 'block', fontSize: '13px', color: C.neutralLight }}>Média do setor: 5–10%</span>
                     </div>
                 </div>
             </div>
@@ -183,7 +183,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                         <Badge color={churnRate > 30 ? C.danger : C.success} bg={churnRate > 30 ? C.dangerBg : C.successBg} border={churnRate > 30 ? C.dangerBorder : C.successBorder}>{churnRate > 30 ? Icon.alert : Icon.check} Churn {churnRate}%</Badge>
                                         <Badge color={C.neutralMid} bg={C.neutralBg} border={C.neutralBorder}>{Icon.trending} Retenção {pctAtivos}%</Badge>
                                     </div>
-                                    <div style={{ padding: '9px 12px', background: pctAtivos >= 70 ? C.successBg : C.warningBg, border: `1px solid ${pctAtivos >= 70 ? C.successBorder : C.warningBorder}`, borderRadius: '6px', fontSize: '12px', color: pctAtivos >= 70 ? C.success : C.warning, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <div style={{ padding: '9px 12px', background: pctAtivos >= 70 ? C.successBg : C.warningBg, border: `1px solid ${pctAtivos >= 70 ? C.successBorder : C.warningBorder}`, borderRadius: '6px', fontSize: '13px', color: pctAtivos >= 70 ? C.success : C.warning, display: 'flex', alignItems: 'center', gap: '6px' }}>
                                         {pctAtivos >= 70 ? Icon.check : Icon.alert}
                                         {pctAtivos >= 70 ? 'Base saudável — mais de 70% ativos' : pctAtivos >= 40 ? 'Base razoável — considere reativar inativos' : 'Base comprometida — muitos usuários bloquearam'}
                                     </div>
@@ -191,23 +191,23 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             ) : (
                                 <div style={{ padding: '20px', background: C.neutralBg, borderRadius: '8px', textAlign: 'center', color: C.neutralMid, fontSize: '13px' }}>
                                     Aguardando dados do OneSignal...
-                                    <div style={{ fontSize: '11px', marginTop: '6px', color: C.neutralLight }}>Configure o OneSignal na aba Configurações</div>
+                                    <div style={{ fontSize: '13px', marginTop: '6px', color: C.neutralLight }}>Configure o OneSignal na aba Configurações</div>
                                 </div>
                             )}
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                             <div className="stat-card" style={{ margin: 0, padding: '14px 16px' }}>
                                 <div className="stat-info">
-                                    <h3 style={{ fontSize: '12px', textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600 }}>Total cadastrado</h3>
-                                    <p style={{ fontSize: '1.5rem', margin: '4px 0', letterSpacing: '-0.02em' }}>{totalSubscribers > 0 ? totalSubscribers.toLocaleString('pt-BR') : '—'}</p>
-                                    <span style={{ fontSize: '11px', color: C.neutralLight }}>Todos que já deram permissão</span>
+                                    <h3 style={{ fontSize: '13px', textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600 }}>Total cadastrado</h3>
+                                    <p style={{ fontSize: '1.75rem', margin: '4px 0', letterSpacing: '-0.02em' }}>{totalSubscribers > 0 ? totalSubscribers.toLocaleString('pt-BR') : '—'}</p>
+                                    <span style={{ fontSize: '13px', color: C.neutralLight }}>Todos que já deram permissão</span>
                                 </div>
                             </div>
                             <div className="stat-card" style={{ margin: 0, padding: '14px 16px' }}>
                                 <div className="stat-info">
-                                    <h3 style={{ fontSize: '12px', textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}>{Icon.clock} Melhor horário</h3>
-                                    <p style={{ fontSize: '1.5rem', margin: '4px 0', letterSpacing: '-0.02em' }}>{melhorHorario ?? '—'}</p>
-                                    <span style={{ fontSize: '11px', color: C.neutralLight }}>{melhorHorario ? 'Baseado nas aberturas' : 'Disponível após campanhas'}</span>
+                                    <h3 style={{ fontSize: '13px', textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}>{Icon.clock} Melhor horário</h3>
+                                    <p style={{ fontSize: '1.75rem', margin: '4px 0', letterSpacing: '-0.02em' }}>{melhorHorario ?? '—'}</p>
+                                    <span style={{ fontSize: '13px', color: C.neutralLight }}>{melhorHorario ? 'Baseado nas aberturas' : 'Disponível após campanhas'}</span>
                                 </div>
                             </div>
                         </div>
@@ -229,9 +229,9 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             {i > 0 && <div style={{ position: 'absolute', left: '-6px', top: '50%', transform: 'translateY(-50%)', color: C.neutralLight, fontSize: '16px' }}>›</div>}
                             <div style={{ background: C.neutralBg, border: `1px solid ${step.color}25`, borderRadius: '10px', padding: '14px 10px' }}>
                                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '5px', color: step.value > 0 ? step.color : C.neutralLight }}>{step.icon}</div>
-                                <div style={{ fontSize: '20px', fontWeight: 700, color: step.value > 0 ? step.color : C.neutralLight, letterSpacing: '-0.02em', marginBottom: '2px' }}>{step.value > 0 ? step.value.toLocaleString('pt-BR') : '—'}</div>
-                                <div style={{ fontSize: '11px', fontWeight: 600, color: C.textMid, marginBottom: '3px' }}>{step.label}</div>
-                                <div style={{ fontSize: '10px', color: C.neutralLight }}>{step.desc}</div>
+                                <div style={{ fontSize: '24px', fontWeight: 700, color: step.value > 0 ? step.color : C.neutralLight, letterSpacing: '-0.02em', marginBottom: '2px' }}>{step.value > 0 ? step.value.toLocaleString('pt-BR') : '—'}</div>
+                                <div style={{ fontSize: '13px', fontWeight: 600, color: C.textMid, marginBottom: '3px' }}>{step.label}</div>
+                                <div style={{ fontSize: '13px', color: C.neutralLight }}>{step.desc}</div>
                                 <div style={{ marginTop: '7px', background: C.neutralBorder, borderRadius: '999px', height: '3px', overflow: 'hidden' }}>
                                     <div style={{ width: `${step.pct}%`, background: step.color, height: '100%', borderRadius: '999px', transition: 'width 0.6s' }} />
                                 </div>
@@ -319,7 +319,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                 <span style={{ color: C.neutralMid, display: 'flex' }}>{Icon.users}</span>
                                 <div style={{ fontSize: '13px', color: C.textMid }}>Alcance estimado: <span style={{ color: C.brand, fontWeight: 700 }}>{alcanceEstimado().toLocaleString('pt-BR')} dispositivos</span></div>
                             </div>
-                            <button onClick={() => setShowSegmentation(!showSegmentation)} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: showSegmentation ? C.brandLight : C.white, border: `1px solid ${showSegmentation ? C.brand : C.neutralBorder}`, borderRadius: '6px', padding: '5px 12px', cursor: 'pointer', fontSize: '12px', fontWeight: 600, color: showSegmentation ? C.brand : C.textMid }}>
+                            <button onClick={() => setShowSegmentation(!showSegmentation)} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: showSegmentation ? C.brandLight : C.white, border: `1px solid ${showSegmentation ? C.brand : C.neutralBorder}`, borderRadius: '6px', padding: '5px 12px', cursor: 'pointer', fontSize: '13px', fontWeight: 600, color: showSegmentation ? C.brand : C.textMid }}>
                                 {Icon.filter} {showSegmentation ? 'Ocultar' : 'Segmentar'}
                             </button>
                         </div>
@@ -330,7 +330,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                 <div style={{ fontSize: '13px', fontWeight: 600, color: C.textMid, marginBottom: '12px' }}>Filtros de segmentação</div>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '10px' }}>
                                     <div>
-                                        <label style={{ fontSize: '12px', fontWeight: 600, color: C.textMid, display: 'block', marginBottom: '4px' }}>Comportamento</label>
+                                        <label style={{ fontSize: '13px', fontWeight: 600, color: C.textMid, display: 'block', marginBottom: '4px' }}>Comportamento</label>
                                         <select value={pushForm.filter_behavior ?? ''} onChange={e => setPushForm({ ...pushForm, filter_behavior: e.target.value || undefined })} style={{ width: '100%', padding: '8px', border: `1px solid ${C.neutralBorder}`, borderRadius: '6px', background: 'white', fontSize: '13px' }}>
                                             <option value="">Todos os inscritos</option>
                                             <option value="buyers">Só quem já comprou</option>
@@ -338,7 +338,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                         </select>
                                     </div>
                                     <div>
-                                        <label style={{ fontSize: '12px', fontWeight: 600, color: C.textMid, display: 'block', marginBottom: '4px' }}>Dispositivo</label>
+                                        <label style={{ fontSize: '13px', fontWeight: 600, color: C.textMid, display: 'block', marginBottom: '4px' }}>Dispositivo</label>
                                         <select value={pushForm.filter_device ?? ''} onChange={e => setPushForm({ ...pushForm, filter_device: e.target.value || undefined })} style={{ width: '100%', padding: '8px', border: `1px solid ${C.neutralBorder}`, borderRadius: '6px', background: 'white', fontSize: '13px' }}>
                                             <option value="">Todos</option>
                                             <option value="Android">Android</option>
@@ -349,7 +349,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                         </select>
                                     </div>
                                     <div>
-                                        <label style={{ fontSize: '12px', fontWeight: 600, color: C.textMid, display: 'block', marginBottom: '4px' }}>País</label>
+                                        <label style={{ fontSize: '13px', fontWeight: 600, color: C.textMid, display: 'block', marginBottom: '4px' }}>País</label>
                                         <select value={pushForm.filter_country ?? ''} onChange={e => setPushForm({ ...pushForm, filter_country: e.target.value || undefined })} style={{ width: '100%', padding: '8px', border: `1px solid ${C.neutralBorder}`, borderRadius: '6px', background: 'white', fontSize: '13px' }}>
                                             <option value="">Todos</option>
                                             <option value="BR">🇧🇷 Brasil</option>
@@ -362,11 +362,11 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                 </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '8px' }}>
                                     <div>
-                                        <label style={{ fontSize: '12px', fontWeight: 600, color: C.textMid, display: 'block', marginBottom: '4px' }}>Agendar envio</label>
+                                        <label style={{ fontSize: '13px', fontWeight: 600, color: C.textMid, display: 'block', marginBottom: '4px' }}>Agendar envio</label>
                                         <input type="datetime-local" value={pushForm.send_after ? pushForm.send_after.slice(0, 16) : ''} onChange={e => setPushForm({ ...pushForm, send_after: e.target.value ? new Date(e.target.value).toISOString() : undefined })} style={{ width: '100%', padding: '8px', border: `1px solid ${C.neutralBorder}`, borderRadius: '6px', background: 'white', fontSize: '13px' }} />
                                     </div>
                                     <div>
-                                        <label style={{ fontSize: '12px', fontWeight: 600, color: C.textMid, display: 'block', marginBottom: '4px' }}>Freq. máxima</label>
+                                        <label style={{ fontSize: '13px', fontWeight: 600, color: C.textMid, display: 'block', marginBottom: '4px' }}>Freq. máxima</label>
                                         <select value={(pushForm as any).frequency_limit ?? ''} onChange={e => setPushForm({ ...pushForm, ...(e.target.value ? { frequency_limit: parseInt(e.target.value) } : { frequency_limit: undefined }) } as any)} style={{ width: '100%', padding: '8px', border: `1px solid ${C.neutralBorder}`, borderRadius: '6px', background: 'white', fontSize: '13px' }}>
                                             <option value="">Sem limite</option>
                                             <option value="1">Máx 1/dia</option>
@@ -376,7 +376,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                     </div>
                                 </div>
                                 {(pushForm.filter_device || pushForm.filter_country || pushForm.send_after || pushForm.filter_behavior) && (
-                                    <button onClick={() => setPushForm({ ...pushForm, filter_device: undefined, filter_country: undefined, send_after: undefined, filter_behavior: undefined })} style={{ background: 'none', border: 'none', color: C.danger, fontSize: '12px', cursor: 'pointer', padding: 0 }}>× Limpar filtros</button>
+                                    <button onClick={() => setPushForm({ ...pushForm, filter_device: undefined, filter_country: undefined, send_after: undefined, filter_behavior: undefined })} style={{ background: 'none', border: 'none', color: C.danger, fontSize: '13px', cursor: 'pointer', padding: 0 }}>× Limpar filtros</button>
                                 )}
                             </div>
                         )}
@@ -385,7 +385,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                         <div className="form-group">
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                                 <label style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: C.textMid }}>Título</label>
-                                <button onClick={() => setShowIAModal(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '6px', border: 'none', background: C.brand, color: C.white, fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
+                                <button onClick={() => setShowIAModal(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '6px', border: 'none', background: C.brand, color: C.white, fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
                                     {Icon.brain} Gerar com IA
                                 </button>
                             </div>
@@ -395,12 +395,12 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
 
                         {/* Templates */}
                         <div style={{ marginBottom: '16px' }}>
-                            <div style={{ fontSize: '12px', fontWeight: 600, color: C.textMid, marginBottom: '8px' }}>
+                            <div style={{ fontSize: '13px', fontWeight: 600, color: C.textMid, marginBottom: '8px' }}>
                                 {objetivo ? `Templates para ${objAtivo?.label}` : 'Templates prontos'} — clique para usar
                             </div>
                             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                                 {templatesAtivos.map(t => (
-                                    <button key={t.label} onClick={() => setPushForm({ ...pushForm, title: t.title, message: t.msg })} style={{ padding: '4px 12px', borderRadius: '999px', border: `1px solid ${objAtivo ? objAtivo.corBorder : C.neutralBorder}`, background: objAtivo ? objAtivo.corBg : C.neutralBg, fontSize: '12px', cursor: 'pointer', color: objAtivo ? objAtivo.cor : C.textMid, fontWeight: 500, transition: 'all 0.15s' }}>
+                                    <button key={t.label} onClick={() => setPushForm({ ...pushForm, title: t.title, message: t.msg })} style={{ padding: '4px 12px', borderRadius: '999px', border: `1px solid ${objAtivo ? objAtivo.corBorder : C.neutralBorder}`, background: objAtivo ? objAtivo.corBg : C.neutralBg, fontSize: '13px', cursor: 'pointer', color: objAtivo ? objAtivo.cor : C.textMid, fontWeight: 500, transition: 'all 0.15s' }}>
                                         {t.label}
                                     </button>
                                 ))}
@@ -418,7 +418,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             <label style={{ fontSize: '13px', fontWeight: 600, color: C.textMid }}>Link (opcional)</label>
                             <div style={{ display: 'flex', gap: '8px' }}>
                                 <input type="text" value={pushForm.url} onChange={e => setPushForm({ ...pushForm, url: e.target.value })} placeholder="https://..." style={{ flex: 1 }} />
-                                <button onClick={() => { setShowDeepLink(true); data.fetchDeepLinks(); }} style={{ padding: '8px 12px', borderRadius: '8px', border: `1px solid ${C.neutralBorder}`, background: C.neutralBg, cursor: 'pointer', fontSize: '12px', fontWeight: 600, color: C.textMid, display: 'inline-flex', alignItems: 'center', gap: '4px', flexShrink: 0, transition: 'all 0.2s' }} onMouseOver={e => { e.currentTarget.style.background = C.brandLight; e.currentTarget.style.color = C.brand; e.currentTarget.style.borderColor = C.brand; }} onMouseOut={e => { e.currentTarget.style.background = C.neutralBg; e.currentTarget.style.color = C.textMid; e.currentTarget.style.borderColor = C.neutralBorder; }}>
+                                <button onClick={() => { setShowDeepLink(true); data.fetchDeepLinks(); }} style={{ padding: '8px 12px', borderRadius: '8px', border: `1px solid ${C.neutralBorder}`, background: C.neutralBg, cursor: 'pointer', fontSize: '13px', fontWeight: 600, color: C.textMid, display: 'inline-flex', alignItems: 'center', gap: '4px', flexShrink: 0, transition: 'all 0.2s' }} onMouseOver={e => { e.currentTarget.style.background = C.brandLight; e.currentTarget.style.color = C.brand; e.currentTarget.style.borderColor = C.brand; }} onMouseOut={e => { e.currentTarget.style.background = C.neutralBg; e.currentTarget.style.color = C.textMid; e.currentTarget.style.borderColor = C.neutralBorder; }}>
                                     {Icon.link} Auto
                                 </button>
                             </div>
@@ -432,19 +432,19 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
 
                         {/* Preview */}
                         <div style={{ marginBottom: '16px' }}>
-                            <div style={{ fontSize: '12px', fontWeight: 600, color: C.textMid, marginBottom: '10px' }}>Preview</div>
+                            <div style={{ fontSize: '13px', fontWeight: 600, color: C.textMid, marginBottom: '10px' }}>Preview</div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                                 {/* Android */}
                                 <div>
-                                    <div style={{ fontSize: '11px', color: C.textSoft, marginBottom: '6px' }}>Android</div>
+                                    <div style={{ fontSize: '13px', color: C.textSoft, marginBottom: '6px' }}>Android</div>
                                     <div style={{ background: '#1a1a2e', borderRadius: '14px', padding: '10px', border: '3px solid #333' }}>
                                         <div style={{ background: '#2d2d2d', borderRadius: '8px', padding: '10px' }}>
                                             {pushForm.image_url && <div style={{ width: '100%', height: '60px', borderRadius: '5px', marginBottom: '7px', overflow: 'hidden', background: '#3d3d3d' }}><img src={pushForm.image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} /></div>}
                                             <div style={{ display: 'flex', gap: '7px', alignItems: 'flex-start' }}>
                                                 <div style={{ width: '26px', height: '26px', borderRadius: '5px', background: objAtivo?.cor ?? C.brand, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px' }}>{objAtivo?.icon ?? '🔔'}</div>
                                                 <div style={{ flex: 1, minWidth: 0 }}>
-                                                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pushForm.title || 'Título'}</div>
-                                                    <div style={{ fontSize: '10px', color: C.neutralLight, marginTop: '1px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{pushForm.message || 'Mensagem'}</div>
+                                                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pushForm.title || 'Título'}</div>
+                                                    <div style={{ fontSize: '13px', color: C.neutralLight, marginTop: '1px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{pushForm.message || 'Mensagem'}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -452,7 +452,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                 </div>
                                 {/* Desktop */}
                                 <div>
-                                    <div style={{ fontSize: '11px', color: C.textSoft, marginBottom: '6px' }}>Desktop</div>
+                                    <div style={{ fontSize: '13px', color: C.textSoft, marginBottom: '6px' }}>Desktop</div>
                                     <div style={{ background: '#f1f1f1', borderRadius: '10px', padding: '8px', border: '1px solid #ddd' }}>
                                         <div style={{ display: 'flex', gap: '4px', marginBottom: '6px' }}>
                                             {['#ff5f57','#febc2e','#28c840'].map(c => <div key={c} style={{ width: '7px', height: '7px', borderRadius: '50%', background: c }} />)}
@@ -460,8 +460,8 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                         <div style={{ background: '#fff', borderRadius: '6px', padding: '9px 11px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', display: 'flex', gap: '9px', alignItems: 'flex-start', position: 'relative' }}>
                                             <div style={{ width: '28px', height: '28px', borderRadius: '5px', background: objAtivo?.cor ?? C.brand, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>{objAtivo?.icon ?? '🔔'}</div>
                                             <div style={{ flex: 1, minWidth: 0 }}>
-                                                <div style={{ fontSize: '11px', fontWeight: 700, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pushForm.title || 'Título'}</div>
-                                                <div style={{ fontSize: '10px', color: C.textSoft, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{pushForm.message || 'Mensagem'}</div>
+                                                <div style={{ fontSize: '13px', fontWeight: 700, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pushForm.title || 'Título'}</div>
+                                                <div style={{ fontSize: '13px', color: C.textSoft, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{pushForm.message || 'Mensagem'}</div>
                                             </div>
                                             <span style={{ position: 'absolute', top: '6px', right: '7px', fontSize: '9px', color: C.neutralLight }}>agora</span>
                                         </div>
@@ -476,7 +476,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                 {Icon.send}
                                 {sendingPush ? 'Enviando...' : pushForm.send_after ? `Agendar — ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos` : `Enviar${objAtivo ? ` · ${objAtivo.label}` : ''} — ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`}
                             </button>
-                            <button onClick={() => setShowABModal(true)} style={{ padding: '10px 14px', borderRadius: '8px', border: `1px solid ${C.neutralBorder}`, background: C.white, cursor: 'pointer', fontSize: '12px', fontWeight: 700, color: C.textMid, display: 'inline-flex', alignItems: 'center', gap: '5px', transition: 'all 0.2s' }} onMouseOver={e => { e.currentTarget.style.borderColor = C.brand; e.currentTarget.style.color = C.brand; }} onMouseOut={e => { e.currentTarget.style.borderColor = C.neutralBorder; e.currentTarget.style.color = C.textMid; }}>
+                            <button onClick={() => setShowABModal(true)} style={{ padding: '10px 14px', borderRadius: '8px', border: `1px solid ${C.neutralBorder}`, background: C.white, cursor: 'pointer', fontSize: '13px', fontWeight: 700, color: C.textMid, display: 'inline-flex', alignItems: 'center', gap: '5px', transition: 'all 0.2s' }} onMouseOver={e => { e.currentTarget.style.borderColor = C.brand; e.currentTarget.style.color = C.brand; }} onMouseOut={e => { e.currentTarget.style.borderColor = C.neutralBorder; e.currentTarget.style.color = C.textMid; }}>
                                 {Icon.flask} A/B
                             </button>
                         </div>
@@ -487,12 +487,12 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                             <div>
                                 <div style={{ fontSize: '14px', fontWeight: 600, color: C.text, display: 'flex', alignItems: 'center', gap: '7px' }}>{Icon.history} Histórico de campanhas</div>
-                                <div style={{ fontSize: '12px', color: C.textSoft, marginTop: '2px' }}>Métricas reais do OneSignal{ticketMedio > 0 ? ' + ROI estimado' : ''}</div>
+                                <div style={{ fontSize: '13px', color: C.textSoft, marginTop: '2px' }}>Métricas reais do OneSignal{ticketMedio > 0 ? ' + ROI estimado' : ''}</div>
                             </div>
                             <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                                 <div style={{ display: 'flex', background: C.neutralBg, borderRadius: '7px', padding: '3px', gap: '2px', border: `1px solid ${C.neutralBorder}` }}>
                                     {(['onesignal', 'ab', 'jornada', 'score', 'local'] as const).map(tab => (
-                                        <button key={tab} onClick={() => setActiveHistorySubTab(tab)} style={{ padding: '4px 10px', borderRadius: '5px', border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: 600, background: activeHistorySubTab === tab ? C.white : 'transparent', color: activeHistorySubTab === tab ? C.text : C.neutralMid, boxShadow: activeHistorySubTab === tab ? '0 1px 2px rgba(0,0,0,0.08)' : 'none', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                        <button key={tab} onClick={() => setActiveHistorySubTab(tab)} style={{ padding: '4px 10px', borderRadius: '5px', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 600, background: activeHistorySubTab === tab ? C.white : 'transparent', color: activeHistorySubTab === tab ? C.text : C.neutralMid, boxShadow: activeHistorySubTab === tab ? '0 1px 2px rgba(0,0,0,0.08)' : 'none', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                                             {tab === 'onesignal' ? <>{Icon.bell} OneSignal</> : tab === 'ab' ? <>{Icon.flask} A/B</> : tab === 'jornada' ? <>{Icon.map} Jornada</> : tab === 'score' ? <>{Icon.score} Score</> : <>{Icon.history} Local</>}
                                         </button>
                                     ))}
@@ -514,7 +514,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                         <th style={{ padding: '10px 12px', textAlign: 'right' }}>Abertos</th>
                                         <th style={{ padding: '10px 12px', textAlign: 'right' }}>Taxa</th>
                                         {ticketMedio > 0 && <th style={{ padding: '10px 12px', textAlign: 'right' }}>ROI est.</th>}
-                                        <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: '10px', color: C.neutralLight, fontWeight: 400 }}>detalhe</th>
+                                        <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: '13px', color: C.neutralLight, fontWeight: 400 }}>detalhe</th>
                                     </tr></thead>
                                     <tbody>{notifs.map(n => {
                                         const roi = ticketMedio > 0 ? Math.round(n.opened * (taxaConvGlobal / 100) * ticketMedio) : 0;
@@ -522,24 +522,24 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                         const funil = inferirFunil(n.title, n.message);
                                         return (
                                             <tr key={n.id} onClick={() => setCampanhaDetalhe(n)} style={{ borderBottom: `1px solid ${C.neutralBorder}`, cursor: 'pointer', transition: 'background 0.15s' }} onMouseOver={e => (e.currentTarget.style.background = C.neutralBg)} onMouseOut={e => (e.currentTarget.style.background = 'transparent')}>
-                                                <td style={{ padding: '10px 12px', whiteSpace: 'nowrap', color: C.textSoft, fontSize: '11px' }}>{formatUnix(n.created_at)}</td>
+                                                <td style={{ padding: '10px 12px', whiteSpace: 'nowrap', color: C.textSoft, fontSize: '13px' }}>{formatUnix(n.created_at)}</td>
                                                 <td style={{ padding: '10px 12px' }}>
                                                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                                         {n.image_url && <img src={n.image_url} alt="" style={{ width: '36px', height: '36px', borderRadius: '5px', objectFit: 'cover', flexShrink: 0 }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />}
-                                                        <div><div style={{ fontWeight: 600, fontSize: '12px', color: C.text }}>{n.title}</div><div style={{ fontSize: '11px', color: C.textSoft }}>{n.message}</div></div>
+                                                        <div><div style={{ fontWeight: 600, fontSize: '13px', color: C.text }}>{n.title}</div><div style={{ fontSize: '13px', color: C.textSoft }}>{n.message}</div></div>
                                                     </div>
                                                 </td>
                                                 <td style={{ padding: '10px 12px' }}>
-                                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '999px', fontSize: '10px', fontWeight: 600, background: funil.bg, color: funil.color, whiteSpace: 'nowrap' }}>
+                                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '999px', fontSize: '13px', fontWeight: 600, background: funil.bg, color: funil.color, whiteSpace: 'nowrap' }}>
                                                         <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: funil.color, display: 'inline-block' }} /> {funil.label}
                                                     </span>
                                                 </td>
                                                 <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 600, color: C.brand }}>{n.sent.toLocaleString('pt-BR')}</td>
                                                 <td style={{ padding: '10px 12px', textAlign: 'right', color: C.success }}>{n.opened.toLocaleString('pt-BR')}</td>
                                                 <td style={{ padding: '10px 12px', textAlign: 'right' }}>
-                                                    <span style={{ background: b.bg, color: b.color, padding: '2px 8px', borderRadius: '999px', fontSize: '10px', fontWeight: 600 }}>{b.icon} {n.taxa_abertura}%</span>
+                                                    <span style={{ background: b.bg, color: b.color, padding: '2px 8px', borderRadius: '999px', fontSize: '13px', fontWeight: 600 }}>{b.icon} {n.taxa_abertura}%</span>
                                                 </td>
-                                                {ticketMedio > 0 && <td style={{ padding: '10px 12px', textAlign: 'right' }}>{roi > 0 ? <span style={{ background: '#dcfce7', color: '#166534', padding: '2px 8px', borderRadius: '999px', fontSize: '11px', fontWeight: 600 }}>~{brl(roi)}</span> : <span style={{ color: C.neutralLight }}>—</span>}</td>}
+                                                {ticketMedio > 0 && <td style={{ padding: '10px 12px', textAlign: 'right' }}>{roi > 0 ? <span style={{ background: '#dcfce7', color: '#166534', padding: '2px 8px', borderRadius: '999px', fontSize: '13px', fontWeight: 600 }}>~{brl(roi)}</span> : <span style={{ color: C.neutralLight }}>—</span>}</td>}
                                                 <td style={{ padding: '10px 12px', textAlign: 'center', color: C.neutralLight }}>›</td>
                                             </tr>
                                         );
@@ -567,8 +567,8 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                     <thead><tr style={{ background: C.neutralBg, color: C.textSoft, textAlign: 'left' }}><th style={{ padding: '10px 12px' }}>Data</th><th style={{ padding: '10px 12px' }}>Mensagem</th><th style={{ padding: '10px 12px', textAlign: 'right' }}>Enviados</th></tr></thead>
                                     <tbody>{history.map(item => (
                                         <tr key={item.id} style={{ borderBottom: `1px solid ${C.neutralBorder}` }}>
-                                            <td style={{ padding: '10px 12px', whiteSpace: 'nowrap', color: C.textSoft, fontSize: '11px' }}>{item.created_at}</td>
-                                            <td style={{ padding: '10px 12px' }}><div style={{ fontWeight: 600, color: C.text }}>{item.title}</div><div style={{ fontSize: '11px', color: C.textSoft }}>{item.message}</div></td>
+                                            <td style={{ padding: '10px 12px', whiteSpace: 'nowrap', color: C.textSoft, fontSize: '13px' }}>{item.created_at}</td>
+                                            <td style={{ padding: '10px 12px' }}><div style={{ fontWeight: 600, color: C.text }}>{item.title}</div><div style={{ fontSize: '13px', color: C.textSoft }}>{item.message}</div></td>
                                             <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 600, color: C.brand }}>{item.sent_count}</td>
                                         </tr>
                                     ))}</tbody>
@@ -591,7 +591,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                         <div style={{ padding: '18px 22px 14px', borderBottom: `1px solid ${C.neutralBorder}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
                                 <div style={{ fontSize: '15px', fontWeight: 700, color: C.text, display: 'flex', alignItems: 'center', gap: '7px' }}>{Icon.link} Deep Link Automático</div>
-                                <div style={{ fontSize: '12px', color: C.textSoft, marginTop: '2px' }}>Selecione o destino da notificação</div>
+                                <div style={{ fontSize: '13px', color: C.textSoft, marginTop: '2px' }}>Selecione o destino da notificação</div>
                             </div>
                             <button onClick={() => setShowDeepLink(false)} style={{ background: C.neutralBg, border: 'none', borderRadius: '8px', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px' }}>×</button>
                         </div>
@@ -601,10 +601,10 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             : (
                                 <>
                                     <div style={{ marginBottom: '18px' }}>
-                                        <div style={{ fontSize: '10px', fontWeight: 700, color: C.neutralLight, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Atalhos</div>
+                                        <div style={{ fontSize: '13px', fontWeight: 700, color: C.neutralLight, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Atalhos</div>
                                         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                                             {[{ label: 'Página Inicial', url: '/' }, { label: 'Carrinho', url: '/checkout' }, { label: 'Produtos', url: '/produtos' }, { label: 'Minha Conta', url: '/minha-conta' }].map(a => (
-                                                <button key={a.url} onClick={() => { setPushForm({ ...pushForm, url: a.url }); setShowDeepLink(false); }} style={{ padding: '5px 12px', borderRadius: '6px', border: `1px solid ${C.neutralBorder}`, background: C.neutralBg, cursor: 'pointer', fontSize: '12px', color: C.textMid }}>
+                                                <button key={a.url} onClick={() => { setPushForm({ ...pushForm, url: a.url }); setShowDeepLink(false); }} style={{ padding: '5px 12px', borderRadius: '6px', border: `1px solid ${C.neutralBorder}`, background: C.neutralBg, cursor: 'pointer', fontSize: '13px', color: C.textMid }}>
                                                     {a.label}
                                                 </button>
                                             ))}
@@ -612,15 +612,15 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                     </div>
                                     {deepLinkData.produtos_visitados.length > 0 && (
                                         <div style={{ marginBottom: '18px' }}>
-                                            <div style={{ fontSize: '10px', fontWeight: 700, color: C.neutralLight, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Produtos mais visitados (7 dias)</div>
+                                            <div style={{ fontSize: '13px', fontWeight: 700, color: C.neutralLight, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Produtos mais visitados (7 dias)</div>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                                                 {deepLinkData.produtos_visitados.map((p, i) => (
                                                     <button key={i} onClick={() => { setPushForm({ ...pushForm, url: p.url }); setShowDeepLink(false); }} style={{ padding: '9px 12px', borderRadius: '8px', border: `1px solid ${C.neutralBorder}`, background: C.neutralBg, cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '10px', transition: 'all 0.15s' }} onMouseOver={e => { e.currentTarget.style.background = C.brandLight; e.currentTarget.style.borderColor = C.brand; }} onMouseOut={e => { e.currentTarget.style.background = C.neutralBg; e.currentTarget.style.borderColor = C.neutralBorder; }}>
                                                         <div style={{ flex: 1, minWidth: 0 }}>
-                                                            <div style={{ fontSize: '12px', fontWeight: 600, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.nome}</div>
-                                                            <div style={{ fontSize: '10px', color: C.textSoft }}>{p.visitas} visitas{p.preco ? ` · R$ ${p.preco}` : ''}</div>
+                                                            <div style={{ fontSize: '13px', fontWeight: 600, color: C.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.nome}</div>
+                                                            <div style={{ fontSize: '13px', color: C.textSoft }}>{p.visitas} visitas{p.preco ? ` · R$ ${p.preco}` : ''}</div>
                                                         </div>
-                                                        <span style={{ fontSize: '11px', color: C.brand, fontWeight: 600, flexShrink: 0 }}>Usar →</span>
+                                                        <span style={{ fontSize: '13px', color: C.brand, fontWeight: 600, flexShrink: 0 }}>Usar →</span>
                                                     </button>
                                                 ))}
                                             </div>
@@ -628,13 +628,13 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                     )}
                                     {deepLinkData.carrinhos_ativos.length > 0 && (
                                         <div>
-                                            <div style={{ fontSize: '10px', fontWeight: 700, color: C.neutralLight, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Carrinhos ativos</div>
+                                            <div style={{ fontSize: '13px', fontWeight: 700, color: C.neutralLight, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Carrinhos ativos</div>
                                             <button onClick={() => { setPushForm({ ...pushForm, url: '/checkout' }); setShowDeepLink(false); }} style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: `2px solid ${C.warningBorder}`, background: C.warningBg, cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '10px' }}>
                                                 <div style={{ flex: 1 }}>
                                                     <div style={{ fontSize: '13px', fontWeight: 600, color: C.warning }}>Direcionar para o Checkout</div>
-                                                    <div style={{ fontSize: '11px', color: C.warning }}>{deepLinkData.carrinhos_ativos.length} carrinhos ativos aguardando</div>
+                                                    <div style={{ fontSize: '13px', color: C.warning }}>{deepLinkData.carrinhos_ativos.length} carrinhos ativos aguardando</div>
                                                 </div>
-                                                <span style={{ fontSize: '11px', color: C.warning, fontWeight: 600 }}>Usar →</span>
+                                                <span style={{ fontSize: '13px', color: C.warning, fontWeight: 600 }}>Usar →</span>
                                             </button>
                                         </div>
                                     )}
