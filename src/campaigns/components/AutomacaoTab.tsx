@@ -1,5 +1,6 @@
 import { AutomacaoConfig } from '../types';
-import { C, Icon } from '../design';
+import { C } from '../design';
+import { Icon } from '../icons';
 import { HORAS_OPCOES } from '../constants';
 import { Toggle } from './Toggle';
 
