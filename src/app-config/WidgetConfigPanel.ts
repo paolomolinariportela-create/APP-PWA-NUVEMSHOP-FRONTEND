@@ -1,4 +1,4 @@
-// src/app-config/WidgetConfigPanel.tsx (VERSÃO QUE COMPILA)
+// src/app-config/WidgetConfigPanel.tsx
 import React, { useState, useEffect } from 'react';
 import PhonePreview from './PhonePreview';
 import {
@@ -9,15 +9,13 @@ import { TriggerConfig as TriggerConfigPanel } from './widgets/triggers/TriggerC
 import { triggerEngine } from './widgets/triggers/triggerEngine';
 
 const WidgetConfigPanel: React.FC = () => {
-  // Config manual
   const [fabEnabled, setFabEnabled] = useState(false);
   const [popupEnabled, setPopupEnabled] = useState(false);
   const [topbarEnabled, setTopbarEnabled] = useState(false);
 
-  // Triggers
   const [fabTrigger, setFabTrigger] = useState<TriggerRule>({
     id: 'fab_1',
-    label: 'FAB Inteligente',
+    label: 'FAB',
     operator: 'OR' as const,
     enabled: false,
     triggers: [{ type: 'time_on_page', seconds: 5 } as TriggerConfigType],
@@ -26,7 +24,7 @@ const WidgetConfigPanel: React.FC = () => {
 
   const [popupTrigger, setPopupTrigger] = useState<TriggerRule>({
     id: 'popup_1',
-    label: 'Popup Inteligente',
+    label: 'Popup',
     operator: 'OR' as const,
     enabled: false,
     triggers: [{ type: 'scroll_depth', percent: 50 } as TriggerConfigType],
@@ -35,89 +33,87 @@ const WidgetConfigPanel: React.FC = () => {
 
   const [topbarTrigger, setTopbarTrigger] = useState<TriggerRule>({
     id: 'topbar_1',
-    label: 'TopBar Inteligente',
+    label: 'TopBar',
     operator: 'OR' as const,
     enabled: false,
     triggers: [{ type: 'exit_intent', sensitivity: 'medium' } as TriggerConfigType],
     maxFiresPerSession: 1,
   });
 
-  // Preview states
   const [showFab, setShowFab] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [showTopbar, setShowTopbar] = useState(false);
 
-  // Trigger engine
   useEffect(() => {
     triggerEngine.destroy();
-
+    
     const rules = [];
     if (fabTrigger.enabled) rules.push(fabTrigger);
     if (popupTrigger.enabled) rules.push(popupTrigger);
     if (topbarTrigger.enabled) rules.push(topbarTrigger);
-
-    if (rules.length > 0) {
+    
+    if (rules.length) {
       triggerEngine.init(rules);
       triggerEngine.on(fabTrigger.id, () => setShowFab(true));
       triggerEngine.on(popupTrigger.id, () => setShowPopup(true));
       triggerEngine.on(topbarTrigger.id, () => setShowTopbar(true));
     }
-
+    
     return () => triggerEngine.destroy();
   }, [fabTrigger, popupTrigger, topbarTrigger]);
 
-  // Final states
   const finalFabEnabled = fabTrigger.enabled ? showFab : fabEnabled;
   const finalPopupEnabled = popupTrigger.enabled ? showPopup : popupEnabled;
   const finalTopbarEnabled = topbarTrigger.enabled ? showTopbar : topbarEnabled;
 
   return (
-    <div style={{ display: 'flex', height: '100vh', background: '#0f0f23' }}>
-      {/* CONFIG PAINEL */}
-      <div style={{ flex: 1, padding: '32px', overflow: 'auto' }}>
-        <h1 style={{ fontSize: '28px', color: '#fff', marginBottom: '32px' }}>
-          Configurar Widgets
-        </h1>
+    <div className="config-root">
+      <div className="config-panel">
+        <header className="config-header">
+          <h1>Configurar Widgets</h1>
+        </header>
 
-        {/* FAB */}
-        <div style={{ marginBottom: '32px', padding: '24px', background: '#1a1a2e', borderRadius: '16px' }}>
-          <h3 style={{ color: '#fff', marginBottom: '16px' }}>📱 FAB</h3>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', color: '#94a3b8' }}>
-            <input type="checkbox" checked={fabEnabled} onChange={e => setFabEnabled(e.target.checked)} />
+        <section className="config-section">
+          <h2>📱 FAB</h2>
+          <label className="toggle-label">
+            <input 
+              type="checkbox" 
+              checked={fabEnabled} 
+              onChange={e => setFabEnabled(e.target.checked)} 
+            />
             Ativar manualmente
           </label>
           <TriggerConfigPanel rule={fabTrigger} onChange={setFabTrigger} />
-        </div>
+        </section>
 
-        {/* POPUP */}
-        <div style={{ marginBottom: '32px', padding: '24px', background: '#1a1a2e', borderRadius: '16px' }}>
-          <h3 style={{ color: '#fff', marginBottom: '16px' }}>🔔 Popup</h3>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', color: '#94a3b8' }}>
-            <input type="checkbox" checked={popupEnabled} onChange={e => setPopupEnabled(e.target.checked)} />
+        <section className="config-section">
+          <h2>🔔 Popup</h2>
+          <label className="toggle-label">
+            <input 
+              type="checkbox" 
+              checked={popupEnabled} 
+              onChange={e => setPopupEnabled(e.target.checked)} 
+            />
             Ativar manualmente
           </label>
           <TriggerConfigPanel rule={popupTrigger} onChange={setPopupTrigger} />
-        </div>
+        </section>
 
-        {/* TOPBAR */}
-        <div style={{ padding: '24px', background: '#1a1a2e', borderRadius: '16px' }}>
-          <h3 style={{ color: '#fff', marginBottom: '16px' }}>📢 TopBar</h3>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', color: '#94a3b8' }}>
-            <input type="checkbox" checked={topbarEnabled} onChange={e => setTopbarEnabled(e.target.checked)} />
+        <section className="config-section">
+          <h2>📢 TopBar</h2>
+          <label className="toggle-label">
+            <input 
+              type="checkbox" 
+              checked={topbarEnabled} 
+              onChange={e => setTopbarEnabled(e.target.checked)} 
+            />
             Ativar manualmente
           </label>
           <TriggerConfigPanel rule={topbarTrigger} onChange={setTopbarTrigger} />
-        </div>
+        </section>
       </div>
 
-      {/* PREVIEW */}
-      <div style={{ 
-        flex: 1, 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-      }}>
+      <div className="preview-panel">
         <PhonePreview
           appName="Minha Loja"
           themeColor="#10b981"
