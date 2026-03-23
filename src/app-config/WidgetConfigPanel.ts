@@ -1,20 +1,42 @@
 // src/app-config/WidgetConfigPanel.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import PhonePreview from './PhonePreview';
 import {
   TriggerRule,
   TriggerConfig as TriggerConfigType,
+  TriggerType,
 } from './widgets/triggers/trigger.types';
 import { TriggerConfig as TriggerConfigPanel } from './widgets/triggers/TriggerConfig';
 import { triggerEngine } from './widgets/triggers/triggerEngine';
 
 const WidgetConfigPanel: React.FC = () => {
-  // Config manual (toggle tradicional)
-  const [fabEnabled, setFabEnabled] = useState(false);
-  const [popupEnabled, setPopupEnabled] = useState(false);
-  const [topbarEnabled, setTopbarEnabled] = useState(false);
+  // === CONFIG MANUAIS (toggle tradicional) ===
+  const [fabConfig, setFabConfig] = useState({
+    enabled: false,
+    text: 'Baixar App',
+    position: 'right' as 'left' | 'right',
+    icon: '📱',
+    size: 'medium' as 'xs' | 'small' | 'medium' | 'large' | 'xl',
+    color: '#10b981',
+  });
 
-  // Config dos triggers (por widget)
+  const [popupConfig, setPopupConfig] = useState({
+    enabled: false,
+    imageUrl: 'https://via.placeholder.com/300x200/FF6B6B/FFFFFF?text=Promo+App',
+  });
+
+  const [topbarConfig, setTopbarConfig] = useState({
+    enabled: false,
+    text: 'Notificações',
+    buttonText: 'Ativar',
+    icon: '🔔',
+    position: 'top' as 'top' | 'bottom',
+    color: '#3b82f6',
+    textColor: '#ffffff',
+    size: 'medium' as 'xs' | 'small' | 'medium' | 'large' | 'xl',
+  });
+
+  // === TRIGGERS (gatilhos inteligentes) ===
   const [fabTrigger, setFabTrigger] = useState<TriggerRule>({
     id: 'fab_rule_1',
     label: 'FAB Inteligente',
@@ -42,17 +64,15 @@ const WidgetConfigPanel: React.FC = () => {
     maxFiresPerSession: 1,
   });
 
-  // Estados reativos para o preview (manual OU trigger)
+  // === ESTADOS DO PREVIEW (reativos) ===
   const [showFab, setShowFab] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [showTopbar, setShowTopbar] = useState(false);
 
-  // Inicializa todos os triggers
+  // === MOTOR DE TRIGGERS ===
   useEffect(() => {
-    // Cleanup anterior
     triggerEngine.destroy();
 
-    // Inicia triggers ativos
     const activeRules: TriggerRule[] = [];
     if (fabTrigger.enabled) activeRules.push(fabTrigger);
     if (popupTrigger.enabled) activeRules.push(popupTrigger);
@@ -60,126 +80,246 @@ const WidgetConfigPanel: React.FC = () => {
 
     if (activeRules.length > 0) {
       triggerEngine.init(activeRules);
+      
+      // Listeners para disparos
+      const fabCb = () => setShowFab(true);
+      const popupCb = () => setShowPopup(true);
+      const topbarCb = () => setShowTopbar(true);
 
-      // Listeners para cada regra
-      triggerEngine.on(fabTrigger.id, () => setShowFab(true));
-      triggerEngine.on(popupTrigger.id, () => setShowPopup(true));
-      triggerEngine.on(topbarTrigger.id, () => setShowTopbar(true));
+      triggerEngine.on(fabTrigger.id, fabCb);
+      triggerEngine.on(popupTrigger.id, popupCb);
+      triggerEngine.on(topbarTrigger.id, topbarCb);
+
+      return () => {
+        triggerEngine.on(fabTrigger.id, fabCb);  // Cleanup
+        triggerEngine.on(popupTrigger.id, popupCb);
+        triggerEngine.on(topbarTrigger.id, topbarCb);
+      };
     }
-
-    return () => triggerEngine.destroy();
   }, [fabTrigger, popupTrigger, topbarTrigger]);
 
-  // Config final para o PhonePreview (manual SOBRE trigger)
-  const finalFabEnabled = fabTrigger.enabled ? showFab : fabEnabled;
-  const finalPopupEnabled = popupTrigger.enabled ? showPopup : popupEnabled;
-  const finalTopbarEnabled = topbarTrigger.enabled ? showTopbar : topbarEnabled;
+  // === LÓGICA FINAL: trigger sobrescreve manual ===
+  const finalFabEnabled = fabTrigger.enabled ? showFab : fabConfig.enabled;
+  const finalPopupEnabled = popupTrigger.enabled ? showPopup : popupConfig.enabled;
+  const finalTopbarEnabled = topbarTrigger.enabled ? showTopbar : topbarConfig.enabled;
 
   return (
-    <div style={{ display: 'flex', height: '100vh', background: '#0f0f23' }}>
-      {/* PAINEL DE CONFIG (esquerda) */}
-      <div style={{ flex: 1, padding: '24px', overflow: 'auto' }}>
-        <h1 style={{ fontSize: '24px', color: 'white', marginBottom: '32px' }}>
-          Configurar Widgets
-        </h1>
+    <div style={styles.root}>
+      {/* PAINEL CONFIG (ESQUERDA) */}
+      <div style={styles.configPanel}>
+        <div style={styles.header}>
+          <h1 style={styles.title}>Configurar Widgets</h1>
+          <div style={styles.subtitle}>Configure e veja o resultado em tempo real</div>
+        </div>
 
-        {/* ABA FAB */}
-        <div style={{ marginBottom: '32px', padding: '20px', background: '#1a1a2e', borderRadius: '16px' }}>
-          <h3 style={{ color: 'white', marginBottom: '16px' }}>FAB</h3>
+        {/* === FAB === */}
+        <div style={styles.section}>
+          <h2 style={styles.sectionTitle}>📱 FAB</h2>
           
-          {/* Toggle manual */}
-          <label style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+          <label style={styles.toggleLabel}>
             <input
               type="checkbox"
-              checked={fabEnabled}
-              onChange={(e) => setFabEnabled(e.target.checked)}
+              checked={fabConfig.enabled}
+              onChange={(e) => setFabConfig({ ...fabConfig, enabled: e.target.checked })}
             />
-            <span style={{ color: '#94a3b8', fontSize: '14px' }}>Ativar manualmente</span>
+            <span>Ativar manualmente</span>
           </label>
 
-          {/* Gatilhos inteligentes */}
           <TriggerConfigPanel
-            value={fabTrigger}
+            rule={fabTrigger}
             onChange={setFabTrigger}
           />
+
+          {/* Configs específicas do FAB */}
+          <div style={styles.fieldGroup}>
+            <label>Texto</label>
+            <input
+              value={fabConfig.text}
+              onChange={(e) => setFabConfig({ ...fabConfig, text: e.target.value })}
+              style={styles.input}
+              placeholder="Baixar App"
+            />
+          </div>
         </div>
 
-        {/* ABA POPUP */}
-        <div style={{ marginBottom: '32px', padding: '20px', background: '#1a1a2e', borderRadius: '16px' }}>
-          <h3 style={{ color: 'white', marginBottom: '16px' }}>Popup</h3>
+        {/* === POPUP === */}
+        <div style={styles.section}>
+          <h2 style={styles.sectionTitle}>🔔 Popup</h2>
           
-          <label style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+          <label style={styles.toggleLabel}>
             <input
               type="checkbox"
-              checked={popupEnabled}
-              onChange={(e) => setPopupEnabled(e.target.checked)}
+              checked={popupConfig.enabled}
+              onChange={(e) => setPopupConfig({ ...popupConfig, enabled: e.target.checked })}
             />
-            <span style={{ color: '#94a3b8', fontSize: '14px' }}>Ativar manualmente</span>
+            <span>Ativar manualmente</span>
           </label>
 
           <TriggerConfigPanel
-            value={popupTrigger}
+            rule={popupTrigger}
             onChange={setPopupTrigger}
           />
+
+          <div style={styles.fieldGroup}>
+            <label>URL da imagem</label>
+            <input
+              value={popupConfig.imageUrl}
+              onChange={(e) => setPopupConfig({ ...popupConfig, imageUrl: e.target.value })}
+              style={styles.input}
+              placeholder="https://..."
+            />
+          </div>
         </div>
 
-        {/* ABA TOPBAR */}
-        <div style={{ padding: '20px', background: '#1a1a2e', borderRadius: '16px' }}>
-          <h3 style={{ color: 'white', marginBottom: '16px' }}>TopBar</h3>
+        {/* === TOPBAR === */}
+        <div style={styles.section}>
+          <h2 style={styles.sectionTitle}>📢 TopBar</h2>
           
-          <label style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+          <label style={styles.toggleLabel}>
             <input
               type="checkbox"
-              checked={topbarEnabled}
-              onChange={(e) => setTopbarEnabled(e.target.checked)}
+              checked={topbarConfig.enabled}
+              onChange={(e) => setTopbarConfig({ ...topbarConfig, enabled: e.target.checked })}
             />
-            <span style={{ color: '#94a3b8', fontSize: '14px' }}>Ativar manualmente</span>
+            <span>Ativar manualmente</span>
           </label>
 
           <TriggerConfigPanel
-            value={topbarTrigger}
+            rule={topbarTrigger}
             onChange={setTopbarTrigger}
           />
+
+          <div style={styles.fieldGroup}>
+            <label>Texto principal</label>
+            <input
+              value={topbarConfig.text}
+              onChange={(e) => setTopbarConfig({ ...topbarConfig, text: e.target.value })}
+              style={styles.input}
+            />
+          </div>
         </div>
       </div>
 
-      {/* PREVIEW (direita) */}
-      <div style={{ 
-        flex: 1, 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-      }}>
-        <PhonePreview
-          appName="Minha Loja"
-          themeColor="#10b981"
-          logoUrl=""
-          
-          // Config final (manual OU trigger)
-          fabEnabled={finalFabEnabled}
-          fabText="Baixar App"
-          fabPosition="right"
-          fabIcon="📱"
-          fab_size="medium"
-          fab_color="#ef4444"
-
-          topbar_enabled={finalTopbarEnabled}
-          topbar_text="Notificações"
-          topbar_button_text="Ativar"
-          topbar_icon="🔔"
-          topbar_position="top"
-
-          popup_enabled={finalPopupEnabled}
-          popup_image_url="https://via.placeholder.com/300x200/FF6B6B/FFFFFF?text=Promo+App"
-
-          showBottomBar={true}
-          bottomBarBg="#ffffff"
-          bottomBarIconColor="#6b7280"
-        />
+      {/* PREVIEW (DIREITA) */}
+      <div style={styles.previewPanel}>
+        <div style={styles.previewCard}>
+          <PhonePreview
+            appName="Minha Loja"
+            themeColor="#10b981"
+            logoUrl=""
+            
+            // FAB
+            fabEnabled={finalFabEnabled}
+            fabText={fabConfig.text}
+            fabPosition={fabConfig.position}
+            fabIcon={fabConfig.icon}
+            fab_size={fabConfig.size}
+            fab_color={fabConfig.color}
+            
+            // TopBar
+            topbar_enabled={finalTopbarEnabled}
+            topbar_text={topbarConfig.text}
+            topbar_button_text={topbarConfig.buttonText}
+            topbar_icon={topbarConfig.icon}
+            topbar_position={topbarConfig.position}
+            topbar_color={topbarConfig.color}
+            topbar_text_color={topbarConfig.textColor}
+            topbar_size={topbarConfig.size}
+            
+            // Popup
+            popup_enabled={finalPopupEnabled}
+            popup_image_url={popupConfig.imageUrl}
+            
+            showBottomBar={true}
+            bottomBarBg="#ffffff"
+            bottomBarIconColor="#6b7280"
+          />
+        </div>
       </div>
     </div>
   );
+};
+
+// === ESTILOS ===
+const styles = {
+  root: {
+    display: 'flex' as const,
+    height: '100vh',
+    background: '#0f0f23',
+    fontFamily: "'Inter', -apple-system, sans-serif",
+  },
+  configPanel: {
+    flex: 1,
+    padding: '32px',
+    overflow: 'auto',
+    background: 'linear-gradient(180deg, #0f0f23 0%, #1a1a2e 100%)',
+  },
+  previewPanel: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  },
+  previewCard: {
+    width: 375,
+    height: 812,
+    borderRadius: '32px',
+    boxShadow: '0 32px 64px rgba(0,0,0,0.5)',
+    overflow: 'hidden',
+    background: '#000',
+  },
+  header: {
+    marginBottom: '40px',
+  },
+  title: {
+    fontSize: '28px',
+    fontWeight: 800 as const,
+    color: '#ffffff',
+    margin: 0,
+    lineHeight: 1.2,
+  },
+  subtitle: {
+    color: '#94a3b8',
+    fontSize: '15px',
+    marginTop: '8px',
+  },
+  section: {
+    background: '#1a1a2e',
+    borderRadius: '20px',
+    padding: '28px',
+    marginBottom: '24px',
+    border: '1px solid #26263a',
+  },
+  sectionTitle: {
+    fontSize: '20px',
+    fontWeight: 700 as const,
+    color: '#ffffff',
+    margin: '0 0 20px 0',
+  },
+  toggleLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    marginBottom: '20px',
+    color: '#e2e8f0',
+    fontSize: '15px',
+    fontWeight: 500,
+  },
+  fieldGroup: {
+    marginTop: '20px',
+  } as any,
+  input: {
+    width: '100%',
+    padding: '12px 16px',
+    borderRadius: '12px',
+    border: '1px solid #334155',
+    background: '#1e1e2e',
+    color: '#ffffff',
+    fontSize: '14px',
+    outline: 'none',
+    transition: 'border-color 0.2s',
+  } as any,
 };
 
 export default WidgetConfigPanel;
