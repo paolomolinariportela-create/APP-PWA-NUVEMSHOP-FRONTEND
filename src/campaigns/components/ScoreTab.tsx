@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ScoreData } from '../types';
-import { C, Icon } from '../design';
+import { C } from '../design';
+import { Icon } from '../icons';
 
 interface Props {
     token: string | null;
