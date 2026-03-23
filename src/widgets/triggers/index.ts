@@ -1,7 +1,4 @@
-// ─────────────────────────────────────────────
-//  index.ts
-//  src/app-config/widgets/triggers/index.ts
-// ─────────────────────────────────────────────
+// src/app-config/widgets/triggers/index.ts
 
 export type {
   TriggerType,
