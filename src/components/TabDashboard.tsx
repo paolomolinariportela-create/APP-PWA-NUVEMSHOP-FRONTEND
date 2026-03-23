@@ -1,2912 +1,676 @@
-import React, { useEffect, useState } from 'react';
+import React from "react";
 
-// ─── DESIGN TOKENS ─────────────────────────────────────────────────────────────
+// ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
 const C = {
-    brand:        '#4F46E5',
-    brandLight:   '#EEF2FF',
-    brandMuted:   '#818CF8',
-    success:      '#059669',
-    successBg:    '#F0FDF4',
-    successBorder:'#A7F3D0',
-    warning:      '#B45309',
-    warningBg:    '#FFFBEB',
-    warningBorder:'#FDE68A',
-    danger:       '#B91C1C',
-    dangerBg:     '#FFF5F5',
-    dangerBorder: '#FECACA',
-    neutralBorder:'#E5E7EB',
-    neutralBg:    '#F9FAFB',
-    neutralMid:   '#6B7280',
-    neutralLight: '#9CA3AF',
-    text:         '#111827',
-    textMid:      '#374151',
-    textSoft:     '#6B7280',
-    white:        '#FFFFFF',
-    dark:         '#111827',
+  brand:       '#4F46E5',
+  brandHover:  '#4338CA',
+  brandLight:  '#EEF2FF',
+  brandMuted:  '#818CF8',
+
+  success:     '#059669',
+  successBg:   '#F0FDF4',
+  successBorder:'#A7F3D0',
+
+  warning:     '#B45309',
+  warningBg:   '#FFFBEB',
+  warningBorder:'#FDE68A',
+
+  danger:      '#B91C1C',
+  dangerBg:    '#FFF5F5',
+  dangerBorder:'#FECACA',
+
+  neutral:     '#374151',
+  neutralMid:  '#6B7280',
+  neutralLight:'#9CA3AF',
+  neutralBorder:'#E5E7EB',
+  neutralBg:   '#F9FAFB',
+
+  text:        '#111827',
+  textMid:     '#374151',
+  textSoft:    '#6B7280',
+
+  white:       '#FFFFFF',
+  dark:        '#111827',
+  darkMid:     '#1F2937',
 };
 
-// ─── SVG ICONS ─────────────────────────────────────────────────────────────────
+// ─── SVG ICONS ────────────────────────────────────────────────────────────────
 const Icon = {
-    bell: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>,
-    send: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>,
-    users: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
-    check: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
-    alert: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
-    info: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>,
-    eye: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
-    target: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
-    lightning: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
-    dollar: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
-    chart: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
-    filter: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>,
-    clock: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-    link: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>,
-    image: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>,
-    map: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21 3 6"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>,
-    flask: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M9 3h6m-6 0v6L5.5 15M9 3H6.5M15 3v6l3.5 6M15 3h2.5M5.5 15h13M5.5 15a2 2 0 0 0 1.5 3h10a2 2 0 0 0 1.5-3"/></svg>,
-    brain: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-1.96-3 2.5 2.5 0 0 1-1.32-4.24A2.5 2.5 0 0 1 5.5 7.5a2.5 2.5 0 0 1 4-2z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 1.96-3 2.5 2.5 0 0 0 1.32-4.24A2.5 2.5 0 0 0 18.5 7.5a2.5 2.5 0 0 0-4-2z"/></svg>,
-    robot: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M12 11V5"/><circle cx="12" cy="4" r="1"/><line x1="8" y1="15" x2="8.01" y2="15"/><line x1="16" y1="15" x2="16.01" y2="15"/><path d="M8 19h8"/></svg>,
-    globe: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
-    smartphone: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>,
-    trending: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>,
-    arrow: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
-    x: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
-    refresh: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>,
-    history: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.97"/></svg>,
-    zap: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
-    score: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
+  revenue: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>
+    </svg>
+  ),
+  ticket: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/>
+    </svg>
+  ),
+  mobile: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>
+    </svg>
+  ),
+  trending: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
+    </svg>
+  ),
+  users: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+  ),
+  eye: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+    </svg>
+  ),
+  pages: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+    </svg>
+  ),
+  cart: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+    </svg>
+  ),
+  conversion: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+    </svg>
+  ),
+  alert: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+  ),
+  check: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  ),
+  info: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+    </svg>
+  ),
+  arrow: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+    </svg>
+  ),
+  lightning: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+    </svg>
+  ),
+  target: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+    </svg>
+  ),
+  dollar: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+    </svg>
+  ),
+  bulb: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/>
+    </svg>
+  ),
 };
 
-// ─── REUSABLE UI PRIMITIVES ────────────────────────────────────────────────────
+// ─── REUSABLE COMPONENTS ──────────────────────────────────────────────────────
+// Número grande estilo fintech — tracking tight
+const Num = ({ children, color }: { children: React.ReactNode; color?: string }) => (
+  <p style={{ letterSpacing: '-0.03em', color: color ?? 'inherit', margin: '4px 0' }}>{children}</p>
+);
 const Badge = ({ color, bg, border, children }: { color: string; bg: string; border: string; children: React.ReactNode }) => (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: bg, color, border: `1px solid ${border}`, fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '4px', letterSpacing: '0.02em' }}>
-        {children}
-    </span>
+  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: bg, color, border: `1px solid ${border}`, fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '4px', letterSpacing: '0.02em' }}>
+    {children}
+  </span>
 );
 
-const SectionHeader = ({ icon, title, subtitle, action }: { icon?: React.ReactNode; title: string; subtitle?: string; action?: React.ReactNode }) => (
-    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {icon && <span style={{ color: C.neutralMid, display: 'flex', flexShrink: 0 }}>{icon}</span>}
-            <div>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: C.text }}>{title}</div>
-                {subtitle && <div style={{ fontSize: '12px', color: C.textSoft, marginTop: '2px' }}>{subtitle}</div>}
-            </div>
-        </div>
-        {action}
-    </div>
-);
-
-interface PushCampaign {
-    title: string;
-    message: string;
-    url: string;
-    image_url?: string;
-    btn1_text?: string;
-    btn1_url?: string;
-    btn2_text?: string;
-    btn2_url?: string;
-    filter_behavior?: string;
-    intelligent_delivery?: boolean;
-    filter_device?: string;
-    filter_country?: string;
-    send_after?: string;
-}
-
-// ── NOVO: Interfaces A/B ─────────────────────────────────────────────────────
-interface ABTestItem {
-    id: number;
-    title_a: string; message_a: string;
-    title_b: string; message_b: string;
-    sent_a: number; sent_b: number;
-    opened_a: number; opened_b: number;
-    ctr_a: number; ctr_b: number;
-    vencedor: string | null;
-    status: string;
-    created_at: string;
-}
-
-interface ABTestForm {
-    title_a: string; message_a: string;
-    title_b: string; message_b: string;
-    url: string;
-    image_url?: string;
-    filter_behavior?: string;
-    filter_device?: string;
-    filter_country?: string;
-    intelligent_delivery?: boolean;
-    auto_escalar?: boolean;
-    horas_avaliacao?: number;
-}
-
-const AB_FORM_DEFAULT: ABTestForm = {
-    title_a: '', message_a: '',
-    title_b: '', message_b: '',
-    url: '/',
-    auto_escalar: true,
-    horas_avaliacao: 4,
-};
-// ────────────────────────────────────────────────────────────────────────────
-
-// ── Interfaces Jornada ───────────────────────────────────────────────────────
-interface JornadaSubscriber {
-    visitor_id: string;
-    clicked_at: string;
-    converted: boolean;
-    converted_at: string | null;
-    revenue: number | null;
-}
-
-interface JornadaNotif {
-    notif_id: string;
-    titulo: string;
-    mensagem: string;
-    enviados: number;
-    cliques: number;
-    convertidos: number;
-    taxa_conversao: number;
-    receita_atribuida: number;
-    subscribers: JornadaSubscriber[];
-}
-
-interface JornadaResumo {
-    total_cliques: number;
-    total_convertidos: number;
-    taxa_conversao: number;
-    receita_atribuida: number;
-}
-// ────────────────────────────────────────────────────────────────────────────
-
-// ── Interfaces Score ─────────────────────────────────────────────────────────
-interface ScoreVisitor {
-    visitor_id: string;
-    ultima_visita: string;
-    comprador: boolean;
-    carrinho_ativo: boolean;
-}
-
-interface ScoreGrupo {
-    id: string;
-    label: string;
-    cor: string;
-    corBg: string;
-    desc: string;
-    count: number;
-    pct: number;
-    segmento_os: string;
-    visitors: ScoreVisitor[];
-}
-
-interface ScoreData {
-    total_visitors: number;
-    grupos: ScoreGrupo[];
-}
-// ────────────────────────────────────────────────────────────────────────────
-
-// ── Interfaces Deep Link ─────────────────────────────────────────────────────
-interface DeepLinkProduto {
-    product_id: string;
-    variant_id: string;
-    nome: string;
-    preco: string | null;
-    visitas: number;
-    ultima_visita: string;
-    url: string;
-}
-
-interface DeepLinkPagina {
-    pagina: string;
-    visitas: number;
-    label: string;
-}
-
-interface DeepLinkData {
-    produtos_visitados: DeepLinkProduto[];
-    paginas_produto: DeepLinkPagina[];
-    carrinhos_ativos: { visitor_id: string; cart_total: number | null; cart_count: number; url: string }[];
-}
-// ────────────────────────────────────────────────────────────────────────────
-
-interface PushHistoryItem {
-    id: number;
-    title: string;
-    message: string;
-    url: string;
-    sent_count: number;
-    created_at: string;
-}
-
-interface OneSignalNotif {
-    id: string;
-    title: string;
-    message: string;
-    url: string;
-    image_url?: string;
-    sent: number;
-    opened: number;
-    failed: number;
-    confirmed_deliveries: number;
-    taxa_abertura: number;
-    created_at: number;
-}
-
-interface PorPais { pais: string; count: number; pct: number; }
-interface PorDispositivo { dispositivo: string; count: number; pct: number; }
-
-interface OneSignalStats {
-    subscribers: number;
-    active_subscribers: number;
-    instalacoes: number;
-    taxa_optin: number;
-    por_pais: PorPais[];
-    por_dispositivo: PorDispositivo[];
-    notifications: OneSignalNotif[];
-}
-
-interface AutomacaoConfig {
-    passo1_ativo: boolean; passo1_horas: number; passo1_titulo: string; passo1_mensagem: string;
-    passo2_ativo: boolean; passo2_horas: number; passo2_titulo: string; passo2_mensagem: string;
-    passo3_ativo: boolean; passo3_horas: number; passo3_titulo: string; passo3_mensagem: string;
-    passo3_cupom?: string;
-    produto_visitado_ativo: boolean;
-    produto_visitado_horas: number;
-    produto_visitado_titulo: string;
-    produto_visitado_mensagem: string;
-    inativo_ativo: boolean;
-    inativo_dias: number;
-    inativo_titulo: string;
-    inativo_mensagem: string;
-}
-
-// ── NOVO: Tipos de objetivo ──────────────────────────────────────────────────
-type ObjetivoCampanha = 'venda' | 'carrinho' | 'reativar' | 'engajamento' | null;
-
-interface ObjetivoConfig {
-    id: ObjetivoCampanha;
-    icon: string;
-    label: string;
-    desc: string;
-    cor: string;
-    corBg: string;
-    corBorder: string;
-    funil: 'fundo' | 'meio' | 'topo';
-    funilLabel: string;
-    segmento: string;
-    templates: Array<{ label: string; title: string; msg: string }>;
-}
-
-const OBJETIVOS: ObjetivoConfig[] = [
-    {
-        id: 'venda',
-        icon: '💰',
-        label: 'Gerar Venda',
-        desc: 'Ofertas e promoções para converter agora',
-        cor: '#059669',
-        corBg: '#f0fdf4',
-        corBorder: '#86efac',
-        funil: 'fundo',
-        funilLabel: 'Fundo de funil',
-        segmento: '',
-        templates: [
-            { label: 'Black Friday', title: 'Black Friday chegou!', msg: 'Ate 70% OFF so hoje. Aproveite antes que acabe!' },
-            { label: 'Frete Gratis', title: 'Frete GRATIS hoje!', msg: 'Aproveite frete gratis em todos os pedidos. So hoje!' },
-            { label: 'Desconto VIP', title: 'Oferta exclusiva para voce!', msg: 'Como cliente especial, preparamos 15% OFF. Use o cupom VIP15.' },
-            { label: 'Flash Sale', title: 'Oferta relampago! ⚡', msg: 'So nas proximas 2 horas: 20% OFF em tudo. Corre!' },
-        ],
-    },
-    {
-        id: 'carrinho',
-        icon: '🛒',
-        label: 'Recuperar Carrinho',
-        desc: 'Resgatar clientes que abandonaram',
-        cor: '#d97706',
-        corBg: '#fffbeb',
-        corBorder: '#fde68a',
-        funil: 'meio',
-        funilLabel: 'Meio de funil',
-        segmento: 'non_buyers',
-        templates: [
-            { label: 'Carrinho', title: 'Seu carrinho te espera!', msg: 'Voce deixou itens no carrinho. Finalize agora com frete gratis.' },
-            { label: 'Estoque', title: 'Ultimas unidades!', msg: 'O produto no seu carrinho esta acabando. Garanta o seu agora.' },
-            { label: 'Cupom', title: 'Presente especial para voce 🎁', msg: 'Seu carrinho ainda esta salvo! Use VOLTA10 e ganhe 10% OFF.' },
-        ],
-    },
-    {
-        id: 'reativar',
-        icon: '🔄',
-        label: 'Reativar Cliente',
-        desc: 'Trazer de volta quem sumiu',
-        cor: '#7c3aed',
-        corBg: '#f5f3ff',
-        corBorder: '#c4b5fd',
-        funil: 'topo',
-        funilLabel: 'Topo de funil',
-        segmento: 'buyers',
-        templates: [
-            { label: 'Saudades', title: 'Saudades de voce!', msg: 'Faz um tempo que nao te vemos. Temos novidades esperando por voce.' },
-            { label: 'Novidades', title: 'Novidades chegaram! 🆕', msg: 'Produtos novos que voce vai amar acabaram de chegar. Confira!' },
-            { label: 'VIP', title: 'Voce e especial para nos 💜', msg: 'Como cliente VIP, preparamos algo exclusivo. Clique para ver.' },
-        ],
-    },
-    {
-        id: 'engajamento',
-        icon: '📣',
-        label: 'Engajamento',
-        desc: 'Visitas, conteúdo e lembretes',
-        cor: '#2563eb',
-        corBg: '#eff6ff',
-        corBorder: '#bfdbfe',
-        funil: 'topo',
-        funilLabel: 'Topo de funil',
-        segmento: '',
-        templates: [
-            { label: 'Novidade', title: 'Novidade no App! 🎉', msg: 'Temos uma novidade especial esperando por voce. Clique e descubra.' },
-            { label: 'Lembrete', title: 'Ja visitou nossa loja hoje?', msg: 'Confira os destaques do dia e aproveite as melhores ofertas.' },
-            { label: 'Evento', title: 'Evento especial amanha! ⏰', msg: 'Nao perca nossa liquidacao relampago amanha as 10h. Marque na agenda!' },
-        ],
-    },
-];
-
-const FUNIL_COLORS: Record<string, string> = {
-    fundo: '#059669',
-    meio: '#d97706',
-    topo: '#2563eb',
+const ActionBtn = ({ primary, onClick, children, contextColor }: { primary?: boolean; onClick?: () => void; children: React.ReactNode; contextColor?: string }) => {
+  const bg = primary ? (contextColor ?? C.dark) : C.white;
+  const color = primary ? C.white : (contextColor ?? C.textMid);
+  const border = primary ? 'none' : `1px solid ${C.neutralBorder}`;
+  return (
+    <button onClick={onClick} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', border, background: bg, color, transition: 'all 0.15s' }}>
+      {children}
+    </button>
+  );
 };
 
-// ────────────────────────────────────────────────────────────────────────────
-
-const AUTOMACAO_DEFAULT: AutomacaoConfig = {
-    passo1_ativo: true, passo1_horas: 1,
-    passo1_titulo: 'Seus itens estao te esperando!',
-    passo1_mensagem: 'Voce deixou alguns itens no carrinho. Que tal finalizar sua compra?',
-    passo2_ativo: true, passo2_horas: 24,
-    passo2_titulo: 'Seus itens estao acabando!',
-    passo2_mensagem: 'O estoque e limitado! Garanta os seus itens antes que esgotem.',
-    passo3_ativo: false, passo3_horas: 48,
-    passo3_titulo: 'Ultimo aviso! Oferta especial para voce.',
-    passo3_mensagem: 'Seu carrinho ainda esta salvo. Use o cupom abaixo para ganhar desconto!',
-    passo3_cupom: '',
-    produto_visitado_ativo: false,
-    produto_visitado_horas: 2,
-    produto_visitado_titulo: 'Voce ainda esta interessado?',
-    produto_visitado_mensagem: 'O produto que voce viu ainda esta disponivel. Garanta o seu antes que acabe!',
-    inativo_ativo: false,
-    inativo_dias: 7,
-    inativo_titulo: 'Saudades de voce!',
-    inativo_mensagem: 'Faz um tempo que nao te vemos. Temos novidades e ofertas esperando por voce.',
-};
+// ─── INTERFACES ───────────────────────────────────────────────────────────────
+interface DashboardStats {
+  receita: number;
+  vendas: number;
+  instalacoes: number;
+  instalacoes_banco?: number;
+  crescimento_instalacoes_7d: number;
+  carrinhos_abandonados: { valor: number; qtd: number; ativos_automacao?: number; ativos_onesignal?: number; };
+  taxa_conversao: { app: number; site: number };
+  visualizacoes: { pageviews: number; tempo_medio: string; top_paginas: string[]; top_paginas_pwa?: string[]; };
+  funil: { visitas: number; carrinho: number; checkout: number };
+  recorrencia: { clientes_2x: number; taxa_recompra: number; compradores_onesignal?: number; };
+  ticket_medio: { app: number; site: number };
+  extra_pwa?: { visitas_pwa: number; visitas_site: number; vendas_pwa: number; vendas_site: number; };
+  onesignal?: { active_subscribers: number; carrinho_ativo_count: number; compradores_count: number; };
+}
 
 interface Props {
-    stats: any;
-    pushForm: PushCampaign;
-    setPushForm: (f: PushCampaign) => void;
-    handleSendPush: () => void;
-    sendingPush: boolean;
-    token: string | null;
-    API_URL: string;
+  stats: DashboardStats;
+  onNavigateCampanhas?: () => void;
 }
 
-const FLAG: Record<string, string> = { BR: '🇧🇷', US: '🇺🇸', PT: '🇵🇹', AR: '🇦🇷', MX: '🇲🇽', CO: '🇨🇴', CL: '🇨🇱', PE: '🇵🇪', UY: '🇺🇾', GB: '🇬🇧' };
-const PAIS_NOME: Record<string, string> = { BR: 'Brasil', US: 'EUA', PT: 'Portugal', AR: 'Argentina', MX: 'Mexico', CO: 'Colombia', CL: 'Chile', PE: 'Peru', UY: 'Uruguai', GB: 'Reino Unido' };
-const HORAS_OPCOES = [
-    { label: '30 minutos', value: 0.5 }, { label: '1 hora', value: 1 }, { label: '2 horas', value: 2 },
-    { label: '3 horas', value: 3 }, { label: '6 horas', value: 6 }, { label: '12 horas', value: 12 },
-    { label: '24 horas', value: 24 }, { label: '48 horas', value: 48 }, { label: '72 horas', value: 72 },
-];
-
-function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
-    return (
-        <label style={{ position: 'relative', display: 'inline-block', width: '46px', height: '24px', flexShrink: 0 }}>
-            <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)} style={{ opacity: 0, width: 0, height: 0 }} />
-            <span style={{ position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: checked ? '#10B981' : '#E5E7EB', transition: '.3s', borderRadius: '34px' }} />
-            <span style={{ position: 'absolute', height: '18px', width: '18px', left: '3px', bottom: '3px', backgroundColor: 'white', transition: '.3s', borderRadius: '50%', transform: checked ? 'translateX(22px)' : 'translateX(0px)', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }} />
-        </label>
-    );
+type Severidade = 'critico' | 'alerta' | 'ok';
+interface AcaoCampanha { label: string; icon: React.ReactNode; }
+interface Diagnostico {
+  severidade: Severidade;
+  badge: string;
+  titulo: string;
+  urgencia: string;
+  descricao: string;
+  causas: string[];
+  acoes: AcaoCampanha[];
+  projecao_inline?: string;
+  proximo_passo: string;
 }
 
-function CardSection({ title, subtitle }: { title: string; subtitle?: string }) {
-    return (
-        <div className="card-header" style={{ paddingBottom: '0.8rem', marginBottom: '1.2rem' }}>
-            <h3 style={{ margin: 0, fontSize: '1rem' }}>{title}</h3>
-            {subtitle && <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: '#6B7280' }}>{subtitle}</p>}
-        </div>
-    );
-}
+// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
+export default function TabDashboard({ stats, onNavigateCampanhas }: Props) {
+  const receita        = stats?.receita ?? 0;
+  const vendas         = stats?.vendas ?? 0;
+  const crescimento7d  = stats?.crescimento_instalacoes_7d ?? 0;
+  const carrinhosValor = stats?.carrinhos_abandonados?.valor ?? 0;
+  const carrinhosQtd   = stats?.carrinhos_abandonados?.qtd ?? 0;
+  const ticketApp      = stats?.ticket_medio?.app ?? 0;
+  const taxaConvApp    = stats?.taxa_conversao?.app ?? 0;
+  const clientesRec    = stats?.recorrencia?.clientes_2x ?? 0;
+  const taxaRecompra   = stats?.recorrencia?.taxa_recompra ?? 0;
+  const pageviews      = stats?.visualizacoes?.pageviews ?? 0;
+  const tempoMedio     = stats?.visualizacoes?.tempo_medio ?? '--';
+  const topPaginasPwa  = stats?.visualizacoes?.top_paginas_pwa ?? [];
+  const funilVisitas   = stats?.funil?.visitas ?? 0;
+  const funilCarrinho  = stats?.funil?.carrinho ?? 0;
+  const funilCheckout  = stats?.funil?.checkout ?? 0;
 
-// ── Componente: Modal de criação A/B ────────────────────────────────────────
-function ABTestModal({
-    form, setForm, onSend, sending, onClose, alcance,
-}: {
-    form: ABTestForm;
-    setForm: (f: ABTestForm) => void;
-    onSend: () => void;
-    sending: boolean;
-    onClose: () => void;
-    alcance: number;
-}) {
-    const metade = Math.round(alcance / 2);
-    const podeEnviar = form.title_a && form.message_a && form.title_b && form.message_b;
+  const osData       = stats?.onesignal;
+  const instalacoes  = osData?.active_subscribers || stats?.instalacoes || 0;
+  const carrinhoOS   = osData?.carrinho_ativo_count ?? 0;
+  const compradoresOS = osData?.compradores_count ?? 0;
+  const temOsData    = !!osData && osData.active_subscribers > 0;
 
-    return (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={onClose}>
-            <div style={{ background: '#fff', borderRadius: '16px', width: '100%', maxWidth: '720px', maxHeight: '92vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }} onClick={e => e.stopPropagation()}>
-                {/* Header */}
-                <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid #E5E7EB', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                        <div style={{ fontSize: '16px', fontWeight: 700, color: '#111827' }}>🧪 Criar Teste A/B</div>
-                        <div style={{ fontSize: '13px', color: '#6B7280', marginTop: '2px' }}>
-                            A base será dividida ~50/50 — cada variante recebe ≈ <strong>{metade.toLocaleString('pt-BR')}</strong> dispositivos
-                        </div>
-                    </div>
-                    <button onClick={onClose} style={{ background: '#F3F4F6', border: 'none', borderRadius: '8px', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px' }}>×</button>
-                </div>
+  const brl = (v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 
-                <div style={{ padding: '20px 24px' }}>
-                    {/* Como funciona */}
-                    <div style={{ background: '#EEF2FF', border: '1px solid #C7D2FE', borderRadius: '10px', padding: '12px 16px', marginBottom: '20px', display: 'flex', gap: '10px' }}>
-                        <span style={{ fontSize: '18px', flexShrink: 0 }}>💡</span>
-                        <div style={{ fontSize: '12px', color: '#3730A3', lineHeight: 1.6 }}>
-                            <strong>Como funciona:</strong> Enviamos a Variante A para metade da base e a Variante B para a outra metade.
-                            Após algumas horas, o sistema compara os CTRs e indica o vencedor automaticamente.
-                            Use para testar títulos, tons de voz ou chamadas para ação diferentes.
-                        </div>
-                    </div>
+  const metaInstalacoes = instalacoes < 100 ? 100 : instalacoes < 500 ? 500 : instalacoes < 1000 ? 1000 : Math.ceil(instalacoes / 1000) * 1000;
+  const metaReceita     = receita < 500 ? 500 : receita < 1000 ? 1000 : receita < 5000 ? 5000 : Math.ceil(receita / 5000) * 5000;
+  const metaRec         = clientesRec < 10 ? 10 : clientesRec < 50 ? 50 : clientesRec < 100 ? 100 : Math.ceil(clientesRec / 100) * 100;
 
-                    {/* Grid A vs B */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-                        {/* Variante A */}
-                        <div style={{ border: '2px solid #3b82f6', borderRadius: '12px', padding: '16px', background: '#eff6ff' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-                                <span style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#3b82f6', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px', flexShrink: 0 }}>A</span>
-                                <span style={{ fontSize: '13px', fontWeight: 700, color: '#1d4ed8' }}>Variante A</span>
-                                <span style={{ marginLeft: 'auto', fontSize: '11px', color: '#3b82f6', background: '#dbeafe', padding: '2px 8px', borderRadius: '999px' }}>≈{metade.toLocaleString('pt-BR')} dispositivos</span>
-                            </div>
-                            <div style={{ marginBottom: '10px' }}>
-                                <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Título</label>
-                                <input type="text" value={form.title_a} maxLength={50} onChange={e => setForm({ ...form, title_a: e.target.value })} placeholder="Ex: Oferta imperdível hoje!" style={{ width: '100%', padding: '8px', border: '1px solid #bfdbfe', borderRadius: '6px', fontSize: '13px', background: '#fff', boxSizing: 'border-box' }} />
-                                <small style={{ fontSize: '10px', color: '#6B7280' }}>{form.title_a.length}/50</small>
-                            </div>
-                            <div>
-                                <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Mensagem</label>
-                                <textarea value={form.message_a} maxLength={120} rows={3} onChange={e => setForm({ ...form, message_a: e.target.value })} placeholder="Ex: Até 50% OFF só hoje. Corre!" style={{ width: '100%', padding: '8px', border: '1px solid #bfdbfe', borderRadius: '6px', fontSize: '13px', background: '#fff', resize: 'vertical', boxSizing: 'border-box' }} />
-                                <small style={{ fontSize: '10px', color: '#6B7280' }}>{form.message_a.length}/120</small>
-                            </div>
-                            {/* Preview A */}
-                            {(form.title_a || form.message_a) && (
-                                <div style={{ marginTop: '10px', background: '#111827', borderRadius: '8px', padding: '8px 12px', display: 'flex', gap: '8px' }}>
-                                    <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: '#3b82f6', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}>🔔</div>
-                                    <div>
-                                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#fff' }}>{form.title_a || 'Título A'}</div>
-                                        <div style={{ fontSize: '10px', color: '#9CA3AF', marginTop: '1px' }}>{form.message_a || 'Mensagem A'}</div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+  const mediaConv       = 1.5;
+  const taxaV2C         = funilVisitas > 0 ? (funilCarrinho / funilVisitas) * 100 : 0;
+  const taxaC2O         = funilCarrinho > 0 ? (funilCheckout / funilCarrinho) * 100 : 0;
+  const produtoDestaque = topPaginasPwa.find(p => p && p !== '/' && p !== 'install' && p.length > 1) ?? null;
 
-                        {/* Variante B */}
-                        <div style={{ border: '2px solid #10b981', borderRadius: '12px', padding: '16px', background: '#f0fdf4' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-                                <span style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#10b981', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px', flexShrink: 0 }}>B</span>
-                                <span style={{ fontSize: '13px', fontWeight: 700, color: '#059669' }}>Variante B</span>
-                                <span style={{ marginLeft: 'auto', fontSize: '11px', color: '#10b981', background: '#dcfce7', padding: '2px 8px', borderRadius: '999px' }}>≈{metade.toLocaleString('pt-BR')} dispositivos</span>
-                            </div>
-                            <div style={{ marginBottom: '10px' }}>
-                                <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Título</label>
-                                <input type="text" value={form.title_b} maxLength={50} onChange={e => setForm({ ...form, title_b: e.target.value })} placeholder="Ex: Não perca essa chance!" style={{ width: '100%', padding: '8px', border: '1px solid #bbf7d0', borderRadius: '6px', fontSize: '13px', background: '#fff', boxSizing: 'border-box' }} />
-                                <small style={{ fontSize: '10px', color: '#6B7280' }}>{form.title_b.length}/50</small>
-                            </div>
-                            <div>
-                                <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Mensagem</label>
-                                <textarea value={form.message_b} maxLength={120} rows={3} onChange={e => setForm({ ...form, message_b: e.target.value })} placeholder="Ex: Sua oferta especial expira em breve!" style={{ width: '100%', padding: '8px', border: '1px solid #bbf7d0', borderRadius: '6px', fontSize: '13px', background: '#fff', resize: 'vertical', boxSizing: 'border-box' }} />
-                                <small style={{ fontSize: '10px', color: '#6B7280' }}>{form.message_b.length}/120</small>
-                            </div>
-                            {(form.title_b || form.message_b) && (
-                                <div style={{ marginTop: '10px', background: '#111827', borderRadius: '8px', padding: '8px 12px', display: 'flex', gap: '8px' }}>
-                                    <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: '#10b981', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}>🔔</div>
-                                    <div>
-                                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#fff' }}>{form.title_b || 'Título B'}</div>
-                                        <div style={{ fontSize: '10px', color: '#9CA3AF', marginTop: '1px' }}>{form.message_b || 'Mensagem B'}</div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* URL comum */}
-                    <div style={{ marginBottom: '16px' }}>
-                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>🔗 Link (comum para A e B)</label>
-                        <input type="text" value={form.url} onChange={e => setForm({ ...form, url: e.target.value })} placeholder="https://..." style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px', boxSizing: 'border-box' }} />
-                    </div>
-
-                    {/* Aviso split */}
-                    <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: '8px', padding: '10px 14px', marginBottom: '16px', fontSize: '12px', color: '#92400E' }}>
-                        ⚠️ <strong>Importante:</strong> O split 50/50 é feito via filtro de session_count par/ímpar — uma boa aproximação para bases com mais de 50 inscritos.
-                        Para bases menores, os grupos podem ter leve desbalanceamento.
-                    </div>
-
-                    {/* A/B Automático */}
-                    <div style={{ background: '#F0FDF4', border: '1px solid #86efac', borderRadius: '10px', padding: '14px 16px', marginBottom: '16px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: form.auto_escalar ? '12px' : '0' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <span style={{ fontSize: '18px' }}>🤖</span>
-                                <div>
-                                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#166534' }}>Escalonamento automático</div>
-                                    <div style={{ fontSize: '11px', color: '#15803D' }}>O sistema avalia o vencedor e escala automaticamente</div>
-                                </div>
-                            </div>
-                            <Toggle checked={form.auto_escalar ?? true} onChange={v => setForm({ ...form, auto_escalar: v })} />
-                        </div>
-                        {form.auto_escalar && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <label style={{ fontSize: '12px', color: '#166534', fontWeight: 600, whiteSpace: 'nowrap' }}>Avaliar após</label>
-                                <select
-                                    value={form.horas_avaliacao ?? 4}
-                                    onChange={e => setForm({ ...form, horas_avaliacao: parseInt(e.target.value) })}
-                                    style={{ padding: '6px 10px', border: '1px solid #86efac', borderRadius: '6px', background: 'white', fontSize: '12px', color: '#166534' }}
-                                >
-                                    <option value={2}>2 horas</option>
-                                    <option value={4}>4 horas</option>
-                                    <option value={6}>6 horas</option>
-                                    <option value={12}>12 horas</option>
-                                    <option value={24}>24 horas</option>
-                                </select>
-                                <span style={{ fontSize: '11px', color: '#15803D' }}>— o vencedor será enviado para toda a base</span>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Botão enviar */}
-                    <button
-                        onClick={onSend}
-                        disabled={sending || !podeEnviar}
-                        style={{ width: '100%', padding: '14px', borderRadius: '10px', border: 'none', cursor: podeEnviar && !sending ? 'pointer' : 'not-allowed', fontSize: '14px', fontWeight: 700, background: podeEnviar && !sending ? 'linear-gradient(135deg, #3b82f6, #10b981)' : '#E5E7EB', color: podeEnviar && !sending ? '#fff' : '#9CA3AF', transition: 'all 0.2s' }}
-                    >
-                        {sending ? '🧪 Enviando as duas variantes...' : `🧪 Disparar Teste A/B para ${alcance.toLocaleString('pt-BR')} dispositivos`}
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-// ── Componente: Card de resultado A/B no histórico ───────────────────────────
-function ABResultCard({ test, onRefresh }: { test: ABTestItem; onRefresh: (id: number) => void }) {
-    const vencedor = test.vencedor;
-    const emAndamento = !vencedor && test.status === 'ativo';
-
-    const CardVariante = ({ variante, title, message, sent, opened, ctr, isVencedor }: {
-        variante: 'A' | 'B'; title: string; message: string;
-        sent: number; opened: number; ctr: number; isVencedor: boolean;
-    }) => {
-        const cor = variante === 'A' ? '#3b82f6' : '#10b981';
-        const corBg = variante === 'A' ? '#eff6ff' : '#f0fdf4';
-        const corBorder = variante === 'A' ? '#bfdbfe' : '#bbf7d0';
-        return (
-            <div style={{ border: `2px solid ${isVencedor ? cor : corBorder}`, borderRadius: '10px', padding: '12px', background: isVencedor ? corBg : '#fff', position: 'relative', flex: 1 }}>
-                {isVencedor && (
-                    <div style={{ position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)', background: cor, color: '#fff', fontSize: '10px', fontWeight: 700, padding: '2px 10px', borderRadius: '999px', whiteSpace: 'nowrap' }}>🏆 VENCEDOR</div>
-                )}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
-                    <span style={{ width: '22px', height: '22px', borderRadius: '6px', background: cor, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '12px' }}>{variante}</span>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: '12px', fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</div>
-                        <div style={{ fontSize: '11px', color: '#6B7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{message}</div>
-                    </div>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', textAlign: 'center' }}>
-                    {[{ label: 'Enviados', value: sent.toLocaleString('pt-BR'), color: '#4F46E5' }, { label: 'Abertos', value: opened.toLocaleString('pt-BR'), color: '#10B981' }, { label: 'CTR', value: `${ctr}%`, color: cor }].map((m, i) => (
-                        <div key={i} style={{ background: '#F9FAFB', borderRadius: '6px', padding: '6px 4px' }}>
-                            <div style={{ fontSize: '14px', fontWeight: 700, color: m.color }}>{m.value}</div>
-                            <div style={{ fontSize: '10px', color: '#9CA3AF' }}>{m.label}</div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        );
+  // ── DIAGNÓSTICO ──
+  const getDiagnostico = (): Diagnostico => {
+    if (funilVisitas === 0) return {
+      severidade: 'alerta', badge: 'Sem tráfego',
+      titulo: 'Nenhuma visita registrada ainda',
+      urgencia: 'O app ainda não tem dados de tráfego para analisar.',
+      descricao: 'Compartilhe o link de instalação com seus clientes para começar a capturar dados e visitantes.',
+      causas: ['App não divulgado para a base de clientes', 'Link de instalação não compartilhado', 'Nenhuma campanha de lançamento ativa'],
+      acoes: [
+        { label: 'Campanha de lançamento', icon: Icon.lightning },
+        { label: 'Cupom de boas-vindas', icon: Icon.target },
+      ],
+      proximo_passo: 'Próximo passo: registrar as primeiras 10 visitas',
     };
 
-    return (
-        <div style={{ border: '1px solid #E5E7EB', borderRadius: '12px', padding: '16px', marginBottom: '12px', background: '#fff' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '16px' }}>🧪</span>
-                    <div>
-                        <span style={{ fontSize: '13px', fontWeight: 700, color: '#111827' }}>Teste A/B #{test.id}</span>
-                        <span style={{ marginLeft: '8px', fontSize: '11px', color: '#6B7280' }}>{test.created_at ? new Date(test.created_at).toLocaleDateString('pt-BR') : ''}</span>
-                    </div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    {emAndamento && <span style={{ background: '#FEF3C7', color: '#92400E', padding: '2px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: 600 }}>⏳ Em andamento</span>}
-                    {vencedor === 'empate' && <span style={{ background: '#F3F4F6', color: '#374151', padding: '2px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: 600 }}>🤝 Empate</span>}
-                    {(vencedor === 'A' || vencedor === 'B') && <span style={{ background: '#DCFCE7', color: '#166534', padding: '2px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: 600 }}>🏆 Variante {vencedor} venceu</span>}
-                    <button onClick={() => onRefresh(test.id)} style={{ background: '#F3F4F6', border: 'none', borderRadius: '6px', padding: '4px 10px', cursor: 'pointer', fontSize: '12px', color: '#374151' }}>🔄 Atualizar</button>
-                </div>
-            </div>
-            <div style={{ display: 'flex', gap: '12px' }}>
-                <CardVariante variante="A" title={test.title_a} message={test.message_a} sent={test.sent_a} opened={test.opened_a} ctr={test.ctr_a} isVencedor={vencedor === 'A'} />
-                <div style={{ display: 'flex', alignItems: 'center', color: '#9CA3AF', fontSize: '18px', fontWeight: 700, flexShrink: 0 }}>vs</div>
-                <CardVariante variante="B" title={test.title_b} message={test.message_b} sent={test.sent_b} opened={test.opened_b} ctr={test.ctr_b} isVencedor={vencedor === 'B'} />
-            </div>
-        </div>
-    );
-}
-// ────────────────────────────────────────────────────────────────────────────
+    if (funilVisitas > 0 && funilCarrinho === 0) {
+      const proj = ticketApp > 0 ? `Converter 2% dessas ${funilVisitas} visitas geraria ${brl(Math.round(funilVisitas * 0.02 * ticketApp))} em receita` : '';
+      return {
+        severidade: 'critico', badge: 'Gargalo identificado',
+        titulo: `${funilVisitas} visitas — nenhuma adição ao carrinho`,
+        urgencia: 'Visitantes chegam mas não iniciam o processo de compra.',
+        descricao: 'O problema está na etapa de decisão. O cliente visualiza mas não age. Uma oferta com incentivo claro costuma resolver.',
+        causas: ['Preço acima da percepção de valor', 'Frete alto ou revelado tarde', 'Ausência de prova social ou avaliações', 'Falta de urgência ou escassez na oferta'],
+        acoes: [
+          { label: 'Criar campanha com cupom', icon: Icon.lightning },
+          { label: 'Oferta de urgência', icon: Icon.target },
+          { label: 'Frete grátis por tempo limitado', icon: Icon.arrow },
+        ],
+        projecao_inline: proj,
+        proximo_passo: 'Próximo passo: gerar o primeiro carrinho',
+      };
+    }
 
-// ── Componente: Modal de geração de mensagem com IA ─────────────────────────
-function IAGerarModal({
-    objetivo,
-    mediaAbertura,
-    onAplicar,
-    onClose,
-}: {
-    objetivo: ObjetivoCampanha;
-    mediaAbertura: number;
-    onAplicar: (title: string, message: string) => void;
-    onClose: () => void;
-}) {
-    const [produto, setProduto] = useState('');
-    const [contexto, setContexto] = useState('');
-    const [tom, setTom] = useState<'urgente' | 'amigavel' | 'exclusivo'>('urgente');
-    const [gerando, setGerando] = useState(false);
-    const [resultado, setResultado] = useState<{ titulo: string; mensagem: string } | null>(null);
-    const [erro, setErro] = useState('');
+    if (funilCarrinho > 0 && funilCheckout === 0) {
+      const proj = ticketApp > 0 ? `Recuperar ${funilCarrinho} carrinho${funilCarrinho > 1 ? 's' : ''} representa até ${brl(funilCarrinho * ticketApp)} em receita potencial` : '';
+      return {
+        severidade: 'critico', badge: 'Abandono no checkout',
+        titulo: `${funilCarrinho} carrinho${funilCarrinho > 1 ? 's' : ''} abandonado${funilCarrinho > 1 ? 's' : ''} sem nenhuma venda`,
+        urgencia: 'Clientes adicionam produtos mas não finalizam a compra.',
+        descricao: 'O gargalo está na etapa de checkout. O cliente quer comprar mas algo o impede de concluir.',
+        causas: ['Frete revelado apenas no checkout', 'Método de pagamento não disponível', 'Processo de compra longo ou confuso', 'Insegurança na finalização'],
+        acoes: [
+          { label: 'Recuperar carrinhos + frete grátis', icon: Icon.lightning },
+          { label: 'Cupom de finalização', icon: Icon.target },
+          { label: 'Push de urgência — tempo limitado', icon: Icon.arrow },
+        ],
+        projecao_inline: proj,
+        proximo_passo: 'Próximo passo: converter o primeiro carrinho em venda',
+      };
+    }
 
-    const objConfig = objetivo ? OBJETIVOS.find(o => o.id === objetivo) : null;
+    if (taxaConvApp < mediaConv && funilVisitas > 10) {
+      const gap = brl(Math.round(funilVisitas * (mediaConv / 100) * ticketApp) - receita);
+      return {
+        severidade: 'alerta', badge: 'Abaixo da média',
+        titulo: `Taxa de conversão ${taxaConvApp}% — média do mercado é ${mediaConv}%`,
+        urgencia: `Diferença de ${(mediaConv - taxaConvApp).toFixed(1)}pp em relação à média do setor.`,
+        descricao: 'Sua taxa está abaixo da média. Ajustes de oferta e segmentação costumam resolver isso rapidamente.',
+        causas: ['Campanhas sem segmentação de comportamento', 'Copy das mensagens pouco persuasivo', 'Frequência de push insuficiente', 'Falta de urgência ou escassez'],
+        acoes: [
+          { label: 'Campanha segmentada — compradores', icon: Icon.target },
+          { label: 'Push de urgência', icon: Icon.lightning },
+          ...(ticketApp > 0 ? [{ label: `Potencial: +${gap} em receita`, icon: Icon.dollar }] : []),
+        ],
+        projecao_inline: ticketApp > 0 ? `Na média do mercado (${mediaConv}%) você faturaria mais ${gap} com o tráfego atual` : '',
+        proximo_passo: `Próximo passo: atingir ${mediaConv}% de taxa de conversão`,
+      };
+    }
 
-    const gerarMensagem = async () => {
-        setGerando(true);
-        setErro('');
-        setResultado(null);
-
-        const toms: Record<string, string> = {
-            urgente: 'urgente e com senso de escassez (tempo limitado, estoque acabando)',
-            amigavel: 'amigável, acolhedor e próximo, como um amigo que está avisando',
-            exclusivo: 'exclusivo e VIP, como se fosse uma oferta só para aquele cliente',
-        };
-
-        const prompt = `Você é um especialista em marketing de push notifications para e-commerce brasileiro.
-
-Gere uma notificação push de alta conversão com:
-- Objetivo: ${objConfig ? objConfig.label : 'Engajamento geral'}
-- Etapa do funil: ${objConfig ? objConfig.funilLabel : 'Topo'}
-- Tom: ${toms[tom]}
-${produto ? `- Produto/contexto: ${produto}` : ''}
-${contexto ? `- Informação extra: ${contexto}` : ''}
-- CTR médio atual da loja: ${mediaAbertura}% (média do setor: 5-10%)
-
-Regras obrigatórias:
-- Título: máximo 50 caracteres, impactante, pode usar 1 emoji
-- Mensagem: máximo 120 caracteres, clara e com CTA direto
-- Linguagem: português brasileiro informal
-- NÃO use aspas no início/fim
-- NÃO use palavras genéricas como "incrível" ou "fantástico"
-
-Responda APENAS em JSON válido, sem markdown, sem explicações:
-{"titulo": "...", "mensagem": "..."}`;
-
-        try {
-            const response = await fetch('https://api.anthropic.com/v1/messages', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: 'claude-sonnet-4-20250514',
-                    max_tokens: 200,
-                    messages: [{ role: 'user', content: prompt }],
-                }),
-            });
-
-            const data = await response.json();
-            const text = data.content?.[0]?.text ?? '';
-            const clean = text.replace(/```json|```/g, '').trim();
-            const parsed = JSON.parse(clean);
-
-            if (parsed.titulo && parsed.mensagem) {
-                setResultado({ titulo: parsed.titulo, mensagem: parsed.mensagem });
-            } else {
-                setErro('Resposta inesperada da IA. Tente novamente.');
-            }
-        } catch (e) {
-            setErro('Erro ao conectar com a IA. Verifique sua conexão.');
-        } finally {
-            setGerando(false);
-        }
+    if (carrinhosValor > 0 && receita === 0) return {
+      severidade: 'alerta', badge: 'Receita represada',
+      titulo: `${brl(carrinhosValor)} em carrinhos sem nenhuma venda concluída`,
+      urgencia: 'Há valor potencial parado em carrinhos abandonados.',
+      descricao: 'Ativar as automações de recuperação pode converter parte desse valor hoje mesmo.',
+      causas: ['Automação de carrinho desativada', 'Clientes sem identificação vinculada', 'Intervalo de recuperação muito longo'],
+      acoes: [
+        { label: 'Ativar recuperação de carrinhos', icon: Icon.lightning },
+        { label: 'Enviar cupom de retorno', icon: Icon.target },
+      ],
+      proximo_passo: 'Próximo passo: fechar a primeira venda',
     };
 
-    return (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={onClose}>
-            <div style={{ background: '#fff', borderRadius: '16px', width: '100%', maxWidth: '520px', boxShadow: '0 20px 60px rgba(0,0,0,0.3)', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
-
-                {/* Header */}
-                <div style={{ padding: '20px 24px 16px', background: 'linear-gradient(135deg, #4F46E5, #7C3AED)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                        <div style={{ fontSize: '16px', fontWeight: 700, color: '#fff' }}>🧠 Gerar mensagem com IA</div>
-                        <div style={{ fontSize: '12px', color: '#C4B5FD', marginTop: '2px' }}>
-                            {objConfig ? `Otimizado para: ${objConfig.label} · ${objConfig.funilLabel}` : 'Informe o contexto para gerar'}
-                        </div>
-                    </div>
-                    <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '8px', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px', color: '#fff' }}>×</button>
-                </div>
-
-                <div style={{ padding: '20px 24px' }}>
-                    {/* Campos de contexto */}
-                    <div style={{ marginBottom: '14px' }}>
-                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '5px' }}>
-                            🛍️ Produto ou promoção (opcional)
-                        </label>
-                        <input
-                            type="text"
-                            value={produto}
-                            onChange={e => setProduto(e.target.value)}
-                            placeholder="Ex: Tênis Nike Air Max, Desconto 20%, Frete grátis..."
-                            style={{ width: '100%', padding: '9px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '13px', boxSizing: 'border-box' }}
-                        />
-                    </div>
-
-                    <div style={{ marginBottom: '14px' }}>
-                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '5px' }}>
-                            📝 Contexto extra (opcional)
-                        </label>
-                        <input
-                            type="text"
-                            value={contexto}
-                            onChange={e => setContexto(e.target.value)}
-                            placeholder="Ex: Só até meia-noite, Cupom SAVE10, Últimas 3 unidades..."
-                            style={{ width: '100%', padding: '9px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '13px', boxSizing: 'border-box' }}
-                        />
-                    </div>
-
-                    {/* Tom */}
-                    <div style={{ marginBottom: '20px' }}>
-                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '8px' }}>🎭 Tom da mensagem</label>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                            {([
-                                { id: 'urgente', label: '⚡ Urgente', desc: 'Escassez e tempo' },
-                                { id: 'amigavel', label: '😊 Amigável', desc: 'Próximo e acolhedor' },
-                                { id: 'exclusivo', label: '👑 Exclusivo', desc: 'VIP e especial' },
-                            ] as const).map(t => (
-                                <button
-                                    key={t.id}
-                                    onClick={() => setTom(t.id)}
-                                    style={{
-                                        flex: 1, padding: '10px 8px', borderRadius: '8px', cursor: 'pointer',
-                                        border: `2px solid ${tom === t.id ? '#4F46E5' : '#E5E7EB'}`,
-                                        background: tom === t.id ? '#EEF2FF' : '#fff',
-                                        textAlign: 'center',
-                                    }}
-                                >
-                                    <div style={{ fontSize: '12px', fontWeight: 700, color: tom === t.id ? '#4F46E5' : '#374151' }}>{t.label}</div>
-                                    <div style={{ fontSize: '10px', color: '#6B7280', marginTop: '2px' }}>{t.desc}</div>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Botão gerar */}
-                    <button
-                        onClick={gerarMensagem}
-                        disabled={gerando}
-                        style={{
-                            width: '100%', padding: '13px', borderRadius: '10px', border: 'none',
-                            background: gerando ? '#E5E7EB' : 'linear-gradient(135deg, #4F46E5, #7C3AED)',
-                            color: gerando ? '#9CA3AF' : '#fff', fontSize: '14px', fontWeight: 700,
-                            cursor: gerando ? 'not-allowed' : 'pointer', marginBottom: '16px',
-                        }}
-                    >
-                        {gerando ? '🧠 Gerando...' : '✨ Gerar mensagem agora'}
-                    </button>
-
-                    {/* Erro */}
-                    {erro && (
-                        <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '8px', padding: '10px 14px', fontSize: '13px', color: '#DC2626', marginBottom: '12px' }}>
-                            ⚠️ {erro}
-                        </div>
-                    )}
-
-                    {/* Resultado */}
-                    {resultado && (
-                        <div style={{ border: '2px solid #4F46E5', borderRadius: '12px', overflow: 'hidden' }}>
-                            {/* Preview estilo push */}
-                            <div style={{ background: '#111827', padding: '14px 16px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: objConfig?.cor ?? '#4F46E5', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>
-                                    {objConfig?.icon ?? '🔔'}
-                                </div>
-                                <div>
-                                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#fff', marginBottom: '3px' }}>{resultado.titulo}</div>
-                                    <div style={{ fontSize: '12px', color: '#9CA3AF' }}>{resultado.mensagem}</div>
-                                </div>
-                            </div>
-                            {/* Métricas */}
-                            <div style={{ background: '#EEF2FF', padding: '10px 16px', display: 'flex', gap: '16px', fontSize: '11px', color: '#4338CA' }}>
-                                <span>📏 Título: {resultado.titulo.length}/50 chars</span>
-                                <span>📏 Mensagem: {resultado.mensagem.length}/120 chars</span>
-                            </div>
-                            {/* Botões de ação */}
-                            <div style={{ padding: '12px 16px', display: 'flex', gap: '8px' }}>
-                                <button
-                                    onClick={() => { onAplicar(resultado.titulo, resultado.mensagem); onClose(); }}
-                                    style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: '#4F46E5', color: '#fff', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}
-                                >
-                                    ✅ Usar esta mensagem
-                                </button>
-                                <button
-                                    onClick={gerarMensagem}
-                                    disabled={gerando}
-                                    style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #d1d5db', background: '#fff', color: '#374151', fontSize: '13px', cursor: 'pointer' }}
-                                >
-                                    🔄 Gerar outra
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-}
-// ────────────────────────────────────────────────────────────────────────────
-
-// ── Componente: Aba de Jornada Visual ────────────────────────────────────────
-function JornadaTab({ token, API_URL, brl }: { token: string | null; API_URL: string; brl: (v: number) => string }) {
-    const [jornada, setJornada] = useState<JornadaNotif[]>([]);
-    const [resumo, setResumo] = useState<JornadaResumo | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [notifSelecionada, setNotifSelecionada] = useState<JornadaNotif | null>(null);
-
-    const fetchJornada = () => {
-        if (!token) return;
-        setLoading(true);
-        fetch(`${API_URL}/analytics/jornada`, { headers: { Authorization: `Bearer ${token}` } })
-            .then(r => r.json())
-            .then(data => {
-                setJornada(data.jornada ?? []);
-                setResumo(data.resumo ?? null);
-                if (data.jornada?.length > 0) setNotifSelecionada(data.jornada[0]);
-            })
-            .catch(() => {})
-            .finally(() => setLoading(false));
+    return {
+      severidade: 'ok', badge: 'Performance saudável',
+      titulo: `Conversão em ${taxaConvApp}% — acima da média do mercado`,
+      urgencia: 'A loja está performando bem. Mantenha o ritmo de campanhas.',
+      descricao: 'Continue enviando campanhas segmentadas e acompanhe o funil semanalmente para manter a consistência.',
+      causas: [],
+      acoes: [
+        { label: 'Nova campanha para clientes VIP', icon: Icon.target },
+        { label: 'Campanha de novidades', icon: Icon.arrow },
+      ],
+      proximo_passo: `Próximo passo: manter conversão acima de ${(taxaConvApp + 0.5).toFixed(1)}%`,
     };
+  };
 
-    useEffect(() => { fetchJornada(); }, [token]);
+  const diag = getDiagnostico();
 
-    const formatDate = (s: string) => {
-        try {
-            const d = new Date(s);
-            return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        } catch { return s; }
-    };
+  const paleta = {
+    critico: { bg: C.dangerBg,  border: C.dangerBorder,  text: C.danger,  badgeBg: '#FEE2E2', accentIcon: C.danger },
+    alerta:  { bg: C.warningBg, border: C.warningBorder, text: C.warning, badgeBg: '#FEF3C7', accentIcon: C.warning },
+    ok:      { bg: C.successBg, border: C.successBorder, text: C.success, badgeBg: '#D1FAE5', accentIcon: C.success },
+  }[diag.severidade];
 
-    if (loading) return (
-        <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-            <div style={{ fontSize: '32px', marginBottom: '12px', animation: 'spin 1s linear infinite' }}>🗺️</div>
-            <div style={{ color: '#6B7280', fontSize: '14px' }}>Carregando jornada...</div>
+  const severidadeIcon = {
+    critico: Icon.alert,
+    alerta:  Icon.info,
+    ok:      Icon.check,
+  }[diag.severidade];
+
+  // Projeções de ganho
+  const projecoes = ticketApp > 0 && funilVisitas > 0 ? [
+    { pct: 1, valor: Math.round(funilVisitas * 0.01 * ticketApp), label: 'Conservador' },
+    { pct: 3, valor: Math.round(funilVisitas * 0.03 * ticketApp), label: 'Realista', destaque: true },
+    { pct: 5, valor: Math.round(funilVisitas * 0.05 * ticketApp), label: 'Otimista' },
+  ] : [];
+
+  // ── RENDER ──────────────────────────────────────────────────────────────────
+  return (
+    <section className="animate-fade-in">
+
+      {/* ── BLOCO DE DIAGNÓSTICO ───────────────────────────────────────── */}
+      <div style={{ background: paleta.bg, border: `1px solid ${paleta.border}`, borderRadius: '10px', padding: '18px 20px', marginBottom: '20px' }}>
+
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+          <span style={{ color: paleta.text, display: 'flex' }}>{severidadeIcon}</span>
+          <Badge color={paleta.text} bg={paleta.badgeBg} border={paleta.border}>{diag.badge}</Badge>
+          <span style={{ fontSize: '13px', color: paleta.text, fontWeight: 500, marginLeft: '2px' }}>{diag.urgencia}</span>
         </div>
-    );
 
-    if (!jornada.length) return (
-        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#6B7280' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🗺️</div>
-            <div style={{ fontWeight: 700, fontSize: '16px', color: '#111827', marginBottom: '8px' }}>Nenhuma jornada registrada ainda</div>
-            <div style={{ fontSize: '13px', lineHeight: 1.6, maxWidth: '340px', margin: '0 auto' }}>
-                A jornada aparece quando um usuário clica em um push e acessa a loja.
-                Os cliques são detectados automaticamente pelo loader.
+        {/* Título */}
+        <div style={{ fontSize: '15px', fontWeight: 700, color: C.text, marginBottom: '4px' }}>{diag.titulo}</div>
+        <div style={{ fontSize: '13px', color: C.textSoft, lineHeight: 1.55, marginBottom: diag.causas.length > 0 ? '12px' : '0' }}>{diag.descricao}</div>
+
+        {/* Causas */}
+        {diag.causas.length > 0 && (
+          <div style={{ marginBottom: '12px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 600, color: C.textMid, textTransform: 'uppercase' as const, letterSpacing: '0.06em', marginBottom: '6px' }}>Possíveis causas</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+              {diag.causas.map((c, i) => (
+                <span key={i} style={{ fontSize: '12px', color: C.textMid, background: C.white, padding: '3px 10px', borderRadius: '4px', border: `1px solid ${C.neutralBorder}` }}>{c}</span>
+              ))}
             </div>
+          </div>
+        )}
+
+        {/* Projeção inline */}
+        {diag.projecao_inline && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: C.dark, color: '#FCD34D', borderRadius: '6px', padding: '9px 14px', marginBottom: '12px', fontSize: '12px', fontWeight: 600 }}>
+            <span style={{ color: '#FCD34D', display: 'flex' }}>{Icon.dollar}</span>
+            {diag.projecao_inline}
+          </div>
+        )}
+
+        {/* Ações */}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
+          {diag.acoes.map((acao, i) => (
+            <ActionBtn key={i} primary={i === 0} onClick={onNavigateCampanhas} contextColor={paleta.text}>
+              {acao.icon} {acao.label}
+            </ActionBtn>
+          ))}
         </div>
-    );
 
-    const n = notifSelecionada;
-    const convertidos = n?.subscribers.filter(s => s.converted) ?? [];
-    const naoConvertidos = n?.subscribers.filter(s => !s.converted) ?? [];
+        {/* Próximo passo + Insight */}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <div style={{ flex: 1, minWidth: '180px', display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.5)', borderRadius: '6px', padding: '7px 10px', fontSize: '12px', color: C.textMid, fontWeight: 500 }}>
+            <span style={{ color: C.brand, display: 'flex', flexShrink: 0 }}>{Icon.target}</span>
+            {diag.proximo_passo}
+          </div>
+          {produtoDestaque && (
+            <div style={{ flex: 1, minWidth: '180px', display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.5)', borderRadius: '6px', padding: '7px 10px', fontSize: '12px', color: C.textSoft }}>
+              <span style={{ color: C.brand, display: 'flex', flexShrink: 0 }}>{Icon.bulb}</span>
+              Mais visitada: <strong style={{ color: C.textMid, marginLeft: '3px' }}>"{produtoDestaque.replace(/\//g, '').slice(0, 20)}"</strong> — use na campanha
+            </div>
+          )}
+        </div>
 
-    // Etapas do fluxo
-    const etapas = n ? [
-        { icon: '📤', label: 'Enviados', valor: n.enviados, cor: '#4F46E5', bg: '#EEF2FF', desc: 'notificações disparadas' },
-        { icon: '👆', label: 'Clicaram', valor: n.cliques, cor: '#3b82f6', bg: '#EFF6FF', desc: `CTR ${n.taxa_conversao}%` },
-        { icon: '🛒', label: 'Compraram', valor: n.convertidos, cor: '#10B981', bg: '#F0FDF4', desc: n.receita_atribuida > 0 ? brl(n.receita_atribuida) : 'sem conversão' },
-    ] : [];
-
-    const pctClique = n && n.enviados > 0 ? Math.round((n.cliques / n.enviados) * 100) : 0;
-    const pctConv = n && n.cliques > 0 ? Math.round((n.convertidos / n.cliques) * 100) : 0;
-
-    return (
-        <div>
-            {/* Cards de resumo global */}
-            {resumo && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '20px' }}>
-                    {[
-                        { icon: '👆', label: 'Total Cliques', value: resumo.total_cliques.toLocaleString('pt-BR'), color: '#4F46E5' },
-                        { icon: '💰', label: 'Convertidos', value: resumo.total_convertidos.toLocaleString('pt-BR'), color: '#10B981' },
-                        { icon: '📊', label: 'Taxa Conv.', value: `${resumo.taxa_conversao}%`, color: '#f59e0b' },
-                        { icon: '💵', label: 'Receita Atribuída', value: brl(resumo.receita_atribuida), color: '#059669' },
-                    ].map((card, i) => (
-                        <div key={i} style={{ background: '#F9FAFB', border: `2px solid ${card.color}20`, borderRadius: '10px', padding: '12px', textAlign: 'center' }}>
-                            <div style={{ fontSize: '20px', marginBottom: '4px' }}>{card.icon}</div>
-                            <div style={{ fontSize: '18px', fontWeight: 700, color: card.color }}>{card.value}</div>
-                            <div style={{ fontSize: '10px', color: '#6B7280', marginTop: '2px' }}>{card.label}</div>
-                        </div>
-                    ))}
+        {/* Mini funil */}
+        {funilVisitas > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '14px', flexWrap: 'wrap' }}>
+            {[
+              { label: 'Visitas', val: funilVisitas, pct: null, ok: true },
+              { label: 'Carrinho', val: funilCarrinho, pct: taxaV2C, ok: funilCarrinho > 0 },
+              { label: 'Checkout', val: funilCheckout, pct: taxaC2O, ok: funilCheckout > 0 },
+            ].map((e, i) => (
+              <React.Fragment key={i}>
+                {i > 0 && <span style={{ color: C.neutralLight, fontSize: '14px' }}>›</span>}
+                <div style={{ background: C.white, borderRadius: '6px', padding: '6px 12px', textAlign: 'center' as const, border: `1px solid ${e.ok ? C.neutralBorder : C.dangerBorder}`, minWidth: '70px' }}>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: e.ok ? C.text : C.danger }}>{e.val}</div>
+                  <div style={{ fontSize: '10px', color: C.textSoft, marginTop: '1px' }}>{e.label}</div>
+                  {e.pct !== null && <div style={{ fontSize: '10px', fontWeight: 600, color: e.ok ? C.success : C.danger, marginTop: '1px' }}>{e.pct.toFixed(1)}%</div>}
                 </div>
-            )}
-
-            <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '16px' }}>
-                {/* Lista lateral de campanhas */}
-                <div>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>
-                        Campanhas com cliques
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        {jornada.map(j => {
-                            const ativa = notifSelecionada?.notif_id === j.notif_id;
-                            return (
-                                <button
-                                    key={j.notif_id}
-                                    onClick={() => setNotifSelecionada(j)}
-                                    style={{
-                                        padding: '10px 12px', borderRadius: '10px', border: 'none', textAlign: 'left', cursor: 'pointer',
-                                        background: ativa ? '#111827' : '#F9FAFB',
-                                        boxShadow: ativa ? '0 2px 8px rgba(0,0,0,0.2)' : 'none',
-                                        transition: 'all 0.2s',
-                                    }}
-                                >
-                                    <div style={{ fontSize: '12px', fontWeight: 700, color: ativa ? '#fff' : '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: '4px' }}>
-                                        {j.titulo || '—'}
-                                    </div>
-                                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                        <span style={{ fontSize: '11px', color: ativa ? '#9CA3AF' : '#6B7280' }}>
-                                            👆 {j.cliques}
-                                        </span>
-                                        {j.convertidos > 0 && (
-                                            <span style={{ background: ativa ? '#10B98130' : '#dcfce7', color: ativa ? '#6ee7b7' : '#166534', padding: '1px 6px', borderRadius: '999px', fontSize: '10px', fontWeight: 600 }}>
-                                                ✅ {j.convertidos} compras
-                                            </span>
-                                        )}
-                                    </div>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-
-                {/* Área principal — fluxo visual */}
-                {n && (
-                    <div>
-                        {/* Header da campanha selecionada */}
-                        <div style={{ background: '#111827', borderRadius: '12px', padding: '14px 18px', marginBottom: '16px' }}>
-                            <div style={{ fontSize: '13px', fontWeight: 700, color: '#fff', marginBottom: '2px' }}>{n.titulo}</div>
-                            <div style={{ fontSize: '11px', color: '#9CA3AF' }}>{n.mensagem}</div>
-                        </div>
-
-                        {/* Fluxo visual horizontal */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0', marginBottom: '20px' }}>
-                            {etapas.map((e, i) => (
-                                <React.Fragment key={i}>
-                                    {/* Card da etapa */}
-                                    <div style={{ flex: 1, background: e.bg, border: `2px solid ${e.cor}30`, borderRadius: '12px', padding: '16px', textAlign: 'center' }}>
-                                        <div style={{ fontSize: '28px', marginBottom: '8px' }}>{e.icon}</div>
-                                        <div style={{ fontSize: '26px', fontWeight: 800, color: e.cor, marginBottom: '4px' }}>
-                                            {e.valor > 0 ? e.valor.toLocaleString('pt-BR') : '—'}
-                                        </div>
-                                        <div style={{ fontSize: '12px', fontWeight: 700, color: '#374151', marginBottom: '2px' }}>{e.label}</div>
-                                        <div style={{ fontSize: '11px', color: '#6B7280' }}>{e.desc}</div>
-                                    </div>
-
-                                    {/* Seta com % de conversão entre etapas */}
-                                    {i < etapas.length - 1 && (
-                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 8px', flexShrink: 0 }}>
-                                            <div style={{ fontSize: '11px', fontWeight: 700, color: i === 0 ? '#3b82f6' : '#10B981', marginBottom: '4px' }}>
-                                                {i === 0 ? `${pctClique}%` : `${pctConv}%`}
-                                            </div>
-                                            <div style={{ fontSize: '20px', color: '#9CA3AF' }}>→</div>
-                                        </div>
-                                    )}
-                                </React.Fragment>
-                            ))}
-                        </div>
-
-                        {/* Barra de perda visual */}
-                        <div style={{ background: '#F9FAFB', borderRadius: '12px', padding: '14px 16px', marginBottom: '16px' }}>
-                            <div style={{ fontSize: '12px', fontWeight: 700, color: '#374151', marginBottom: '10px' }}>📉 Onde os usuários saíram</div>
-                            <div style={{ marginBottom: '8px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#6B7280', marginBottom: '4px' }}>
-                                    <span>Enviados → Cliques</span>
-                                    <span style={{ fontWeight: 600, color: pctClique >= 5 ? '#10B981' : '#EF4444' }}>{pctClique}% clicaram</span>
-                                </div>
-                                <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '8px', overflow: 'hidden' }}>
-                                    <div style={{ width: `${pctClique}%`, background: '#3b82f6', height: '100%', borderRadius: '999px', transition: 'width 0.8s' }} />
-                                </div>
-                            </div>
-                            <div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#6B7280', marginBottom: '4px' }}>
-                                    <span>Cliques → Compras</span>
-                                    <span style={{ fontWeight: 600, color: pctConv >= 10 ? '#10B981' : '#f59e0b' }}>{pctConv}% compraram</span>
-                                </div>
-                                <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '8px', overflow: 'hidden' }}>
-                                    <div style={{ width: `${pctConv}%`, background: '#10B981', height: '100%', borderRadius: '999px', transition: 'width 0.8s' }} />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Subscribers divididos em convertidos vs não */}
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                            {/* Convertidos */}
-                            <div style={{ background: '#F0FDF4', border: '1px solid #86efac', borderRadius: '12px', padding: '14px' }}>
-                                <div style={{ fontSize: '12px', fontWeight: 700, color: '#166534', marginBottom: '10px' }}>
-                                    ✅ Compraram ({convertidos.length})
-                                </div>
-                                {convertidos.length === 0 ? (
-                                    <div style={{ fontSize: '12px', color: '#6B7280', textAlign: 'center', padding: '10px 0' }}>Nenhuma conversão</div>
-                                ) : (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '180px', overflowY: 'auto' }}>
-                                        {convertidos.map((s, i) => (
-                                            <div key={i} style={{ background: '#fff', borderRadius: '8px', padding: '8px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <div>
-                                                    <div style={{ fontSize: '10px', fontFamily: 'monospace', color: '#374151' }}>{s.visitor_id.substring(0, 14)}…</div>
-                                                    <div style={{ fontSize: '10px', color: '#6B7280' }}>{formatDate(s.clicked_at)}</div>
-                                                </div>
-                                                {s.revenue && (
-                                                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#059669' }}>{brl(s.revenue)}</div>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Não convertidos */}
-                            <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: '12px', padding: '14px' }}>
-                                <div style={{ fontSize: '12px', fontWeight: 700, color: '#92400E', marginBottom: '10px' }}>
-                                    ⏳ Clicaram mas não compraram ({naoConvertidos.length})
-                                </div>
-                                {naoConvertidos.length === 0 ? (
-                                    <div style={{ fontSize: '12px', color: '#6B7280', textAlign: 'center', padding: '10px 0' }}>Todos converteram!</div>
-                                ) : (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '180px', overflowY: 'auto' }}>
-                                        {naoConvertidos.map((s, i) => (
-                                            <div key={i} style={{ background: '#fff', borderRadius: '8px', padding: '8px 10px' }}>
-                                                <div style={{ fontSize: '10px', fontFamily: 'monospace', color: '#374151' }}>{s.visitor_id.substring(0, 14)}…</div>
-                                                <div style={{ fontSize: '10px', color: '#6B7280' }}>{formatDate(s.clicked_at)}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            <button onClick={fetchJornada} style={{ marginTop: '16px', background: 'none', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '8px 16px', cursor: 'pointer', fontSize: '13px', color: '#374151' }}>
-                🔄 Atualizar jornada
-            </button>
-        </div>
-    );
-}
-// ────────────────────────────────────────────────────────────────────────────
-
-// ── Componente: Score de Usuários ────────────────────────────────────────────
-function ScoreTab({
-    token, API_URL,
-    onSegmentar,
-}: {
-    token: string | null;
-    API_URL: string;
-    onSegmentar: (segmento: string, label: string) => void;
-}) {
-    const [data, setData] = useState<ScoreData | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [grupoAberto, setGrupoAberto] = useState<string | null>(null);
-
-    const fetchScores = () => {
-        if (!token) return;
-        setLoading(true);
-        fetch(`${API_URL}/analytics/scores`, { headers: { Authorization: `Bearer ${token}` } })
-            .then(r => r.json())
-            .then(d => setData(d))
-            .catch(() => {})
-            .finally(() => setLoading(false));
-    };
-
-    useEffect(() => { fetchScores(); }, [token]);
-
-    const formatDate = (s: string) => {
-        try {
-            const d = new Date(s);
-            const diff = Math.round((Date.now() - d.getTime()) / 86400000);
-            if (diff === 0) return 'hoje';
-            if (diff === 1) return 'ontem';
-            return `há ${diff} dias`;
-        } catch { return s; }
-    };
-
-    if (loading) return (
-        <div style={{ textAlign: 'center', padding: '50px', color: '#6B7280' }}>
-            <div style={{ fontSize: '32px', marginBottom: '10px' }}>⚡</div>
-            <div>Calculando scores...</div>
-        </div>
-    );
-
-    if (!data || data.total_visitors === 0) return (
-        <div style={{ textAlign: 'center', padding: '50px', color: '#6B7280' }}>
-            <div style={{ fontSize: '40px', marginBottom: '12px' }}>🎯</div>
-            <div style={{ fontWeight: 700, fontSize: '15px', color: '#111827', marginBottom: '8px' }}>Nenhum visitor ainda</div>
-            <div style={{ fontSize: '13px' }}>Os scores aparecem assim que os primeiros usuários acessarem a loja pelo app.</div>
-        </div>
-    );
-
-    return (
-        <div>
-            {/* Header com total */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <div>
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>🎯 Score de Usuários</div>
-                    <div style={{ fontSize: '12px', color: '#6B7280', marginTop: '2px' }}>
-                        {data.total_visitors.toLocaleString('pt-BR')} visitors classificados por comportamento
-                    </div>
-                </div>
-                <button onClick={fetchScores} style={{ background: 'none', border: '1px solid #E5E7EB', borderRadius: '8px', padding: '6px 12px', cursor: 'pointer', fontSize: '12px', color: '#374151' }}>
-                    🔄 Atualizar
-                </button>
-            </div>
-
-            {/* Barra de distribuição visual */}
-            <div style={{ display: 'flex', borderRadius: '10px', overflow: 'hidden', height: '12px', marginBottom: '20px' }}>
-                {data.grupos.filter(g => g.count > 0).map(g => (
-                    <div
-                        key={g.id}
-                        title={`${g.label}: ${g.count} (${g.pct}%)`}
-                        style={{ width: `${g.pct}%`, background: g.cor, transition: 'width 0.6s' }}
-                    />
-                ))}
-            </div>
-
-            {/* Cards de grupos */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {data.grupos.map(g => {
-                    const aberto = grupoAberto === g.id;
-                    return (
-                        <div key={g.id} style={{ border: `2px solid ${g.count > 0 ? g.cor + '40' : '#E5E7EB'}`, borderRadius: '12px', overflow: 'hidden', opacity: g.count === 0 ? 0.5 : 1 }}>
-                            {/* Header do grupo */}
-                            <div
-                                onClick={() => g.count > 0 && setGrupoAberto(aberto ? null : g.id)}
-                                style={{
-                                    padding: '14px 16px', background: aberto ? g.corBg : '#fff',
-                                    cursor: g.count > 0 ? 'pointer' : 'default',
-                                    display: 'flex', alignItems: 'center', gap: '12px',
-                                    transition: 'background 0.2s',
-                                }}
-                            >
-                                {/* Ícone + label */}
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-                                        <span style={{ fontSize: '16px', fontWeight: 700, color: g.cor }}>{g.label}</span>
-                                        <span style={{ background: g.corBg, color: g.cor, border: `1px solid ${g.cor}30`, padding: '2px 10px', borderRadius: '999px', fontSize: '12px', fontWeight: 700 }}>
-                                            {g.count.toLocaleString('pt-BR')} visitors
-                                        </span>
-                                        <span style={{ fontSize: '12px', color: '#9CA3AF' }}>{g.pct}%</span>
-                                    </div>
-                                    <div style={{ fontSize: '12px', color: '#6B7280' }}>{g.desc}</div>
-                                </div>
-
-                                {/* Barra de proporção */}
-                                <div style={{ width: '100px', flexShrink: 0 }}>
-                                    <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '6px', overflow: 'hidden' }}>
-                                        <div style={{ width: `${g.pct}%`, background: g.cor, height: '100%', borderRadius: '999px', transition: 'width 0.6s' }} />
-                                    </div>
-                                </div>
-
-                                {/* Botão de segmentar */}
-                                {g.count > 0 && (
-                                    <button
-                                        onClick={e => { e.stopPropagation(); onSegmentar(g.segmento_os, g.label); }}
-                                        style={{
-                                            padding: '6px 12px', borderRadius: '8px', border: `1px solid ${g.cor}`,
-                                            background: 'white', color: g.cor, fontSize: '12px', fontWeight: 600,
-                                            cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
-                                            transition: 'all 0.2s',
-                                        }}
-                                        onMouseOver={e => { e.currentTarget.style.background = g.corBg; }}
-                                        onMouseOut={e => { e.currentTarget.style.background = 'white'; }}
-                                    >
-                                        📢 Enviar push
-                                    </button>
-                                )}
-
-                                {g.count > 0 && (
-                                    <span style={{ color: '#9CA3AF', fontSize: '14px', flexShrink: 0 }}>{aberto ? '▲' : '▼'}</span>
-                                )}
-                            </div>
-
-                            {/* Lista de visitors expandida */}
-                            {aberto && g.visitors.length > 0 && (
-                                <div style={{ borderTop: `1px solid ${g.cor}20`, background: g.corBg }}>
-                                    <div style={{ padding: '10px 16px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                                        {g.visitors.map((v, i) => (
-                                            <div key={i} style={{ background: '#fff', borderRadius: '8px', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: g.cor, flexShrink: 0 }} />
-                                                <div style={{ flex: 1, fontFamily: 'monospace', fontSize: '11px', color: '#374151' }}>
-                                                    {v.visitor_id.substring(0, 20)}…
-                                                </div>
-                                                <div style={{ fontSize: '11px', color: '#6B7280' }}>
-                                                    {formatDate(v.ultima_visita)}
-                                                </div>
-                                                <div style={{ display: 'flex', gap: '4px' }}>
-                                                    {v.comprador && <span style={{ background: '#dcfce7', color: '#166534', padding: '1px 6px', borderRadius: '999px', fontSize: '10px', fontWeight: 600 }}>💰</span>}
-                                                    {v.carrinho_ativo && <span style={{ background: '#fef3c7', color: '#92400e', padding: '1px 6px', borderRadius: '999px', fontSize: '10px', fontWeight: 600 }}>🛒</span>}
-                                                </div>
-                                            </div>
-                                        ))}
-                                        {g.count > g.visitors.length && (
-                                            <div style={{ textAlign: 'center', fontSize: '11px', color: '#9CA3AF', padding: '4px' }}>
-                                                + {g.count - g.visitors.length} visitors não exibidos
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    );
-                })}
-            </div>
-
-            {/* Legenda */}
-            <div style={{ marginTop: '16px', padding: '12px 16px', background: '#F9FAFB', borderRadius: '10px', fontSize: '11px', color: '#6B7280', lineHeight: 1.6 }}>
-                <strong style={{ color: '#374151' }}>Como funciona:</strong> O score é calculado com base nas visitas, compras e carrinhos reais do seu banco.
-                Clique em <strong>"📢 Enviar push"</strong> para criar uma campanha já segmentada para aquele grupo.
-            </div>
-        </div>
-    );
-}
-// ────────────────────────────────────────────────────────────────────────────
-
-// ── Componente: Coach Automático ─────────────────────────────────────────────
-function CoachInsights({
-    notifs,
-    totalSubscribers,
-    activeSubscribers,
-    churnRate,
-    mediaAbertura,
-    ticketMedio,
-    taxaConvGlobal,
-    melhorHorario,
-    brl,
-    onAcao,
-}: {
-    notifs: OneSignalNotif[];
-    totalSubscribers: number;
-    activeSubscribers: number;
-    churnRate: number;
-    mediaAbertura: number;
-    ticketMedio: number;
-    taxaConvGlobal: number;
-    melhorHorario: string | null;
-    brl: (v: number) => string;
-    onAcao: (acao: string) => void;
-}) {
-    // Gera insights baseados nos dados reais
-    const insights: Array<{
-        nivel: 'critico' | 'aviso' | 'ok' | 'dica';
-        icon: string;
-        titulo: string;
-        detalhe: string;
-        acao?: { label: string; key: string };
-        cor: string; bg: string; border: string;
-    }> = [];
-
-    const CORES = {
-        critico: { cor: '#991b1b', bg: '#fef2f2', border: '#fecaca' },
-        aviso:   { cor: '#92400e', bg: '#fffbeb', border: '#fde68a' },
-        ok:      { cor: '#166534', bg: '#f0fdf4', border: '#bbf7d0' },
-        dica:    { cor: '#1e40af', bg: '#eff6ff', border: '#bfdbfe' },
-    };
-
-    // 1. Churn alto
-    if (totalSubscribers > 10 && churnRate > 40) {
-        insights.push({
-            nivel: 'critico', icon: '🚨',
-            titulo: `Churn crítico: ${churnRate}% inativos`,
-            detalhe: 'Mais de 40% da sua base bloqueou as notificações. Reduza a frequência de envio imediatamente.',
-            acao: { label: 'Criar campanha de reativação', key: 'reativar' },
-            ...CORES.critico,
-        });
-    } else if (totalSubscribers > 10 && churnRate > 25) {
-        insights.push({
-            nivel: 'aviso', icon: '⚠️',
-            titulo: `Churn elevado: ${churnRate}% inativos`,
-            detalhe: 'Considere enviar menos campanhas por semana e personalizar mais as mensagens.',
-            ...CORES.aviso,
-        });
-    }
-
-    // 2. CTR abaixo da média
-    if (notifs.length >= 3 && mediaAbertura < 3) {
-        const piorNotif = [...notifs].sort((a, b) => a.taxa_abertura - b.taxa_abertura)[0];
-        insights.push({
-            nivel: 'critico', icon: '📉',
-            titulo: `CTR médio muito baixo: ${mediaAbertura}%`,
-            detalhe: `Suas campanhas têm CTR abaixo de 3%. A pior foi "${piorNotif.title}" com ${piorNotif.taxa_abertura}%. Teste títulos com urgência e emojis.`,
-            acao: { label: 'Criar teste A/B de título', key: 'ab' },
-            ...CORES.critico,
-        });
-    } else if (notifs.length >= 3 && mediaAbertura < 5) {
-        insights.push({
-            nivel: 'aviso', icon: '📊',
-            titulo: `CTR abaixo da média do setor: ${mediaAbertura}%`,
-            detalhe: 'A média do setor é 5-10%. Experimente Rich Push com imagens e botões de ação para aumentar engajamento.',
-            acao: { label: 'Criar campanha com imagem', key: 'richpush' },
-            ...CORES.aviso,
-        });
-    } else if (notifs.length >= 3 && mediaAbertura >= 10) {
-        insights.push({
-            nivel: 'ok', icon: '🔥',
-            titulo: `CTR excelente: ${mediaAbertura}% — acima da média!`,
-            detalhe: 'Sua audiência está muito engajada. Continue com este estilo de mensagens e considere aumentar a frequência.',
-            ...CORES.ok,
-        });
-    }
-
-    // 3. Melhor horário não sendo usado
-    if (melhorHorario) {
-        const horaAtual = new Date().getHours();
-        const horaMelhor = parseInt(melhorHorario);
-        const diff = Math.abs(horaAtual - horaMelhor);
-        if (diff > 3) {
-            insights.push({
-                nivel: 'dica', icon: '⏰',
-                titulo: `Melhor horário: ${melhorHorario} — você ainda não está aproveitando`,
-                detalhe: `Seu público abre mais notificações às ${melhorHorario}. Agende sua próxima campanha para esse horário e espere um CTR até 2x maior.`,
-                acao: { label: 'Agendar campanha para este horário', key: 'agendar' },
-                ...CORES.dica,
-            });
-        }
-    }
-
-    // 4. Campanhas recentes com CTR abaixo
-    if (notifs.length > 0) {
-        const recentes = notifs.slice(0, 3);
-        const ctrRecente = recentes.reduce((a, n) => a + n.taxa_abertura, 0) / recentes.length;
-        if (mediaAbertura > 0 && ctrRecente < mediaAbertura * 0.7) {
-            insights.push({
-                nivel: 'aviso', icon: '📌',
-                titulo: 'Últimas campanhas abaixo da sua média histórica',
-                detalhe: `CTR recente: ${ctrRecente.toFixed(1)}% vs média histórica: ${mediaAbertura}%. Suas mensagens mais recentes estão perdendo engajamento. Hora de testar novos copies.`,
-                acao: { label: 'Criar teste A/B', key: 'ab' },
-                ...CORES.aviso,
-            });
-        }
-    }
-
-    // 5. Base pequena mas crescendo
-    if (activeSubscribers > 0 && activeSubscribers < 50) {
-        insights.push({
-            nivel: 'dica', icon: '🌱',
-            titulo: `Base pequena: ${activeSubscribers} subscribers ativos`,
-            detalhe: 'Com menos de 50 subscribers, foque em capturar mais opt-ins antes de escalar campanhas. Ative o FAB e o banner de notificação.',
-            ...CORES.dica,
-        });
-    }
-
-    // 6. Receita via push estimada
-    if (ticketMedio > 0 && notifs.length > 0) {
-        const totalCliques = notifs.reduce((a, n) => a + n.opened, 0);
-        const receitaEst = Math.round(totalCliques * (taxaConvGlobal / 100) * ticketMedio);
-        if (receitaEst > 0) {
-            insights.push({
-                nivel: 'ok', icon: '💰',
-                titulo: `Receita estimada via push: ${brl(receitaEst)}`,
-                detalhe: `${totalCliques} cliques × ${taxaConvGlobal}% conversão × ${brl(ticketMedio)} ticket médio. Cada notificação gera em média ${brl(Math.round(receitaEst / notifs.length))} de receita.`,
-                ...CORES.ok,
-            });
-        }
-    }
-
-    // 7. Sem campanhas
-    if (notifs.length === 0 && activeSubscribers > 0) {
-        insights.push({
-            nivel: 'dica', icon: '🚀',
-            titulo: `Você tem ${activeSubscribers} subscribers mas nenhuma campanha enviada`,
-            detalhe: 'Sua base está esperando! Envie sua primeira campanha agora. Comece com um template pronto.',
-            acao: { label: 'Criar primeira campanha', key: 'campanha' },
-            ...CORES.dica,
-        });
-    }
-
-    if (insights.length === 0) return null;
-
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {insights.map((ins, i) => (
-                <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', padding: '12px 14px', background: ins.bg, border: `1px solid ${ins.border}`, borderRadius: '10px' }}>
-                    <span style={{ fontSize: '20px', flexShrink: 0, marginTop: '1px' }}>{ins.icon}</span>
-                    <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: 700, fontSize: '13px', color: ins.cor, marginBottom: '2px' }}>{ins.titulo}</div>
-                        <div style={{ fontSize: '12px', color: '#374151', lineHeight: 1.5 }}>{ins.detalhe}</div>
-                        {ins.acao && (
-                            <button
-                                onClick={() => onAcao(ins.acao!.key)}
-                                style={{ marginTop: '8px', padding: '4px 12px', borderRadius: '6px', border: `1px solid ${ins.cor}`, background: 'white', color: ins.cor, fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
-                            >
-                                → {ins.acao.label}
-                            </button>
-                        )}
-                    </div>
-                </div>
+              </React.Fragment>
             ))}
-        </div>
-    );
-}
-// ────────────────────────────────────────────────────────────────────────────
-
-// ── Função: inferir etapa do funil pelo texto da campanha ───────────────────
-function inferirFunil(title: string, message: string): { label: string; color: string; bg: string; etapa: 'fundo' | 'meio' | 'topo' } {
-    const texto = `${title} ${message}`.toLowerCase();
-
-    const palavrasFundo = ['off', 'desconto', 'cupom', 'promo', 'oferta', 'comprar', 'compre', 'black', 'sale', 'frete', 'gratis', 'grátis', 'relampago', 'relâmpago', 'liquidacao', 'liquidação', 'flash', 'vip', '%'];
-    const palavrasMeio = ['carrinho', 'itens', 'deixou', 'esperando', 'estoque', 'acabando', 'garanta', 'finalize', 'voltou', 'salvo'];
-    const palavrasTopo = ['saudades', 'novidade', 'novidades', 'sumiu', 'tempo', 'vemos', 'reativação', 'reativacao', 'lembrete', 'visitou', 'viu', 'inativo', 'sumidos', 'evento', 'lançamento', 'lancamento'];
-
-    const scoreFundo = palavrasFundo.filter(p => texto.includes(p)).length;
-    const scoreMeio = palavrasMeio.filter(p => texto.includes(p)).length;
-    const scoreTopo = palavrasTopo.filter(p => texto.includes(p)).length;
-
-    if (scoreMeio >= scoreFundo && scoreMeio >= scoreTopo && scoreMeio > 0) {
-        return { label: 'Meio · Carrinho', color: '#d97706', bg: '#fffbeb', etapa: 'meio' };
-    }
-    if (scoreTopo > scoreFundo) {
-        return { label: 'Topo · Reativar', color: '#7c3aed', bg: '#f5f3ff', etapa: 'topo' };
-    }
-    if (scoreFundo > 0) {
-        return { label: 'Fundo · Venda', color: '#059669', bg: '#f0fdf4', etapa: 'fundo' };
-    }
-    return { label: 'Engajamento', color: '#2563eb', bg: '#eff6ff', etapa: 'topo' };
-}
-// ────────────────────────────────────────────────────────────────────────────
-
-// ── NOVO: Componente do seletor de objetivo ──────────────────────────────────
-function SeletorObjetivo({
-    objetivo,
-    onSelect,
-}: {
-    objetivo: ObjetivoCampanha;
-    onSelect: (obj: ObjetivoConfig) => void;
-}) {
-    return (
-        <div style={{ marginBottom: '24px' }}>
-            <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>
-                🎯 Qual o objetivo desta campanha?
+            <span style={{ color: C.neutralLight, fontSize: '14px' }}>›</span>
+            <div style={{ background: C.neutralBg, borderRadius: '6px', padding: '6px 12px', textAlign: 'center' as const, border: `1px solid ${C.neutralBorder}`, minWidth: '70px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: C.neutralMid }}>1–3%</div>
+              <div style={{ fontSize: '10px', color: C.neutralLight, marginTop: '1px' }}>Mercado</div>
+              <div style={{ fontSize: '10px', color: C.neutralLight, marginTop: '1px' }}>benchmark</div>
             </div>
-            <div style={{ fontSize: '12px', color: '#6B7280', marginBottom: '14px' }}>
-                Selecione para receber templates e segmentação automáticos
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
-                {OBJETIVOS.map(obj => {
-                    const ativo = objetivo === obj.id;
-                    return (
-                        <button
-                            key={obj.id}
-                            onClick={() => onSelect(obj)}
-                            style={{
-                                padding: '14px 10px',
-                                borderRadius: '12px',
-                                border: `2px solid ${ativo ? obj.cor : '#E5E7EB'}`,
-                                background: ativo ? obj.corBg : '#fff',
-                                cursor: 'pointer',
-                                textAlign: 'left',
-                                transition: 'all 0.2s',
-                                position: 'relative',
-                                boxShadow: ativo ? `0 0 0 3px ${obj.cor}20` : 'none',
-                            }}
-                        >
-                            {ativo && (
-                                <span style={{
-                                    position: 'absolute', top: '8px', right: '8px',
-                                    width: '16px', height: '16px', borderRadius: '50%',
-                                    background: obj.cor, display: 'flex', alignItems: 'center',
-                                    justifyContent: 'center', fontSize: '9px', color: '#fff', fontWeight: 700,
-                                }}>✓</span>
-                            )}
-                            <div style={{ fontSize: '22px', marginBottom: '6px' }}>{obj.icon}</div>
-                            <div style={{ fontSize: '13px', fontWeight: 700, color: ativo ? obj.cor : '#111827', marginBottom: '2px' }}>{obj.label}</div>
-                            <div style={{ fontSize: '11px', color: '#6B7280', lineHeight: 1.4 }}>{obj.desc}</div>
-                            <div style={{
-                                marginTop: '10px', display: 'inline-flex', alignItems: 'center', gap: '4px',
-                                padding: '2px 8px', borderRadius: '999px',
-                                background: ativo ? obj.cor : '#F3F4F6',
-                                color: ativo ? '#fff' : '#6B7280',
-                                fontSize: '10px', fontWeight: 600, transition: 'all 0.2s',
-                            }}>
-                                <span style={{
-                                    width: '6px', height: '6px', borderRadius: '50%',
-                                    background: ativo ? '#fff' : FUNIL_COLORS[obj.funil],
-                                    display: 'inline-block',
-                                }} />
-                                {obj.funilLabel}
-                            </div>
-                        </button>
-                    );
-                })}
-            </div>
+          </div>
+        )}
+      </div>
 
-            {/* Banner contextual quando objetivo selecionado */}
-            {objetivo && (() => {
-                const obj = OBJETIVOS.find(o => o.id === objetivo)!;
-                const dicas: Record<string, string> = {
-                    venda: 'Foco em urgência e escassez. Use emojis de tempo (⚡⏰) e deixe o CTA claro: "Comprar agora", "Pegar desconto".',
-                    carrinho: 'Lembre sem pressionar. Mencione os itens deixados e ofereça uma facilidade (frete grátis, cupom) como incentivo final.',
-                    reativar: 'Tom acolhedor. Mostre novidades relevantes ou benefício exclusivo. Evite parecer spam — 1 mensagem por ciclo.',
-                    engajamento: 'Conteúdo genuíno. Eventos, lançamentos e novidades têm melhor abertura quando enviados no melhor horário do público.',
-                };
-                return (
-                    <div style={{
-                        marginTop: '12px', padding: '12px 16px',
-                        background: obj.corBg, border: `1px solid ${obj.corBorder}`,
-                        borderRadius: '10px', display: 'flex', gap: '10px', alignItems: 'flex-start',
-                    }}>
-                        <span style={{ fontSize: '18px', flexShrink: 0 }}>💡</span>
-                        <div>
-                            <div style={{ fontSize: '12px', fontWeight: 700, color: obj.cor, marginBottom: '2px' }}>
-                                Dica para campanha de {obj.label}
-                            </div>
-                            <div style={{ fontSize: '12px', color: '#374151', lineHeight: 1.5 }}>
-                                {dicas[objetivo]}
-                                {obj.segmento && (
-                                    <span style={{ marginLeft: '4px' }}>
-                                        <strong>Segmentação automática aplicada:</strong>{' '}
-                                        {obj.segmento === 'buyers' ? 'só quem já comprou' : 'só quem nunca comprou'}.
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                );
-            })()}
-        </div>
-    );
-}
-// ────────────────────────────────────────────────────────────────────────────
-
-// ── Componente: Painel de Detalhes de uma Campanha ──────────────────────────
-function CampanhaDetalhe({
-    notif,
-    mediaAbertura,
-    ticketMedio,
-    taxaConvGlobal,
-    onClose,
-    brl,
-}: {
-    notif: OneSignalNotif;
-    mediaAbertura: number;
-    ticketMedio: number;
-    taxaConvGlobal: number;
-    onClose: () => void;
-    brl: (v: number) => string;
-}) {
-    const roi = ticketMedio > 0 ? Math.round(notif.opened * (taxaConvGlobal / 100) * ticketMedio) : 0;
-    const ctr = notif.sent > 0 ? ((notif.opened / notif.sent) * 100).toFixed(1) : '0';
-    const taxaEntrega = notif.sent > 0 ? Math.round((notif.confirmed_deliveries / notif.sent) * 100) : 0;
-    const convertidos = Math.round(notif.opened * (taxaConvGlobal / 100));
-    const vsMedia = notif.taxa_abertura - mediaAbertura;
-
-    const getBenchmarkBadge = (taxa: number) => {
-        if (taxa >= 10) return { label: 'Acima da Media', bg: '#dcfce7', color: '#166534', icon: '🔥' };
-        if (taxa >= 5) return { label: 'Na Media', bg: '#dbeafe', color: '#1d4ed8', icon: '✅' };
-        return { label: 'Precisa Melhorar', bg: '#fef3c7', color: '#92400e', icon: '⚠️' };
-    };
-    const badge = getBenchmarkBadge(notif.taxa_abertura);
-
-    const metricas = [
-        { icon: '📤', label: 'Enviados', value: notif.sent.toLocaleString('pt-BR'), sub: '100% da base', color: '#4F46E5' },
-        { icon: '📬', label: 'Entregues', value: notif.confirmed_deliveries.toLocaleString('pt-BR'), sub: `${taxaEntrega}% de entrega`, color: '#3b82f6' },
-        { icon: '👆', label: 'Abertos', value: notif.opened.toLocaleString('pt-BR'), sub: `CTR: ${ctr}%`, color: '#10B981' },
-        { icon: '❌', label: 'Falhos', value: notif.failed.toLocaleString('pt-BR'), sub: 'nao entregues', color: '#EF4444' },
-    ];
-
-    return (
-        <div style={{
-            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
-            zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '20px',
-        }} onClick={onClose}>
-            <div style={{
-                background: '#fff', borderRadius: '16px', width: '100%', maxWidth: '640px',
-                maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-            }} onClick={e => e.stopPropagation()}>
-                {/* Header */}
-                <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid #E5E7EB', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                        <div style={{ fontSize: '11px', color: '#6B7280', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Detalhes da Campanha</div>
-                        <div style={{ fontSize: '16px', fontWeight: 700, color: '#111827' }}>{notif.title}</div>
-                        <div style={{ fontSize: '13px', color: '#6B7280', marginTop: '2px' }}>{notif.message}</div>
-                        {(() => {
-                            const f = inferirFunil(notif.title, notif.message);
-                            return (
-                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '8px', padding: '3px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: 600, background: f.bg, color: f.color }}>
-                                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: f.color, display: 'inline-block' }} />
-                                    {f.label}
-                                </span>
-                            );
-                        })()}
-                    </div>
-                    <button onClick={onClose} style={{ background: '#F3F4F6', border: 'none', borderRadius: '8px', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px', flexShrink: 0, marginLeft: '12px' }}>×</button>
-                </div>
-
-                <div style={{ padding: '20px 24px' }}>
-                    {/* 4 métricas principais */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '20px' }}>
-                        {metricas.map((m, i) => (
-                            <div key={i} style={{ background: '#F9FAFB', border: `1px solid ${m.color}20`, borderRadius: '10px', padding: '12px 10px', textAlign: 'center' }}>
-                                <div style={{ fontSize: '18px', marginBottom: '4px' }}>{m.icon}</div>
-                                <div style={{ fontSize: '20px', fontWeight: 700, color: m.color }}>{m.value}</div>
-                                <div style={{ fontSize: '11px', fontWeight: 600, color: '#374151', marginBottom: '2px' }}>{m.label}</div>
-                                <div style={{ fontSize: '10px', color: '#9CA3AF' }}>{m.sub}</div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* CTR vs média */}
-                    <div style={{ background: '#F9FAFB', borderRadius: '12px', padding: '16px', marginBottom: '16px' }}>
-                        <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827', marginBottom: '12px' }}>📊 Taxa de Abertura vs Media Geral</div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                            <div style={{ flex: 1 }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '12px' }}>
-                                    <span style={{ color: '#6B7280' }}>Esta campanha</span>
-                                    <span style={{ fontWeight: 700, color: badge.color }}>{notif.taxa_abertura}%</span>
-                                </div>
-                                <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '8px', overflow: 'hidden' }}>
-                                    <div style={{ width: `${Math.min(notif.taxa_abertura * 5, 100)}%`, background: badge.color, height: '100%', borderRadius: '999px' }} />
-                                </div>
-                            </div>
-                            <div style={{ flex: 1 }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '12px' }}>
-                                    <span style={{ color: '#6B7280' }}>Media geral</span>
-                                    <span style={{ fontWeight: 700, color: '#6B7280' }}>{mediaAbertura}%</span>
-                                </div>
-                                <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '8px', overflow: 'hidden' }}>
-                                    <div style={{ width: `${Math.min(mediaAbertura * 5, 100)}%`, background: '#9CA3AF', height: '100%', borderRadius: '999px' }} />
-                                </div>
-                            </div>
-                        </div>
-                        <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span style={{ background: badge.bg, color: badge.color, padding: '3px 10px', borderRadius: '999px', fontSize: '12px', fontWeight: 600 }}>
-                                {badge.icon} {badge.label}
-                            </span>
-                            {mediaAbertura > 0 && (
-                                <span style={{ fontSize: '12px', color: vsMedia >= 0 ? '#059669' : '#DC2626', fontWeight: 600 }}>
-                                    {vsMedia >= 0 ? `+${vsMedia.toFixed(1)}` : vsMedia.toFixed(1)}% vs sua media
-                                </span>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* ROI */}
-                    {ticketMedio > 0 && (
-                        <div style={{ background: roi > 0 ? '#f0fdf4' : '#F9FAFB', border: `1px solid ${roi > 0 ? '#86efac' : '#E5E7EB'}`, borderRadius: '12px', padding: '16px', marginBottom: '16px' }}>
-                            <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827', marginBottom: '12px' }}>💰 ROI Estimado</div>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', textAlign: 'center' }}>
-                                <div>
-                                    <div style={{ fontSize: '11px', color: '#6B7280', marginBottom: '4px' }}>Cliques</div>
-                                    <div style={{ fontSize: '18px', fontWeight: 700, color: '#10B981' }}>{notif.opened}</div>
-                                </div>
-                                <div>
-                                    <div style={{ fontSize: '11px', color: '#6B7280', marginBottom: '4px' }}>Convertidos est.</div>
-                                    <div style={{ fontSize: '18px', fontWeight: 700, color: '#f59e0b' }}>{convertidos}</div>
-                                </div>
-                                <div>
-                                    <div style={{ fontSize: '11px', color: '#6B7280', marginBottom: '4px' }}>Receita est.</div>
-                                    <div style={{ fontSize: '18px', fontWeight: 700, color: roi > 0 ? '#059669' : '#9CA3AF' }}>{roi > 0 ? brl(roi) : '—'}</div>
-                                </div>
-                            </div>
-                            <div style={{ marginTop: '10px', fontSize: '11px', color: '#9CA3AF', textAlign: 'center' }}>
-                                {notif.opened} cliques × {taxaConvGlobal}% conv. × {brl(ticketMedio)} ticket médio
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Barra de progresso do funil */}
-                    <div style={{ background: '#F9FAFB', borderRadius: '12px', padding: '16px' }}>
-                        <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827', marginBottom: '14px' }}>🔔 Funil desta Campanha</div>
-                        {[
-                            { label: 'Enviados', value: notif.sent, pct: 100, color: '#4F46E5' },
-                            { label: 'Entregues', value: notif.confirmed_deliveries, pct: taxaEntrega, color: '#3b82f6' },
-                            { label: 'Abertos', value: notif.opened, pct: notif.sent > 0 ? Math.round((notif.opened / notif.sent) * 100) : 0, color: '#10B981' },
-                            ...(ticketMedio > 0 ? [{ label: 'Convertidos', value: convertidos, pct: notif.opened > 0 ? Math.round((convertidos / notif.opened) * 100) : 0, color: '#f59e0b' }] : []),
-                        ].map((step, i) => (
-                            <div key={i} style={{ marginBottom: '10px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '12px' }}>
-                                    <span style={{ color: '#374151', fontWeight: 500 }}>{step.label}</span>
-                                    <span style={{ color: step.color, fontWeight: 700 }}>{step.value.toLocaleString('pt-BR')} <span style={{ color: '#9CA3AF', fontWeight: 400 }}>({step.pct}%)</span></span>
-                                </div>
-                                <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '6px', overflow: 'hidden' }}>
-                                    <div style={{ width: `${step.pct}%`, background: step.color, height: '100%', borderRadius: '999px', transition: 'width 0.6s' }} />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
-// ────────────────────────────────────────────────────────────────────────────
-
-export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendPush, sendingPush, token, API_URL }: Props) {
-    const [history, setHistory] = useState<PushHistoryItem[]>([]);
-    const [loadingHistory, setLoadingHistory] = useState(false);
-    const [osStats, setOsStats] = useState<OneSignalStats | null>(null);
-    const [loadingStats, setLoadingStats] = useState(false);
-    const [activeHistoryTab, setActiveHistoryTab] = useState<'onesignal' | 'local'>('onesignal');
-    const [showSegmentation, setShowSegmentation] = useState(false);
-    const [automacao, setAutomacao] = useState<AutomacaoConfig>(AUTOMACAO_DEFAULT);
-    const [loadingAutomacao, setLoadingAutomacao] = useState(false);
-    const [savingAutomacao, setSavingAutomacao] = useState(false);
-    const [activeTab, setActiveTab] = useState<'campanhas' | 'automacoes'>('campanhas');
-
-    // ── NOVO: estado do objetivo ─────────────────────────────────────────────
-    const [objetivo, setObjetivo] = useState<ObjetivoCampanha>(null);
-    // ── NOVO: campanha selecionada para detalhe ──────────────────────────────
-    const [campanhaDetalhe, setCampanhaDetalhe] = useState<OneSignalNotif | null>(null);
-    // ── NOVO: Teste A/B ──────────────────────────────────────────────────────
-    const [showABModal, setShowABModal] = useState(false);
-    const [abForm, setAbForm] = useState<ABTestForm>(AB_FORM_DEFAULT);
-    const [sendingAB, setSendingAB] = useState(false);
-    const [abTests, setAbTests] = useState<ABTestItem[]>([]);
-    const [loadingAB, setLoadingAB] = useState(false);
-    const [activeHistorySubTab, setActiveHistorySubTab] = useState<'onesignal' | 'ab' | 'jornada' | 'score' | 'local'>('onesignal');
-    // ── NOVO: IA Gerador ─────────────────────────────────────────────────────
-    const [showIAModal, setShowIAModal] = useState(false);
-
-    const handleSelecionarObjetivo = (obj: ObjetivoConfig) => {
-        // Se já estava selecionado, deseleciona (toggle)
-        if (objetivo === obj.id) {
-            setObjetivo(null);
-            return;
-        }
-        setObjetivo(obj.id);
-        // Aplica segmentação automática se definida no objetivo
-        if (obj.segmento) {
-            setPushForm({ ...pushForm, filter_behavior: obj.segmento });
-            setShowSegmentation(true);
-        } else {
-            setPushForm({ ...pushForm, filter_behavior: undefined });
-        }
-    };
-
-    const templatesAtivos = objetivo
-        ? OBJETIVOS.find(o => o.id === objetivo)?.templates ?? []
-        : [
-            { label: 'Black Friday', title: 'Black Friday chegou!', msg: 'Ate 70% OFF so hoje. Aproveite antes que acabe!' },
-            { label: 'Carrinho', title: 'Seu carrinho te espera!', msg: 'Voce deixou itens no carrinho. Finalize agora com frete gratis.' },
-            { label: 'Frete Gratis', title: 'Frete GRATIS hoje!', msg: 'Aproveite frete gratis em todos os pedidos. So hoje!' },
-            { label: 'Desconto VIP', title: 'Oferta exclusiva para voce!', msg: 'Como cliente especial, preparamos 15% OFF. Use o cupom VIP15.' },
-            { label: 'Estoque', title: 'Ultimas unidades!', msg: 'O produto que voce viu esta acabando. Garanta o seu agora.' },
-            { label: 'Saudades', title: 'Saudades de voce!', msg: 'Faz um tempo que nao te vemos. Temos novidades esperando por voce.' },
-        ];
-    // ────────────────────────────────────────────────────────────────────────
-
-    const fetchHistory = () => {
-        if (!token) return;
-        setLoadingHistory(true);
-        fetch(`${API_URL}/push/history`, { headers: { Authorization: `Bearer ${token}` } })
-            .then(r => r.json()).then(data => { if (Array.isArray(data)) setHistory(data); else setHistory([]); })
-            .catch(() => setHistory([])).finally(() => setLoadingHistory(false));
-    };
-    const fetchOsStats = () => {
-        if (!token) return;
-        setLoadingStats(true);
-        fetch(`${API_URL}/push/stats`, { headers: { Authorization: `Bearer ${token}` } })
-            .then(r => r.json()).then(data => setOsStats(data))
-            .catch(() => setOsStats(null)).finally(() => setLoadingStats(false));
-    };
-    const fetchAutomacao = () => {
-        if (!token) return;
-        setLoadingAutomacao(true);
-        fetch(`${API_URL}/automacao/config`, { headers: { Authorization: `Bearer ${token}` } })
-            .then(r => r.json()).then(data => setAutomacao({ ...AUTOMACAO_DEFAULT, ...data }))
-            .catch(() => {}).finally(() => setLoadingAutomacao(false));
-    };
-
-    // ── NOVO: funções A/B ────────────────────────────────────────────────────
-    const fetchABTests = () => {
-        if (!token) return;
-        setLoadingAB(true);
-        fetch(`${API_URL}/push/ab-list`, { headers: { Authorization: `Bearer ${token}` } })
-            .then(r => r.json()).then(data => setAbTests(Array.isArray(data) ? data : []))
-            .catch(() => setAbTests([])).finally(() => setLoadingAB(false));
-    };
-
-    const handleSendAB = async () => {
-        if (!token) return;
-        setSendingAB(true);
-        try {
-            const res = await fetch(`${API_URL}/push/send-ab`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                body: JSON.stringify(abForm),
-            });
-            const data = await res.json();
-            if (data.status === 'success' || data.status === 'partial_error') {
-                setShowABModal(false);
-                setAbForm(AB_FORM_DEFAULT);
-                setActiveHistorySubTab('ab');
-                fetchABTests();
-            } else {
-                alert('Erro ao enviar: ' + JSON.stringify(data));
-            }
-        } catch { alert('Erro de rede ao enviar A/B.'); }
-        finally { setSendingAB(false); }
-    };
-
-    const refreshABTest = async (id: number) => {
-        if (!token) return;
-        try {
-            const res = await fetch(`${API_URL}/push/ab-results/${id}`, { headers: { Authorization: `Bearer ${token}` } });
-            const data = await res.json();
-            setAbTests(prev => prev.map(t => t.id === id ? {
-                ...t,
-                sent_a: data.variante_a?.sent ?? t.sent_a,
-                sent_b: data.variante_b?.sent ?? t.sent_b,
-                opened_a: data.variante_a?.opened ?? t.opened_a,
-                opened_b: data.variante_b?.opened ?? t.opened_b,
-                ctr_a: data.variante_a?.ctr ?? t.ctr_a,
-                ctr_b: data.variante_b?.ctr ?? t.ctr_b,
-                vencedor: data.vencedor ?? t.vencedor,
-                status: data.status ?? t.status,
-            } : t));
-        } catch { alert('Erro ao atualizar resultados.'); }
-    };
-
-    // ── Score: pré-segmenta campanha pelo grupo clicado ──────────────────────
-    const handleSegmentarScore = (segmento: string, label: string) => {
-        setPushForm({ ...pushForm, filter_behavior: segmento || undefined });
-        setShowSegmentation(true);
-        setActiveTab('campanhas');
-        setActiveHistorySubTab('onesignal');
-        setTimeout(() => {
-            document.querySelector('.config-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-    };
-
-    // ── Deep Link ────────────────────────────────────────────────────────────
-    const [showDeepLink, setShowDeepLink] = useState(false);
-    const [deepLinkData, setDeepLinkData] = useState<DeepLinkData | null>(null);
-    const [loadingDeepLink, setLoadingDeepLink] = useState(false);
-
-    const fetchDeepLinks = () => {
-        if (!token || deepLinkData) return; // cache simples
-        setLoadingDeepLink(true);
-        fetch(`${API_URL}/analytics/deep-links`, { headers: { Authorization: `Bearer ${token}` } })
-            .then(r => r.json())
-            .then(d => setDeepLinkData(d))
-            .catch(() => {})
-            .finally(() => setLoadingDeepLink(false));
-    };
-
-    const handleAbrirDeepLink = () => {
-        setShowDeepLink(true);
-        fetchDeepLinks();
-    };
-
-    const handleSelecionarDeepLink = (url: string, nome?: string) => {
-        setPushForm({ ...pushForm, url });
-        setShowDeepLink(false);
-    };
-    // ────────────────────────────────────────────────────────────────────────
-    // ────────────────────────────────────────────────────────────────────────
-    const saveAutomacao = async () => {
-        if (!token) return;
-        setSavingAutomacao(true);
-        try {
-            await fetch(`${API_URL}/automacao/config`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(automacao) });
-            alert('Automacoes salvas!');
-        } catch { alert('Erro ao salvar.'); } finally { setSavingAutomacao(false); }
-    };
-
-    useEffect(() => { if (!sendingPush) { fetchHistory(); fetchOsStats(); fetchAutomacao(); fetchABTests(); } }, [token, sendingPush]);
-
-    const formatDate = (s: string) => { try { const d = new Date(s); return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' as ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); } catch { return s; } };
-    const formatUnix = (ts: number) => { try { const d = new Date(ts * 1000); return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' as ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); } catch { return '—'; } };
-    const brl = (v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
-
-    const activeSubscribers = osStats?.active_subscribers ?? stats.instalacoes ?? 0;
-    const totalSubscribers = osStats?.subscribers ?? 0;
-    const taxaOptin = osStats?.taxa_optin ?? 0;
-    const notifs = osStats?.notifications ?? [];
-    const mediaAbertura = notifs.length > 0 ? Math.round(notifs.reduce((acc, n) => acc + n.taxa_abertura, 0) / notifs.length) : 0;
-    const porPais = osStats?.por_pais ?? [];
-    const porDisp = osStats?.por_dispositivo ?? [];
-    const dispColors: Record<string, string> = { Android: '#22c55e', iOS: '#3b82f6', Web: '#8b5cf6' };
-    const dispIcons: Record<string, string> = { Android: '🤖', iOS: '🍎', Web: '🌐' };
-
-    const inativos = Math.max(0, totalSubscribers - activeSubscribers);
-    const pctAtivos = totalSubscribers > 0 ? Math.round((activeSubscribers / totalSubscribers) * 100) : 0;
-    const pctInativos = 100 - pctAtivos;
-    const churnRate = totalSubscribers > 0 ? Math.round((inativos / totalSubscribers) * 100) : 0;
-
-    const melhorHorario = (() => {
-        if (notifs.length === 0) return null;
-        const h: Record<number, number> = {};
-        notifs.forEach(n => { if (!n.created_at) return; const hr = new Date(n.created_at * 1000).getHours(); h[hr] = (h[hr] || 0) + n.opened; });
-        const m = Object.entries(h).sort((a, b) => b[1] - a[1])[0];
-        return m ? `${m[0]}:00` : null;
-    })();
-
-    const ticketMedio = stats?.ticket_medio?.app ?? 0;
-    const taxaConvGlobal = stats?.taxa_conversao?.app ?? 0;
-
-    const totalEnviados = notifs.reduce((a, n) => a + n.sent, 0);
-    const totalConfirmados = notifs.reduce((a, n) => a + (n.confirmed_deliveries || 0), 0);
-    const totalClicados = notifs.reduce((a, n) => a + n.opened, 0);
-    const totalConvertidos = Math.round(totalClicados * (taxaConvGlobal / 100));
-    const pctEntrega = totalEnviados > 0 ? Math.round((totalConfirmados / totalEnviados) * 100) : 0;
-    const pctClique = totalEnviados > 0 ? Math.round((totalClicados / totalEnviados) * 100) : 0;
-    const pctConversao = totalClicados > 0 ? Math.round((totalConvertidos / totalClicados) * 100) : 0;
-
-    const getBenchmarkBadge = (taxa: number) => {
-        if (taxa >= 10) return { label: 'Acima da Media', bg: '#dcfce7', color: '#166534', icon: '🔥' };
-        if (taxa >= 5) return { label: 'Na Media', bg: '#dbeafe', color: '#1d4ed8', icon: '✅' };
-        return { label: 'Precisa Melhorar', bg: '#fef3c7', color: '#92400e', icon: '⚠️' };
-    };
-
-    const alcanceEstimado = () => {
-        if (!osStats) return activeSubscribers;
-        let base = osStats.active_subscribers;
-        if (pushForm.filter_device) { const d = porDisp.find(x => x.dispositivo === pushForm.filter_device); if (d) base = Math.round(base * d.pct / 100); }
-        if (pushForm.filter_country) { const p = porPais.find(x => x.pais === pushForm.filter_country); if (p) base = Math.round(base * p.pct / 100); }
-        return base;
-    };
-
-    const renderPassoCard = (passo: 1 | 2 | 3, ativo: boolean, horas: number, titulo: string, mensagem: string, cupom?: string) => {
-        const key = `passo${passo}` as 'passo1' | 'passo2' | 'passo3';
-        const cor = passo === 1 ? '#3b82f6' : passo === 2 ? '#f59e0b' : '#10b981';
-        const emoji = passo === 1 ? '⏰' : passo === 2 ? '🔥' : '🎁';
-        const label = passo === 1 ? '1a Mensagem' : passo === 2 ? '2a Mensagem' : '3a Mensagem (com cupom)';
-        return (
-            <div key={passo} style={{ border: `2px solid ${ativo ? cor : '#E5E7EB'}`, borderRadius: '12px', padding: '20px', marginBottom: '16px', background: ativo ? '#fafafa' : '#f9fafb', transition: 'all 0.2s' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: ativo ? '16px' : '0' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: cor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>{emoji}</div>
-                        <div><div style={{ fontWeight: 600, fontSize: '14px', color: '#111827' }}>{label}</div><div style={{ fontSize: '12px', color: '#6B7280' }}>{ativo ? `Envia apos ${horas >= 1 ? `${horas}h` : '30 min'}` : 'Desativado'}</div></div>
-                    </div>
-                    <Toggle checked={ativo} onChange={v => setAutomacao({ ...automacao, [`${key}_ativo`]: v })} />
-                </div>
-                {ativo && (
-                    <div className="animate-fade-in">
-                        <div className="form-group" style={{ marginBottom: '12px' }}>
-                            <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Enviar apos</label>
-                            <select value={horas} onChange={e => setAutomacao({ ...automacao, [`${key}_horas`]: parseFloat(e.target.value) })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', background: 'white', fontSize: '13px' }}>
-                                {HORAS_OPCOES.map(op => <option key={op.value} value={op.value}>{op.label}</option>)}
-                            </select>
-                        </div>
-                        <div className="form-group" style={{ marginBottom: '12px' }}>
-                            <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Titulo</label>
-                            <input type="text" value={titulo} maxLength={50} onChange={e => setAutomacao({ ...automacao, [`${key}_titulo`]: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} />
-                            <small style={{ fontSize: '10px', color: '#6B7280' }}>{titulo.length}/50</small>
-                        </div>
-                        <div className="form-group" style={{ marginBottom: passo === 3 ? '12px' : '0' }}>
-                            <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Mensagem</label>
-                            <textarea value={mensagem} maxLength={120} rows={2} onChange={e => setAutomacao({ ...automacao, [`${key}_mensagem`]: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px', resize: 'vertical' }} />
-                            <small style={{ fontSize: '10px', color: '#6B7280' }}>{mensagem.length}/120</small>
-                        </div>
-                        {passo === 3 && (
-                            <div className="form-group" style={{ marginBottom: '0' }}>
-                                <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Cupom (opcional)</label>
-                                <input type="text" value={cupom ?? ''} placeholder="Ex: VOLTA10" onChange={e => setAutomacao({ ...automacao, passo3_cupom: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px', textTransform: 'uppercase' }} />
-                            </div>
-                        )}
-                        <div style={{ marginTop: '12px', background: '#111827', borderRadius: '10px', padding: '10px 14px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: cor, flexShrink: 0 }} />
-                            <div><div style={{ fontSize: '12px', fontWeight: 600, color: '#fff' }}>{titulo || 'Titulo'}</div><div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>{mensagem || 'Mensagem'}{passo === 3 && cupom ? ` Cupom: ${cupom}` : ''}</div></div>
-                        </div>
-                    </div>
+      {/* ── PROJEÇÃO DE GANHO ─────────────────────────────────────────── */}
+      {projecoes.length > 0 && (
+        <div style={{ background: C.dark, borderRadius: '10px', padding: '18px 20px', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <span style={{ color: '#FCD34D', display: 'flex' }}>{Icon.dollar}</span>
+            <span style={{ fontSize: '14px', fontWeight: 700, color: C.white }}>Projeção de receita</span>
+            <span style={{ fontSize: '11px', color: C.neutralLight }}>— {funilVisitas} visitas × {brl(ticketApp)} ticket médio</span>
+          </div>
+          <div style={{ fontSize: '12px', color: C.neutralLight, marginBottom: '14px' }}>Se você converter esse tráfego:</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+            {projecoes.map((p, i) => (
+              <div key={i} style={{ background: p.destaque ? C.brand : 'rgba(255,255,255,0.06)', borderRadius: '8px', padding: '14px 12px', textAlign: 'center' as const, border: p.destaque ? `1px solid ${C.brandMuted}` : '1px solid rgba(255,255,255,0.08)', position: 'relative' as const }}>
+                {p.destaque && (
+                  <div style={{ position: 'absolute' as const, top: '-9px', left: '50%', transform: 'translateX(-50%)', background: '#F59E0B', color: C.dark, fontSize: '10px', fontWeight: 700, padding: '1px 8px', borderRadius: '4px', whiteSpace: 'nowrap' as const }}>
+                    META REALISTA
+                  </div>
                 )}
-            </div>
-        );
-    };
-
-    return (
-        <div className="animate-fade-in" style={{ marginTop: '20px' }}>
-
-            {/* ── 3 CARDS DE METRICAS ── */}
-            <div className="stats-grid" style={{ marginBottom: '2rem' }}>
-                <div className="stat-card">
-                    <div className="stat-icon" style={{ color: C.brand }}>{Icon.users}</div>
-                    <div className="stat-info">
-                        <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, fontSize: '14px' }}>Subscribers ativos</h3>
-                        <p style={{ letterSpacing: '-0.02em' }}>{loadingStats ? '—' : activeSubscribers.toLocaleString('pt-BR')}</p>
-                        <span className="stat-growth" style={{ color: C.brand, fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px' }}>{Icon.bell} Push habilitado</span>
-                        <div style={{ marginTop: '8px' }}>
-                            <div style={{ background: C.neutralBorder, borderRadius: '999px', height: '5px', overflow: 'hidden' }}>
-                                <div style={{ width: `${Math.min(activeSubscribers, 100)}%`, background: C.brand, height: '100%', borderRadius: '999px', transition: 'width 0.5s' }} />
-                            </div>
-                            <span style={{ fontSize: '11px', color: C.neutralLight, marginTop: '4px', display: 'block' }}>Meta: {activeSubscribers} / 100</span>
-                        </div>
-                    </div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-icon" style={{ color: C.brand }}>{Icon.check}</div>
-                    <div className="stat-info">
-                        <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, fontSize: '14px' }}>Taxa de opt-in</h3>
-                        <p style={{ letterSpacing: '-0.02em' }}>{loadingStats ? '—' : `${taxaOptin}%`}</p>
-                        <Badge color={taxaOptin >= 50 ? C.success : C.warning} bg={taxaOptin >= 50 ? C.successBg : C.warningBg} border={taxaOptin >= 50 ? C.successBorder : C.warningBorder}>
-                            {taxaOptin >= 50 ? Icon.check : Icon.alert}
-                            {taxaOptin >= 50 ? 'Excelente' : 'Pode melhorar'}
-                        </Badge>
-                        <span style={{ marginTop: '6px', display: 'block', fontSize: '11px', color: C.neutralLight }}>{osStats?.instalacoes ?? 0} instalações → {activeSubscribers} inscritos</span>
-                    </div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-icon" style={{ color: C.brand }}>{Icon.chart}</div>
-                    <div className="stat-info">
-                        <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, fontSize: '14px' }}>Taxa de abertura média</h3>
-                        <p style={{ letterSpacing: '-0.02em' }}>{loadingStats ? '—' : `${mediaAbertura}%`}</p>
-                        {mediaAbertura > 0 && (() => { const b = getBenchmarkBadge(mediaAbertura); return <Badge color={b.color} bg={b.bg} border={b.bg}>{b.icon} {b.label}</Badge>; })()}
-                        <span style={{ marginTop: '6px', display: 'block', fontSize: '11px', color: C.neutralLight }}>Média do setor: 5–10%</span>
-                    </div>
-                </div>
-            </div>
-
-            {/* ── SAUDE DA BASE ── */}
-            {loadingStats ? (
-                <div className="config-card" style={{ marginBottom: '1.5rem', textAlign: 'center', padding: '30px', color: C.neutralMid }}>Carregando dados do OneSignal...</div>
-            ) : (
-                <div className="config-card" style={{ marginBottom: '1.5rem' }}>
-                    <SectionHeader icon={Icon.users} title="Saúde da base de push" subtitle="Ativos vs. inativos (bloquearam ou desinstalaram)" />
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'flex-start' }}>
-                        <div>
-                            {totalSubscribers > 0 ? (
-                                <>
-                                    <div style={{ marginBottom: '14px' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '13px', color: C.textMid, fontWeight: 500 }}>
-                                            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '50%', background: C.success, display: 'inline-block' }} />Ativos</span>
-                                            <span>{activeSubscribers.toLocaleString('pt-BR')} <span style={{ color: C.success, fontWeight: 600 }}>({pctAtivos}%)</span></span>
-                                        </div>
-                                        <div style={{ background: C.neutralBorder, borderRadius: '999px', height: '5px', overflow: 'hidden' }}>
-                                            <div style={{ width: `${pctAtivos}%`, background: C.success, height: '100%', borderRadius: '999px', transition: 'width 0.6s' }} />
-                                        </div>
-                                    </div>
-                                    <div style={{ marginBottom: '14px' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '13px', color: C.textMid, fontWeight: 500 }}>
-                                            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '50%', background: C.danger, display: 'inline-block' }} />Inativos</span>
-                                            <span>{inativos.toLocaleString('pt-BR')} <span style={{ color: C.danger, fontWeight: 600 }}>({pctInativos}%)</span></span>
-                                        </div>
-                                        <div style={{ background: C.neutralBorder, borderRadius: '999px', height: '5px', overflow: 'hidden' }}>
-                                            <div style={{ width: `${pctInativos}%`, background: C.danger, height: '100%', borderRadius: '999px', transition: 'width 0.6s' }} />
-                                        </div>
-                                    </div>
-                                    <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
-                                        <Badge color={churnRate > 30 ? C.danger : C.success} bg={churnRate > 30 ? C.dangerBg : C.successBg} border={churnRate > 30 ? C.dangerBorder : C.successBorder}>
-                                            {churnRate > 30 ? Icon.alert : Icon.check} Churn {churnRate}%
-                                        </Badge>
-                                        <Badge color={C.neutralMid} bg={C.neutralBg} border={C.neutralBorder}>
-                                            {Icon.trending} Retenção {pctAtivos}%
-                                        </Badge>
-                                    </div>
-                                    <div style={{ padding: '9px 12px', background: pctAtivos >= 70 ? C.successBg : C.warningBg, border: `1px solid ${pctAtivos >= 70 ? C.successBorder : C.warningBorder}`, borderRadius: '6px', fontSize: '12px', color: pctAtivos >= 70 ? C.success : C.warning, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                        {pctAtivos >= 70 ? Icon.check : Icon.alert}
-                                        {pctAtivos >= 70 ? 'Base saudável — mais de 70% ativos' : pctAtivos >= 40 ? 'Base razoável — considere reativar inativos' : 'Base comprometida — muitos usuários bloquearam'}
-                                    </div>
-                                </>
-                            ) : (
-                                <div style={{ padding: '20px', background: C.neutralBg, borderRadius: '8px', textAlign: 'center', color: C.neutralMid, fontSize: '13px' }}>
-                                    Aguardando dados do OneSignal...
-                                    <div style={{ fontSize: '11px', marginTop: '6px', color: C.neutralLight }}>Configure o OneSignal na aba Configurações</div>
-                                </div>
-                            )}
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            <div className="stat-card" style={{ margin: 0, padding: '14px 16px' }}>
-                                <div className="stat-info">
-                                    <h3 style={{ fontSize: '12px', textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600 }}>Total cadastrado</h3>
-                                    <p style={{ fontSize: '1.5rem', margin: '4px 0', letterSpacing: '-0.02em' }}>{totalSubscribers > 0 ? totalSubscribers.toLocaleString('pt-BR') : '—'}</p>
-                                    <span style={{ fontSize: '11px', color: C.neutralLight }}>Todos que já deram permissão</span>
-                                </div>
-                            </div>
-                            <div className="stat-card" style={{ margin: 0, padding: '14px 16px' }}>
-                                <div className="stat-info">
-                                    <h3 style={{ fontSize: '12px', textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}>{Icon.clock} Melhor horário</h3>
-                                    <p style={{ fontSize: '1.5rem', margin: '4px 0', letterSpacing: '-0.02em' }}>{melhorHorario ?? '—'}</p>
-                                    <span style={{ fontSize: '11px', color: C.neutralLight }}>{melhorHorario ? 'Baseado nas aberturas' : 'Disponível após campanhas'}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* ── FUNIL DE NOTIFICACOES ── */}
-            <div className="config-card" style={{ marginBottom: '1.5rem' }}>
-                <SectionHeader icon={Icon.bell} title="Funil de notificações" subtitle={notifs.length > 0 ? `Performance agregada de ${notifs.length} campanhas` : 'Disponível após enviar campanhas'} />
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
-                    {[
-                        { label: 'Enviados', value: totalEnviados, pct: 100, color: C.brand, icon: Icon.send, desc: 'Total disparado' },
-                        { label: 'Entregues', value: totalConfirmados, pct: pctEntrega, color: '#3b82f6', icon: Icon.check, desc: totalEnviados > 0 ? `${pctEntrega}% do total` : 'Aguardando dados' },
-                        { label: 'Clicados', value: totalClicados, pct: pctClique, color: C.success, icon: Icon.eye, desc: totalEnviados > 0 ? `CTR: ${pctClique}%` : 'Aguardando dados' },
-                        { label: 'Convertidos', value: totalConvertidos, pct: pctConversao, color: C.warning, icon: Icon.dollar, desc: totalClicados > 0 ? `${pctConversao}% dos cliques` : 'Aguardando dados' },
-                    ].map((step, i) => (
-                        <div key={i} style={{ textAlign: 'center', position: 'relative' }}>
-                            {i > 0 && <div style={{ position: 'absolute', left: '-6px', top: '50%', transform: 'translateY(-50%)', color: C.neutralLight, fontSize: '16px' }}>›</div>}
-                            <div style={{ background: C.neutralBg, border: `1px solid ${step.color}25`, borderRadius: '10px', padding: '14px 10px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '6px', color: step.value > 0 ? step.color : C.neutralLight }}>{step.icon}</div>
-                                <div style={{ fontSize: '20px', fontWeight: 700, color: step.value > 0 ? step.color : C.neutralLight, marginBottom: '2px', letterSpacing: '-0.02em' }}>{step.value > 0 ? step.value.toLocaleString('pt-BR') : '—'}</div>
-                                <div style={{ fontSize: '11px', fontWeight: 600, color: C.textMid, marginBottom: '3px' }}>{step.label}</div>
-                                <div style={{ fontSize: '10px', color: C.neutralLight }}>{step.desc}</div>
-                                <div style={{ marginTop: '8px', background: C.neutralBorder, borderRadius: '999px', height: '3px', overflow: 'hidden' }}>
-                                    <div style={{ width: `${step.pct}%`, background: step.color, height: '100%', borderRadius: '999px', transition: 'width 0.6s' }} />
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* ── COACH AUTOMÁTICO ── */}
-            <div className="config-card" style={{ marginBottom: '1.5rem' }}>
-                <SectionHeader icon={Icon.brain} title="Coach automático" subtitle="Diagnóstico em tempo real baseado nos seus dados" />
-                <CoachInsights
-                    notifs={notifs}
-                    totalSubscribers={totalSubscribers}
-                    activeSubscribers={activeSubscribers}
-                    churnRate={churnRate}
-                    mediaAbertura={mediaAbertura}
-                    ticketMedio={ticketMedio}
-                    taxaConvGlobal={taxaConvGlobal}
-                    melhorHorario={melhorHorario}
-                    brl={brl}
-                    onAcao={(acao) => {
-                        if (acao === 'ab') { setShowABModal(true); }
-                        else if (acao === 'reativar') { setObjetivo('reativar'); setActiveTab('campanhas'); }
-                        else if (acao === 'campanha') { setActiveTab('campanhas'); }
-                        else if (acao === 'agendar') { setShowSegmentation(true); setActiveTab('campanhas'); }
-                        else if (acao === 'richpush') { setActiveTab('campanhas'); }
-                    }}
-                />
-            </div>
-
-            {/* ── DISPOSITIVOS + PAISES ── */}
-            {(porDisp.length > 0 || porPais.length > 0) && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                    <div className="config-card" style={{ marginBottom: 0 }}>
-                        <SectionHeader icon={Icon.smartphone} title="Plataformas" subtitle="Distribuição por dispositivo" />
-                        {porDisp.map(d => {
-                            const cliques = Math.round(totalClicados * (d.pct / 100));
-                            const cor = dispColors[d.dispositivo] ?? C.brand;
-                            return (
-                                <div key={d.dispositivo} style={{ marginBottom: '12px' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px', color: C.textMid, fontWeight: 500 }}>
-                                        <span>{d.dispositivo}</span>
-                                        <span style={{ color: C.textSoft }}>{d.count} ({d.pct}%){cliques > 0 && <span style={{ marginLeft: '6px', color: C.success, fontWeight: 600 }}>· {cliques} cliques</span>}</span>
-                                    </div>
-                                    <div style={{ background: C.neutralBorder, borderRadius: '999px', height: '5px', overflow: 'hidden' }}>
-                                        <div style={{ width: `${d.pct}%`, background: cor, height: '100%', borderRadius: '999px', transition: 'width 0.5s' }} />
-                                    </div>
-                                </div>
-                            );
-                        })}
-                        {porDisp.length === 0 && <p style={{ fontSize: '13px', color: C.neutralLight }}>Aguardando dados...</p>}
-                    </div>
-                    <div className="config-card" style={{ marginBottom: 0 }}>
-                        <SectionHeader icon={Icon.globe} title="Por país" />
-                        {porPais.length === 0
-                            ? <p style={{ color: C.neutralMid, fontSize: '13px' }}>Dados insuficientes</p>
-                            : porPais.map(p => (
-                                <div key={p.pais} style={{ marginBottom: '12px' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px', color: C.textMid, fontWeight: 500 }}>
-                                        <span>{FLAG[p.pais] ?? '🏳️'} {PAIS_NOME[p.pais] ?? p.pais}</span>
-                                        <span style={{ color: C.textSoft }}>{p.count} ({p.pct}%)</span>
-                                    </div>
-                                    <div style={{ background: C.neutralBorder, borderRadius: '999px', height: '5px', overflow: 'hidden' }}>
-                                        <div style={{ width: `${p.pct}%`, background: C.brand, height: '100%', borderRadius: '999px', transition: 'width 0.5s' }} />
-                                    </div>
-                                </div>
-                            ))}
-                    </div>
-                </div>
-            )}
-
-            {/* ── TABS ── */}
-            <div style={{ display: 'flex', gap: '4px', marginBottom: '20px', background: C.neutralBg, borderRadius: '8px', padding: '3px' }}>
-                {(['campanhas', 'automacoes'] as const).map(tab => (
-                    <button key={tab} onClick={() => setActiveTab(tab)} style={{ flex: 1, padding: '7px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 600, background: activeTab === tab ? C.white : 'transparent', color: activeTab === tab ? C.text : C.neutralMid, boxShadow: activeTab === tab ? '0 1px 3px rgba(0,0,0,0.08)' : 'none', transition: 'all 0.15s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                        {tab === 'campanhas' ? <>{Icon.send} Campanhas</> : <>{Icon.robot} Automações</>}
-                    </button>
-                ))}
-            </div>
-
-            {/* ── ABA CAMPANHAS ── */}
-            {activeTab === 'campanhas' && (
-                <>
-                    <div className="config-card">
-                        <div className="card-header" style={{ borderBottom: 'none', paddingBottom: 0 }}>
-                            <h2 style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: C.text, display: 'flex', alignItems: 'center', gap: '8px' }}>{Icon.send} Criar nova campanha</h2>
-                            <p style={{ color: C.textSoft, fontSize: '13px', marginTop: '3px' }}>Envie notificações push para seus clientes.</p>
-                        </div>
-
-                        {/* ── NOVO: SELETOR DE OBJETIVO ── */}
-                        <div style={{ marginTop: '20px' }}>
-                            <SeletorObjetivo objetivo={objetivo} onSelect={handleSelecionarObjetivo} />
-                        </div>
-
-                        {/* Divisor visual */}
-                        <div style={{ borderTop: '1px solid #E5E7EB', margin: '4px 0 20px' }} />
-
-                        <div style={{ background: C.neutralBg, padding: '12px 14px', borderRadius: '8px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: `1px solid ${C.neutralBorder}` }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <span style={{ color: C.neutralMid, display: 'flex' }}>{Icon.users}</span>
-                                <div style={{ fontSize: '13px', color: C.textMid }}>
-                                    Alcance estimado:{' '}
-                                    <span style={{ color: C.brand, fontWeight: 700 }}>{alcanceEstimado().toLocaleString('pt-BR')} dispositivos</span>
-                                    {(pushForm.filter_device || pushForm.filter_country || pushForm.filter_behavior) && <Badge color={C.brand} bg={C.brandLight} border={C.brandLight} children={<>filtro ativo</>} />}
-                                </div>
-                            </div>
-                            <button onClick={() => setShowSegmentation(!showSegmentation)} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: showSegmentation ? C.brandLight : C.white, border: `1px solid ${showSegmentation ? C.brand : C.neutralBorder}`, borderRadius: '6px', padding: '5px 12px', cursor: 'pointer', fontSize: '12px', fontWeight: 600, color: showSegmentation ? C.brand : C.textMid }}>
-                                {Icon.filter} {showSegmentation ? 'Ocultar' : 'Segmentar'}
-                            </button>
-                        </div>
-                        {showSegmentation && (
-                            <div className="animate-fade-in" style={{ background: '#F9FAFB', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', marginBottom: '20px' }}>
-                                <h4 style={{ margin: '0 0 14px', fontSize: '14px', color: '#374151' }}>🎯 Filtros de Segmentacao</h4>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '12px' }}>
-                                    <div>
-                                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '5px' }}>💰 Comportamento</label>
-                                        <select value={pushForm.filter_behavior ?? ''} onChange={e => setPushForm({ ...pushForm, filter_behavior: e.target.value || undefined })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', background: 'white', fontSize: '13px' }}>
-                                            <option value="">🟢 Todos os inscritos</option>
-                                            <option value="buyers">💰 So quem JA comprou (VIPs)</option>
-                                            <option value="non_buyers">👻 So quem NUNCA comprou</option>
-                                        </select>
-                                        <small style={{ fontSize: '10px', color: '#6B7280' }}>
-                                            {objetivo && OBJETIVOS.find(o => o.id === objetivo)?.segmento
-                                                ? '✅ Aplicado automaticamente pelo objetivo'
-                                                : 'Baseado nas tags do app'}
-                                        </small>
-                                    </div>
-                                    <div>
-                                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '5px' }}>📱 Dispositivo</label>
-                                        <select value={pushForm.filter_device ?? ''} onChange={e => setPushForm({ ...pushForm, filter_device: e.target.value || undefined })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', background: 'white', fontSize: '13px' }}>
-                                            <option value="">Todos</option>
-                                            <option value="Android">🤖 Android</option>
-                                            <option value="iOS">🍎 iOS</option>
-                                            <option value="Chrome">🌐 Chrome Web</option>
-                                            <option value="Firefox">🦊 Firefox</option>
-                                            <option value="Safari">🧭 Safari</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '5px' }}>🌍 Pais</label>
-                                        <select value={pushForm.filter_country ?? ''} onChange={e => setPushForm({ ...pushForm, filter_country: e.target.value || undefined })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', background: 'white', fontSize: '13px' }}>
-                                            <option value="">Todos</option>
-                                            <option value="BR">🇧🇷 Brasil</option>
-                                            <option value="PT">🇵🇹 Portugal</option>
-                                            <option value="US">🇺🇸 EUA</option>
-                                            <option value="AR">🇦🇷 Argentina</option>
-                                            <option value="MX">🇲🇽 Mexico</option>
-                                            <option value="CO">🇨🇴 Colombia</option>
-                                            <option value="CL">🇨🇱 Chile</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '8px' }}>
-                                    <div>
-                                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '5px' }}>⏰ Agendar envio</label>
-                                        <input type="datetime-local" value={pushForm.send_after ? pushForm.send_after.slice(0, 16) : ''} onChange={e => setPushForm({ ...pushForm, send_after: e.target.value ? new Date(e.target.value).toISOString() : undefined })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', background: 'white', fontSize: '13px' }} />
-                                        <small style={{ fontSize: '10px', color: '#6B7280' }}>Vazio = envio imediato</small>
-                                    </div>
-                                    <div>
-                                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '5px' }}>🧠 Intelligent Delivery</label>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px', border: `1px solid ${pushForm.intelligent_delivery ? '#818CF8' : '#d1d5db'}`, borderRadius: '6px', background: pushForm.intelligent_delivery ? '#EEF2FF' : 'white', cursor: 'pointer' }} onClick={() => setPushForm({ ...pushForm, intelligent_delivery: !pushForm.intelligent_delivery })}>
-                                            <Toggle checked={pushForm.intelligent_delivery ?? false} onChange={v => setPushForm({ ...pushForm, intelligent_delivery: v })} />
-                                            <span style={{ fontSize: '12px', color: pushForm.intelligent_delivery ? '#4F46E5' : '#6B7280' }}>{pushForm.intelligent_delivery ? 'Ativo — horario ideal' : 'Desativado'}</span>
-                                        </div>
-                                        <small style={{ fontSize: '10px', color: '#6B7280' }}>IA entrega quando cada usuario costuma abrir</small>
-                                    </div>
-                                </div>
-                                {(pushForm.filter_device || pushForm.filter_country || pushForm.send_after || pushForm.filter_behavior) && (
-                                    <button onClick={() => setPushForm({ ...pushForm, filter_device: undefined, filter_country: undefined, send_after: undefined, filter_behavior: undefined })} style={{ marginTop: '10px', background: 'none', border: 'none', color: '#DC2626', fontSize: '12px', cursor: 'pointer', padding: 0 }}>x Limpar filtros</button>
-                                )}
-                            </div>
-                        )}
-                        <div className="form-group">
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                                <label style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: C.textMid }}>Título</label>
-                                <button
-                                    onClick={() => setShowIAModal(true)}
-                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '6px', border: 'none', background: C.brand, color: C.white, fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
-                                >
-                                    {Icon.brain} Gerar com IA
-                                </button>
-                            </div>
-                            <input type="text" value={pushForm.title} onChange={e => setPushForm({ ...pushForm, title: e.target.value })} maxLength={50} placeholder="Ex: Oferta Relâmpago!" />
-                            <small style={{ color: C.neutralLight }}>{pushForm.title.length}/50 — use <code style={{ background: C.neutralBg, padding: '1px 4px', borderRadius: '3px' }}>{'{{first_name}}'}</code> para personalizar</small>
-                        </div>
-
-                        {/* ── TEMPLATES (dinâmicos pelo objetivo) ── */}
-                        <div style={{ marginBottom: '16px' }}>
-                            <div style={{ fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>
-                                📝 {objetivo ? `Templates para ${OBJETIVOS.find(o => o.id === objetivo)?.label}` : 'Templates prontos'} — clique para usar
-                            </div>
-                            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                                {templatesAtivos.map(t => {
-                                    const objConfig = objetivo ? OBJETIVOS.find(o => o.id === objetivo) : null;
-                                    return (
-                                        <button
-                                            key={t.label}
-                                            onClick={() => setPushForm({ ...pushForm, title: t.title, message: t.msg })}
-                                            style={{
-                                                padding: '5px 12px', borderRadius: '999px',
-                                                border: `1px solid ${objConfig ? objConfig.corBorder : '#d1d5db'}`,
-                                                background: objConfig ? objConfig.corBg : '#F9FAFB',
-                                                fontSize: '12px', cursor: 'pointer',
-                                                color: objConfig ? objConfig.cor : '#374151',
-                                                fontWeight: 500, transition: 'all 0.15s',
-                                            }}
-                                        >
-                                            {t.label}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        <div className="form-group">
-                            <label>Mensagem</label>
-                            <input type="text" value={pushForm.message} onChange={e => setPushForm({ ...pushForm, message: e.target.value })} maxLength={120} placeholder="Ex: 10% OFF hoje por tempo limitado!" />
-                            <small>{pushForm.message.length}/120 — ex: "Ola {'{{first_name}}'}, seu cupom chegou!"</small>
-                        </div>
-                        <div className="form-group">
-                            <label>Link (Opcional)</label>
-                            <div style={{ display: 'flex', gap: '8px' }}>
-                                <input
-                                    type="text"
-                                    value={pushForm.url}
-                                    onChange={e => setPushForm({ ...pushForm, url: e.target.value })}
-                                    placeholder="https://..."
-                                    style={{ flex: 1 }}
-                                />
-                                <button
-                                    onClick={handleAbrirDeepLink}
-                                    title="Usar produto ou página visitada automaticamente"
-                                    style={{
-                                        padding: '8px 12px', borderRadius: '8px', border: '1px solid #d1d5db',
-                                        background: '#F9FAFB', cursor: 'pointer', fontSize: '13px',
-                                        fontWeight: 600, color: '#374151', whiteSpace: 'nowrap',
-                                        display: 'flex', alignItems: 'center', gap: '4px',
-                                        transition: 'all 0.2s', flexShrink: 0,
-                                    }}
-                                    onMouseOver={e => { e.currentTarget.style.background = '#EEF2FF'; e.currentTarget.style.color = '#4F46E5'; e.currentTarget.style.borderColor = '#818CF8'; }}
-                                    onMouseOut={e => { e.currentTarget.style.background = '#F9FAFB'; e.currentTarget.style.color = '#374151'; e.currentTarget.style.borderColor = '#d1d5db'; }}
-                                >
-                                    🔗 Auto
-                                </button>
-                            </div>
-                            <small style={{ fontSize: '11px', color: '#6B7280' }}>
-                                Clique em <strong>🔗 Auto</strong> para usar um produto visitado ou página de carrinho automaticamente
-                            </small>
-                        </div>
-                        <div className="form-group">
-                            <label>🖼️ Imagem do Push (Rich Push — opcional)</label>
-                            <input type="text" value={pushForm.image_url ?? ''} onChange={e => setPushForm({ ...pushForm, image_url: e.target.value || undefined })} placeholder="https://... (banner de promocao, foto do produto)" />
-                            <small>Aparece como imagem grande na notificacao (Android + Chrome). Aumenta o CTR em ate 50%.</small>
-                        </div>
-                        <div style={{ background: '#F9FAFB', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', marginBottom: '16px' }}>
-                            <div style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '12px' }}>🔘 Botoes de Acao (opcional) <span style={{ fontWeight: 400, color: '#6B7280' }}>— aparecem embaixo da notificacao</span></div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
-                                <div><label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Botao 1 — Texto</label><input type="text" value={pushForm.btn1_text ?? ''} onChange={e => setPushForm({ ...pushForm, btn1_text: e.target.value || undefined })} placeholder="Ex: 🛒 Comprar Agora" maxLength={30} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} /></div>
-                                <div><label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Botao 1 — Link</label><input type="text" value={pushForm.btn1_url ?? ''} onChange={e => setPushForm({ ...pushForm, btn1_url: e.target.value || undefined })} placeholder="https://..." style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} /></div>
-                            </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                                <div><label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Botao 2 — Texto</label><input type="text" value={pushForm.btn2_text ?? ''} onChange={e => setPushForm({ ...pushForm, btn2_text: e.target.value || undefined })} placeholder="Ex: 🎁 Pegar Cupom" maxLength={30} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} /></div>
-                                <div><label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '4px' }}>Botao 2 — Link</label><input type="text" value={pushForm.btn2_url ?? ''} onChange={e => setPushForm({ ...pushForm, btn2_url: e.target.value || undefined })} placeholder="https://..." style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} /></div>
-                            </div>
-                        </div>
-
-                        {/* ── PREVIEW ANDROID + DESKTOP ── */}
-                        <div style={{ marginBottom: '16px' }}>
-                            <div style={{ fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '10px' }}>👁️ Preview nas plataformas</div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                                <div>
-                                    <div style={{ fontSize: '11px', color: '#6B7280', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>🤖 Android</div>
-                                    <div style={{ background: '#1a1a2e', borderRadius: '16px', padding: '10px', border: '3px solid #333' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', padding: '0 4px' }}>
-                                            <span style={{ fontSize: '9px', color: '#aaa' }}>12:30</span>
-                                            <span style={{ fontSize: '9px', color: '#aaa' }}>🔋 📶</span>
-                                        </div>
-                                        <div style={{ background: '#2d2d2d', borderRadius: '10px', padding: '10px', overflow: 'hidden' }}>
-                                            {pushForm.image_url && (
-                                                <div style={{ width: '100%', height: '70px', borderRadius: '6px', marginBottom: '8px', overflow: 'hidden', background: '#3d3d3d' }}>
-                                                    <img src={pushForm.image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                                                </div>
-                                            )}
-                                            <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                                                <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: objetivo ? OBJETIVOS.find(o => o.id === objetivo)?.cor ?? '#4F46E5' : '#4F46E5', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
-                                                    {objetivo ? OBJETIVOS.find(o => o.id === objetivo)?.icon : '🔔'}
-                                                </div>
-                                                <div style={{ flex: 1, minWidth: 0 }}>
-                                                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#fff', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                        {pushForm.title || 'Titulo da notificacao'}
-                                                    </div>
-                                                    <div style={{ fontSize: '11px', color: '#9CA3AF', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-                                                        {pushForm.message || 'Mensagem da notificacao'}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {(pushForm.btn1_text || pushForm.btn2_text) && (
-                                                <div style={{ display: 'flex', gap: '6px', marginTop: '8px', borderTop: '1px solid #444', paddingTop: '8px' }}>
-                                                    {pushForm.btn1_text && <span style={{ background: '#374151', color: '#fff', padding: '3px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 600 }}>{pushForm.btn1_text}</span>}
-                                                    {pushForm.btn2_text && <span style={{ background: '#374151', color: '#fff', padding: '3px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: 600 }}>{pushForm.btn2_text}</span>}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div style={{ fontSize: '11px', color: '#6B7280', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>🖥️ Desktop (Chrome / Windows)</div>
-                                    <div style={{ background: '#f1f1f1', borderRadius: '12px', padding: '10px', border: '1px solid #ddd', position: 'relative' }}>
-                                        <div style={{ display: 'flex', gap: '4px', marginBottom: '8px' }}>
-                                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ff5f57' }} />
-                                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#febc2e' }} />
-                                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#28c840' }} />
-                                        </div>
-                                        <div style={{ background: '#fff', borderRadius: '8px', padding: '10px 12px', boxShadow: '0 2px 12px rgba(0,0,0,0.15)', display: 'flex', gap: '10px', alignItems: 'flex-start', position: 'relative' }}>
-                                            <div style={{ width: '32px', height: '32px', borderRadius: '6px', background: objetivo ? OBJETIVOS.find(o => o.id === objetivo)?.cor ?? '#4F46E5' : '#4F46E5', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>
-                                                {objetivo ? OBJETIVOS.find(o => o.id === objetivo)?.icon : '🔔'}
-                                            </div>
-                                            <div style={{ flex: 1, minWidth: 0 }}>
-                                                <div style={{ fontSize: '12px', fontWeight: 700, color: '#111827', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                    {pushForm.title || 'Titulo da notificacao'}
-                                                </div>
-                                                <div style={{ fontSize: '11px', color: '#6B7280', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-                                                    {pushForm.message || 'Mensagem da notificacao'}
-                                                </div>
-                                                {pushForm.image_url && (
-                                                    <div style={{ marginTop: '6px', width: '100%', height: '50px', borderRadius: '4px', overflow: 'hidden', background: '#f3f4f6' }}>
-                                                        <img src={pushForm.image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <span style={{ position: 'absolute', top: '8px', right: '8px', fontSize: '10px', color: '#9CA3AF' }}>agora</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* ── CONTROLE DE FREQUENCIA ── */}
-                        <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: '8px', padding: '12px 14px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
-                                <span style={{ fontSize: '18px' }}>🔔</span>
-                                <div>
-                                    <div style={{ fontSize: '13px', fontWeight: 600, color: '#92400E' }}>Controle de Frequencia</div>
-                                    <div style={{ fontSize: '11px', color: '#B45309' }}>Limita quantos pushs cada usuario recebe por dia (evita bloqueio)</div>
-                                </div>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-                                <select
-                                    value={(pushForm as any).frequency_limit ?? ''}
-                                    onChange={e => setPushForm({ ...pushForm, ...(e.target.value ? { frequency_limit: parseInt(e.target.value) } : { frequency_limit: undefined }) } as any)}
-                                    style={{ padding: '6px 10px', border: '1px solid #FED7AA', borderRadius: '6px', background: 'white', fontSize: '13px', color: '#374151' }}
-                                >
-                                    <option value="">Sem limite</option>
-                                    <option value="1">Max 1 por dia</option>
-                                    <option value="2">Max 2 por dia</option>
-                                    <option value="3">Max 3 por dia</option>
-                                    <option value="5">Max 5 por semana</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        {/* ── BOTÃO DE ENVIO + A/B ── */}
-                        <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-                            <button
-                                className="save-button"
-                                onClick={handleSendPush}
-                                disabled={sendingPush || !pushForm.title || !pushForm.message}
-                                style={{
-                                    background: sendingPush ? C.neutralBorder : objetivo ? OBJETIVOS.find(o => o.id === objetivo)?.cor ?? C.brand : C.dark,
-                                    flex: 1, transition: 'background 0.3s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '13px', fontWeight: 600,
-                                }}
-                            >
-                                {Icon.send}
-                                {sendingPush ? 'Enviando...' : pushForm.send_after
-                                    ? `Agendar para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`
-                                    : objetivo
-                                        ? `Enviar campanha de ${OBJETIVOS.find(o => o.id === objetivo)?.label} — ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`
-                                        : `Enviar para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`}
-                            </button>
-                            <button
-                                onClick={() => setShowABModal(true)}
-                                style={{ padding: '10px 14px', borderRadius: '8px', border: `1px solid ${C.neutralBorder}`, background: C.white, cursor: 'pointer', fontSize: '12px', fontWeight: 700, color: C.textMid, whiteSpace: 'nowrap', transition: 'all 0.2s', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
-                                onMouseOver={e => { e.currentTarget.style.borderColor = C.brand; e.currentTarget.style.color = C.brand; }}
-                                onMouseOut={e => { e.currentTarget.style.borderColor = C.neutralBorder; e.currentTarget.style.color = C.textMid; }}
-                            >
-                                {Icon.flask} A/B
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* ── HISTORICO COM ROI ── */}
-                    <div className="config-card" style={{ marginTop: '24px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                            <div>
-                                <div style={{ fontSize: '14px', fontWeight: 600, color: C.text, display: 'flex', alignItems: 'center', gap: '7px' }}>{Icon.history} Histórico de campanhas</div>
-                                <div style={{ fontSize: '12px', color: C.textSoft, marginTop: '2px' }}>Métricas reais do OneSignal{ticketMedio > 0 ? ' + ROI estimado' : ''}</div>
-                            </div>
-                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                                <div style={{ display: 'flex', background: C.neutralBg, borderRadius: '7px', padding: '3px', gap: '2px', border: `1px solid ${C.neutralBorder}` }}>
-                                    {(['onesignal', 'ab', 'jornada', 'score', 'local'] as const).map(tab => (
-                                        <button key={tab} onClick={() => setActiveHistorySubTab(tab)} style={{ padding: '4px 10px', borderRadius: '5px', border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: 600, background: activeHistorySubTab === tab ? C.white : 'transparent', color: activeHistorySubTab === tab ? C.text : C.neutralMid, boxShadow: activeHistorySubTab === tab ? '0 1px 2px rgba(0,0,0,0.08)' : 'none', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                            {tab === 'onesignal' ? <>{Icon.bell} OneSignal</> : tab === 'ab' ? <>{Icon.flask} A/B</> : tab === 'jornada' ? <>{Icon.map} Jornada</> : tab === 'score' ? <>{Icon.score} Score</> : <>{Icon.history} Local</>}
-                                        </button>
-                                    ))}
-                                </div>
-                                <button onClick={() => { fetchHistory(); fetchOsStats(); fetchABTests(); }} style={{ background: 'none', border: `1px solid ${C.neutralBorder}`, borderRadius: '6px', padding: '4px 8px', cursor: 'pointer', color: C.neutralMid, display: 'flex', alignItems: 'center' }}>{Icon.refresh}</button>
-                            </div>
-                        </div>
-                        {activeHistorySubTab === 'onesignal' && (
-                            loadingStats ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Carregando...</p>
-                                : notifs.length === 0 ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Nenhuma campanha ainda.</p>
-                                    : <div style={{ overflowX: 'auto' }}>
-                                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-                                            <thead><tr style={{ background: '#f9fafb', color: '#666', textAlign: 'left' }}>
-                                                <th style={{ padding: '12px' }}>Data</th>
-                                                <th style={{ padding: '12px' }}>Mensagem</th>
-                                                <th style={{ padding: '12px' }}>Funil</th>
-                                                <th style={{ padding: '12px', textAlign: 'right' }}>Enviados</th>
-                                                <th style={{ padding: '12px', textAlign: 'right' }}>Abertos</th>
-                                                <th style={{ padding: '12px', textAlign: 'right' }}>Falhos</th>
-                                                <th style={{ padding: '12px', textAlign: 'right' }}>Taxa</th>
-                                                {ticketMedio > 0 && <th style={{ padding: '12px', textAlign: 'right' }}>ROI Est.</th>}
-                                                <th style={{ padding: '12px', textAlign: 'center', fontSize: '11px', color: '#9CA3AF', fontWeight: 400 }}>👆 detalhe</th>
-                                            </tr></thead>
-                                            <tbody>{notifs.map(n => {
-                                                const roi = ticketMedio > 0 ? Math.round(n.opened * (taxaConvGlobal / 100) * ticketMedio) : 0;
-                                                const badge = getBenchmarkBadge(n.taxa_abertura);
-                                                const funil = inferirFunil(n.title, n.message);
-                                                return (
-                                                    <tr key={n.id} onClick={() => setCampanhaDetalhe(n)} style={{ borderBottom: '1px solid #eee', cursor: 'pointer', transition: 'background 0.15s' }} onMouseOver={e => (e.currentTarget.style.background = '#F9FAFB')} onMouseOut={e => (e.currentTarget.style.background = 'transparent')}>
-                                                        <td style={{ padding: '12px', whiteSpace: 'nowrap', color: '#555', fontSize: '12px' }}>{formatUnix(n.created_at)}</td>
-                                                        <td style={{ padding: '12px' }}>
-                                                            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                                                                {n.image_url && <img src={n.image_url} alt="" style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover', flexShrink: 0 }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />}
-                                                                <div><div style={{ fontWeight: 'bold', fontSize: '13px' }}>{n.title}</div><div style={{ fontSize: '12px', color: '#666' }}>{n.message}</div></div>
-                                                            </div>
-                                                        </td>
-                                                        <td style={{ padding: '12px' }}>
-                                                            <span style={{
-                                                                display: 'inline-flex', alignItems: 'center', gap: '4px',
-                                                                padding: '3px 8px', borderRadius: '999px', fontSize: '11px', fontWeight: 600,
-                                                                background: funil.bg, color: funil.color, whiteSpace: 'nowrap',
-                                                            }}>
-                                                                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: funil.color, display: 'inline-block' }} />
-                                                                {funil.label}
-                                                            </span>
-                                                        </td>
-                                                        <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold', color: '#4F46E5' }}>{n.sent.toLocaleString('pt-BR')}</td>
-                                                        <td style={{ padding: '12px', textAlign: 'right', color: '#059669' }}>{n.opened.toLocaleString('pt-BR')}</td>
-                                                        <td style={{ padding: '12px', textAlign: 'right', color: '#DC2626' }}>{n.failed.toLocaleString('pt-BR')}</td>
-                                                        <td style={{ padding: '12px', textAlign: 'right' }}>
-                                                            <span style={{ background: badge.bg, color: badge.color, padding: '3px 8px', borderRadius: '999px', fontSize: '11px', fontWeight: 600 }}>{badge.icon} {n.taxa_abertura}%</span>
-                                                        </td>
-                                                        {ticketMedio > 0 && (
-                                                            <td style={{ padding: '12px', textAlign: 'right' }}>
-                                                                {roi > 0 ? <span style={{ background: '#dcfce7', color: '#166534', padding: '3px 8px', borderRadius: '999px', fontSize: '12px', fontWeight: 600 }}>~{brl(roi)}</span> : <span style={{ color: '#9CA3AF', fontSize: '12px' }}>—</span>}
-                                                            </td>
-                                                        )}
-                                                        <td style={{ padding: '12px', textAlign: 'center', color: '#9CA3AF' }}>›</td>
-                                                    </tr>
-                                                );
-                                            })}</tbody>
-                                        </table>
-                                        {ticketMedio > 0 && <p style={{ fontSize: '11px', color: '#9CA3AF', padding: '8px 12px', margin: 0 }}>* ROI estimado: abertos x {taxaConvGlobal}% conversao x {brl(ticketMedio)} ticket medio</p>}
-                                    </div>
-                        )}
-                        {activeHistorySubTab === 'ab' && (
-                            <div style={{ padding: '8px 0' }}>
-                                {loadingAB
-                                    ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Carregando...</p>
-                                    : abTests.length === 0
-                                        ? (
-                                            <div style={{ textAlign: 'center', padding: '32px 20px', color: '#6B7280' }}>
-                                                <div style={{ fontSize: '32px', marginBottom: '10px' }}>🧪</div>
-                                                <div style={{ fontWeight: 600, marginBottom: '6px' }}>Nenhum teste A/B ainda</div>
-                                                <div style={{ fontSize: '13px' }}>Clique no botão <strong>🧪 A/B</strong> ao lado do envio para criar seu primeiro teste.</div>
-                                            </div>
-                                        )
-                                        : abTests.map(t => <ABResultCard key={t.id} test={t} onRefresh={refreshABTest} />)
-                                }
-                            </div>
-                        )}
-                        {activeHistorySubTab === 'jornada' && (
-                            <div style={{ padding: '8px 0' }}>
-                                <JornadaTab token={token} API_URL={API_URL} brl={brl} />
-                            </div>
-                        )}
-                        {activeHistorySubTab === 'score' && (
-                            <div style={{ padding: '8px 0' }}>
-                                <ScoreTab token={token} API_URL={API_URL} onSegmentar={handleSegmentarScore} />
-                            </div>
-                        )}
-                        {activeHistorySubTab === 'local' && (
-                            loadingHistory ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Carregando...</p>
-                                : history.length === 0 ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Nenhuma campanha local.</p>
-                                    : <div style={{ overflowX: 'auto' }}>
-                                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
-                                            <thead><tr style={{ background: '#f9fafb', color: '#666', textAlign: 'left' }}><th style={{ padding: '12px' }}>Data</th><th style={{ padding: '12px' }}>Mensagem</th><th style={{ padding: '12px', textAlign: 'right' }}>Enviados</th></tr></thead>
-                                            <tbody>{history.map(item => (
-                                                <tr key={item.id} style={{ borderBottom: '1px solid #eee' }}>
-                                                    <td style={{ padding: '12px', whiteSpace: 'nowrap', color: '#555' }}>{formatDate(item.created_at)}</td>
-                                                    <td style={{ padding: '12px' }}><div style={{ fontWeight: 'bold' }}>{item.title}</div><div style={{ fontSize: '12px', color: '#666' }}>{item.message}</div></td>
-                                                    <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold', color: '#4F46E5' }}>{item.sent_count}</td>
-                                                </tr>
-                                            ))}</tbody>
-                                        </table>
-                                    </div>
-                        )}
-                    </div>
-                </>
-            )}
-
-            {/* ── ABA AUTOMACOES ── */}
-            {activeTab === 'automacoes' && (
-                <div className="config-card">
-                    <div className="card-header">
-                        <h2 style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: C.text, display: 'flex', alignItems: 'center', gap: '8px' }}>{Icon.robot} Recuperação de carrinho abandonado</h2>
-                        <p style={{ color: C.textSoft, margin: '4px 0 0', fontSize: '13px' }}>Configure as mensagens automáticas enviadas quando um cliente abandona o carrinho.</p>
-                    </div>
-                    <div style={{ background: C.brandLight, border: `1px solid ${C.brandMuted}30`, borderRadius: '8px', padding: '12px 14px', marginBottom: '24px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                        <span style={{ color: C.brand, display: 'flex', flexShrink: 0, marginTop: '1px' }}>{Icon.info}</span>
-                        <div style={{ fontSize: '13px', color: C.brand, lineHeight: '1.5' }}><strong>Como funciona:</strong> Quando um cliente adiciona itens ao carrinho e sai sem comprar, o sistema aguarda o tempo configurado e envia a notificação automaticamente.</div>
-                    </div>
-                    {loadingAutomacao ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Carregando...</p> : (
-                        <>
-                            {renderPassoCard(1, automacao.passo1_ativo, automacao.passo1_horas, automacao.passo1_titulo, automacao.passo1_mensagem)}
-                            {renderPassoCard(2, automacao.passo2_ativo, automacao.passo2_horas, automacao.passo2_titulo, automacao.passo2_mensagem)}
-                            {renderPassoCard(3, automacao.passo3_ativo, automacao.passo3_horas, automacao.passo3_titulo, automacao.passo3_mensagem, automacao.passo3_cupom)}
-
-                            <div style={{ borderTop: `1px solid ${C.neutralBorder}`, paddingTop: '20px', marginTop: '4px', marginBottom: '16px' }}>
-                                <div style={{ fontSize: '13px', fontWeight: 600, color: C.textMid, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                    {Icon.eye} Produto Visitado
-                                    <span style={{ fontSize: '11px', fontWeight: 400, color: C.neutralLight }}>— lembrete automático após visitar produto</span>
-                                </div>
-                            </div>
-                            <div style={{ border: `2px solid ${automacao.produto_visitado_ativo ? '#8b5cf6' : '#E5E7EB'}`, borderRadius: '12px', padding: '20px', marginBottom: '16px', background: automacao.produto_visitado_ativo ? '#fafafa' : '#f9fafb', transition: 'all 0.2s' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: automacao.produto_visitado_ativo ? '16px' : '0' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>🛍️</div>
-                                        <div>
-                                            <div style={{ fontWeight: 600, fontSize: '14px', color: '#111827' }}>Visitou produto sem comprar</div>
-                                            <div style={{ fontSize: '12px', color: '#6B7280' }}>{automacao.produto_visitado_ativo ? `Lembrete apos ${automacao.produto_visitado_horas}h` : 'Desativado'}</div>
-                                        </div>
-                                    </div>
-                                    <Toggle checked={automacao.produto_visitado_ativo} onChange={v => setAutomacao({ ...automacao, produto_visitado_ativo: v })} />
-                                </div>
-                                {automacao.produto_visitado_ativo && (
-                                    <div className="animate-fade-in">
-                                        <div className="form-group" style={{ marginBottom: '12px' }}>
-                                            <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Enviar apos</label>
-                                            <select value={automacao.produto_visitado_horas} onChange={e => setAutomacao({ ...automacao, produto_visitado_horas: parseFloat(e.target.value) })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', background: 'white', fontSize: '13px' }}>
-                                                {HORAS_OPCOES.map(op => <option key={op.value} value={op.value}>{op.label}</option>)}
-                                            </select>
-                                        </div>
-                                        <div className="form-group" style={{ marginBottom: '12px' }}>
-                                            <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Titulo</label>
-                                            <input type="text" value={automacao.produto_visitado_titulo} maxLength={50} onChange={e => setAutomacao({ ...automacao, produto_visitado_titulo: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} />
-                                        </div>
-                                        <div className="form-group" style={{ marginBottom: '0' }}>
-                                            <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Mensagem</label>
-                                            <textarea value={automacao.produto_visitado_mensagem} maxLength={120} rows={2} onChange={e => setAutomacao({ ...automacao, produto_visitado_mensagem: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px', resize: 'vertical' }} />
-                                        </div>
-                                        <div style={{ marginTop: '12px', background: '#111827', borderRadius: '10px', padding: '10px 14px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                                            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#8b5cf6', flexShrink: 0 }} />
-                                            <div><div style={{ fontSize: '12px', fontWeight: 600, color: '#fff' }}>{automacao.produto_visitado_titulo || 'Titulo'}</div><div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>{automacao.produto_visitado_mensagem || 'Mensagem'}</div></div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div style={{ borderTop: `1px solid ${C.neutralBorder}`, paddingTop: '20px', marginTop: '4px', marginBottom: '16px' }}>
-                                <div style={{ fontSize: '13px', fontWeight: 600, color: C.textMid, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                    {Icon.clock} Cliente Inativo
-                                    <span style={{ fontSize: '11px', fontWeight: 400, color: C.neutralLight }}>— reativação automática de clientes sumidos</span>
-                                </div>
-                            </div>
-                            <div style={{ border: `2px solid ${automacao.inativo_ativo ? '#f59e0b' : '#E5E7EB'}`, borderRadius: '12px', padding: '20px', marginBottom: '16px', background: automacao.inativo_ativo ? '#fafafa' : '#f9fafb', transition: 'all 0.2s' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: automacao.inativo_ativo ? '16px' : '0' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>😴</div>
-                                        <div>
-                                            <div style={{ fontWeight: 600, fontSize: '14px', color: '#111827' }}>Nao visita ha X dias</div>
-                                            <div style={{ fontSize: '12px', color: '#6B7280' }}>{automacao.inativo_ativo ? `Dispara apos ${automacao.inativo_dias} dias sem visita` : 'Desativado'}</div>
-                                        </div>
-                                    </div>
-                                    <Toggle checked={automacao.inativo_ativo} onChange={v => setAutomacao({ ...automacao, inativo_ativo: v })} />
-                                </div>
-                                {automacao.inativo_ativo && (
-                                    <div className="animate-fade-in">
-                                        <div className="form-group" style={{ marginBottom: '12px' }}>
-                                            <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Dias de inatividade</label>
-                                            <select value={automacao.inativo_dias} onChange={e => setAutomacao({ ...automacao, inativo_dias: parseInt(e.target.value) })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', background: 'white', fontSize: '13px' }}>
-                                                <option value={3}>3 dias</option>
-                                                <option value={7}>7 dias</option>
-                                                <option value={14}>14 dias</option>
-                                                <option value={30}>30 dias</option>
-                                                <option value={60}>60 dias</option>
-                                            </select>
-                                            <small style={{ fontSize: '10px', color: '#6B7280' }}>Baseado na tag ultima_visita — roda 1x por dia automaticamente</small>
-                                        </div>
-                                        <div className="form-group" style={{ marginBottom: '12px' }}>
-                                            <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Titulo</label>
-                                            <input type="text" value={automacao.inativo_titulo} maxLength={50} onChange={e => setAutomacao({ ...automacao, inativo_titulo: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px' }} />
-                                        </div>
-                                        <div className="form-group" style={{ marginBottom: '0' }}>
-                                            <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}>Mensagem</label>
-                                            <textarea value={automacao.inativo_mensagem} maxLength={120} rows={2} onChange={e => setAutomacao({ ...automacao, inativo_mensagem: e.target.value })} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '13px', resize: 'vertical' }} />
-                                        </div>
-                                        <div style={{ marginTop: '12px', background: '#111827', borderRadius: '10px', padding: '10px 14px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                                            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#f59e0b', flexShrink: 0 }} />
-                                            <div><div style={{ fontSize: '12px', fontWeight: 600, color: '#fff' }}>{automacao.inativo_titulo || 'Titulo'}</div><div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '2px' }}>{automacao.inativo_mensagem || 'Mensagem'}</div></div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                            <button className="save-button" onClick={saveAutomacao} disabled={savingAutomacao} style={{ width: '100%', marginTop: '8px', background: savingAutomacao ? C.neutralBorder : C.dark, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '13px', fontWeight: 600 }}>
-                                {Icon.check} {savingAutomacao ? 'Salvando...' : 'Salvar automações'}
-                            </button>
-                        </>
-                    )}
-                </div>
-            )}
-
-            {/* ── MODAL DEEP LINK ── */}
-            {showDeepLink && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setShowDeepLink(false)}>
-                    <div style={{ background: '#fff', borderRadius: '16px', width: '100%', maxWidth: '560px', maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }} onClick={e => e.stopPropagation()}>
-                        {/* Header */}
-                        <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid #E5E7EB', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                                <div style={{ fontSize: '16px', fontWeight: 700, color: '#111827' }}>🔗 Deep Link Automático</div>
-                                <div style={{ fontSize: '13px', color: '#6B7280', marginTop: '2px' }}>Selecione o destino da notificação</div>
-                            </div>
-                            <button onClick={() => setShowDeepLink(false)} style={{ background: '#F3F4F6', border: 'none', borderRadius: '8px', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px' }}>×</button>
-                        </div>
-
-                        <div style={{ padding: '20px 24px' }}>
-                            {loadingDeepLink ? (
-                                <div style={{ textAlign: 'center', padding: '30px', color: '#6B7280' }}>Carregando produtos...</div>
-                            ) : !deepLinkData ? (
-                                <div style={{ textAlign: 'center', padding: '30px', color: '#6B7280' }}>Nenhum dado disponível</div>
-                            ) : (
-                                <>
-                                    {/* Atalhos rápidos */}
-                                    <div style={{ marginBottom: '20px' }}>
-                                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Atalhos</div>
-                                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                                            {[
-                                                { label: '🏠 Página Inicial', url: '/' },
-                                                { label: '🛒 Carrinho', url: '/checkout' },
-                                                { label: '🛍️ Produtos', url: '/produtos' },
-                                                { label: '👤 Minha Conta', url: '/minha-conta' },
-                                            ].map(a => (
-                                                <button
-                                                    key={a.url}
-                                                    onClick={() => handleSelecionarDeepLink(a.url)}
-                                                    style={{ padding: '6px 12px', borderRadius: '8px', border: '1px solid #E5E7EB', background: '#F9FAFB', cursor: 'pointer', fontSize: '12px', fontWeight: 500, color: '#374151', transition: 'all 0.15s' }}
-                                                    onMouseOver={e => { e.currentTarget.style.background = '#EEF2FF'; e.currentTarget.style.borderColor = '#818CF8'; e.currentTarget.style.color = '#4F46E5'; }}
-                                                    onMouseOut={e => { e.currentTarget.style.background = '#F9FAFB'; e.currentTarget.style.borderColor = '#E5E7EB'; e.currentTarget.style.color = '#374151'; }}
-                                                >
-                                                    {a.label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Produtos mais visitados */}
-                                    {deepLinkData.produtos_visitados.length > 0 && (
-                                        <div style={{ marginBottom: '20px' }}>
-                                            <div style={{ fontSize: '11px', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>
-                                                🔥 Produtos mais visitados (últimos 7 dias)
-                                            </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                                                {deepLinkData.produtos_visitados.map((p, i) => (
-                                                    <button
-                                                        key={i}
-                                                        onClick={() => handleSelecionarDeepLink(p.url, p.nome)}
-                                                        style={{ padding: '10px 14px', borderRadius: '10px', border: '1px solid #E5E7EB', background: '#F9FAFB', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', transition: 'all 0.15s' }}
-                                                        onMouseOver={e => { e.currentTarget.style.background = '#EEF2FF'; e.currentTarget.style.borderColor = '#818CF8'; }}
-                                                        onMouseOut={e => { e.currentTarget.style.background = '#F9FAFB'; e.currentTarget.style.borderColor = '#E5E7EB'; }}
-                                                    >
-                                                        <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#4F46E520', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>🛍️</div>
-                                                        <div style={{ flex: 1, minWidth: 0 }}>
-                                                            <div style={{ fontSize: '13px', fontWeight: 600, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.nome}</div>
-                                                            <div style={{ fontSize: '11px', color: '#6B7280', marginTop: '1px' }}>
-                                                                {p.visitas} visitas · {p.preco ? `R$ ${p.preco}` : 'sem preço'}
-                                                            </div>
-                                                        </div>
-                                                        <span style={{ fontSize: '11px', color: '#4F46E5', fontWeight: 600, flexShrink: 0 }}>Usar →</span>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Páginas de produto visitadas */}
-                                    {deepLinkData.paginas_produto.length > 0 && (
-                                        <div style={{ marginBottom: '20px' }}>
-                                            <div style={{ fontSize: '11px', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>
-                                                📄 Páginas visitadas
-                                            </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                                                {deepLinkData.paginas_produto.slice(0, 5).map((p, i) => (
-                                                    <button
-                                                        key={i}
-                                                        onClick={() => handleSelecionarDeepLink(p.pagina)}
-                                                        style={{ padding: '8px 14px', borderRadius: '10px', border: '1px solid #E5E7EB', background: '#F9FAFB', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '10px', transition: 'all 0.15s' }}
-                                                        onMouseOver={e => { e.currentTarget.style.background = '#EEF2FF'; e.currentTarget.style.borderColor = '#818CF8'; }}
-                                                        onMouseOut={e => { e.currentTarget.style.background = '#F9FAFB'; e.currentTarget.style.borderColor = '#E5E7EB'; }}
-                                                    >
-                                                        <span style={{ fontSize: '16px' }}>🔗</span>
-                                                        <div style={{ flex: 1, minWidth: 0 }}>
-                                                            <div style={{ fontSize: '12px', fontWeight: 500, color: '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.label}</div>
-                                                            <div style={{ fontSize: '10px', color: '#9CA3AF', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.pagina}</div>
-                                                        </div>
-                                                        <span style={{ fontSize: '11px', color: '#6B7280', flexShrink: 0 }}>{p.visitas}x</span>
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Carrinhos ativos */}
-                                    {deepLinkData.carrinhos_ativos.length > 0 && (
-                                        <div>
-                                            <div style={{ fontSize: '11px', fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>
-                                                🛒 Recuperar carrinhos ativos
-                                            </div>
-                                            <button
-                                                onClick={() => handleSelecionarDeepLink('/checkout')}
-                                                style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: '2px solid #FED7AA', background: '#FFF7ED', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px' }}
-                                            >
-                                                <span style={{ fontSize: '22px' }}>🛒</span>
-                                                <div>
-                                                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#92400E' }}>Direcionar para o Checkout</div>
-                                                    <div style={{ fontSize: '11px', color: '#B45309' }}>{deepLinkData.carrinhos_ativos.length} carrinhos ativos aguardando</div>
-                                                </div>
-                                                <span style={{ marginLeft: 'auto', fontSize: '11px', color: '#d97706', fontWeight: 600 }}>Usar →</span>
-                                            </button>
-                                        </div>
-                                    )}
-
-                                    {deepLinkData.produtos_visitados.length === 0 && deepLinkData.paginas_produto.length === 0 && deepLinkData.carrinhos_ativos.length === 0 && (
-                                        <div style={{ textAlign: 'center', padding: '20px', color: '#6B7280', fontSize: '13px' }}>
-                                            Nenhum produto visitado nos últimos 7 dias. Use os atalhos acima.
-                                        </div>
-                                    )}
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* ── MODAL TESTE A/B ── */}
-            {showABModal && (
-                <ABTestModal
-                    form={abForm}
-                    setForm={setAbForm}
-                    onSend={handleSendAB}
-                    sending={sendingAB}
-                    onClose={() => setShowABModal(false)}
-                    alcance={alcanceEstimado()}
-                />
-            )}
-
-            {/* ── MODAL DETALHE DA CAMPANHA ── */}
-            {campanhaDetalhe && (
-                <CampanhaDetalhe
-                    notif={campanhaDetalhe}
-                    mediaAbertura={mediaAbertura}
-                    ticketMedio={ticketMedio}
-                    taxaConvGlobal={taxaConvGlobal}
-                    onClose={() => setCampanhaDetalhe(null)}
-                    brl={brl}
-                />
-            )}
+                <div style={{ fontSize: '10px', color: p.destaque ? '#C7D2FE' : C.neutralLight, marginBottom: '4px', fontWeight: 500 }}>{p.label} — {p.pct}%</div>
+                <div style={{ fontSize: '19px', fontWeight: 800, color: p.destaque ? C.white : '#D1D5DB' }}>{brl(p.valor)}</div>
+                <div style={{ fontSize: '10px', color: p.destaque ? '#A5B4FC' : C.neutralLight, marginTop: '3px' }}>{Math.round(funilVisitas * p.pct / 100)} vendas</div>
+              </div>
+            ))}
+          </div>
+          <button onClick={onNavigateCampanhas} style={{ marginTop: '14px', width: '100%', background: C.brand, color: C.white, border: 'none', borderRadius: '6px', padding: '9px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+            {Icon.target} Criar campanha para atingir essa meta
+          </button>
         </div>
-    );
+      )}
+
+      {/* ── METRIC CARDS ──────────────────────────────────────────────── */}
+      <div className="stats-grid">
+
+        {/* Receita */}
+        <div className="stat-card" style={{ borderLeft: `3px solid ${C.success}` }}>
+          <div className="stat-icon green" style={{ color: C.success }}>{Icon.revenue}</div>
+          <div className="stat-info">
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Receita app</h3>
+            <Num>{brl(receita)}</Num>
+            <span className="stat-growth" style={{ color: C.success, fontWeight: 500 }}>{vendas} pedidos realizados</span>
+            <div className="card-meta-text">Meta: {brl(metaReceita)}</div>
+          </div>
+        </div>
+
+        {/* Ticket Médio */}
+        <div className="stat-card">
+          <div className="stat-icon" style={{ color: C.brand }}>{Icon.ticket}</div>
+          <div className="stat-info">
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Ticket médio</h3>
+            <div className="ticket-main-row" style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginTop: '4px' }}>
+              <span className="ticket-main-value">{brl(ticketApp)}</span>
+              <Badge color={C.brand} bg={C.brandLight} border={C.brandLight}>App</Badge>
+            </div>
+          </div>
+        </div>
+
+        {/* Instalações */}
+        <div className="stat-card">
+          <div className="stat-icon purple" style={{ color: C.brand }}>{Icon.mobile}</div>
+          <div className="stat-info">
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Instalações ativas</h3>
+            <Num>{instalacoes}</Num>
+            <span className="stat-growth" style={{ color: temOsData ? C.brand : C.textSoft, fontWeight: 500 }}>
+              {temOsData ? 'Push habilitado — dados em tempo real' : 'Base de clientes fiéis'}
+            </span>
+            <div className="card-meta-text">Meta: {instalacoes} / {metaInstalacoes}</div>
+          </div>
+        </div>
+
+        {/* Crescimento */}
+        <div className="stat-card">
+          <div className="stat-icon" style={{ color: crescimento7d > 0 ? C.success : C.neutralMid }}>{Icon.trending}</div>
+          <div className="stat-info">
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Crescimento do app</h3>
+            <Num color={crescimento7d > 0 ? C.success : C.text}>+{crescimento7d}%</Num>
+            <span className="stat-growth" style={{ color: C.textSoft }}>vs. últimos 7 dias</span>
+          </div>
+        </div>
+
+        {/* Clientes Convertidos */}
+        <div className="stat-card">
+          <div className="stat-icon blue" style={{ color: C.brand }}>{Icon.users}</div>
+          <div className="stat-info">
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Clientes convertidos</h3>
+            <Num>{temOsData && compradoresOS > 0 ? compradoresOS : clientesRec}</Num>
+            {temOsData && compradoresOS > 0 ? (
+              <>
+                <div style={{ fontSize: '12px', color: C.textMid, marginTop: '4px', fontWeight: 500 }}>
+                  {instalacoes > 0 ? Math.round((compradoresOS / instalacoes) * 100) : 0}% dos usuários com app já compraram
+                </div>
+                <div style={{ fontSize: '11px', color: C.textSoft, marginTop: '2px' }}>via OneSignal</div>
+              </>
+            ) : (
+              <>
+                <div style={{ fontSize: '12px', color: C.textMid, marginTop: '4px', fontWeight: 500 }}>
+                  Taxa de recompra: {taxaRecompra}%
+                </div>
+                <div className="card-meta-text">Meta: {metaRec} clientes</div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Pageviews */}
+        <div className="stat-card">
+          <div className="stat-icon" style={{ color: C.brand }}>{Icon.eye}</div>
+          <div className="stat-info">
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Páginas visualizadas</h3>
+            <Num>{pageviews.toLocaleString()}</Num>
+            <div style={{ fontSize: '12px', color: C.textMid, marginTop: '6px', fontWeight: 500 }}>
+              Tempo médio: <strong>{tempoMedio}</strong>
+            </div>
+          </div>
+        </div>
+
+        {/* Top Páginas */}
+        {topPaginasPwa.length > 0 && (
+          <div className="stat-card">
+            <div className="stat-icon" style={{ color: C.brand }}>{Icon.pages}</div>
+            <div className="stat-info">
+              <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Top páginas do app</h3>
+              <ul style={{ marginTop: '8px', paddingLeft: 0, listStyle: 'none', fontSize: '11px', color: C.textMid }}>
+                {topPaginasPwa.filter(p => p !== 'install').slice(0, 5).map((pagina, idx) => {
+                  let label = pagina || '/';
+                  const isHome = label === '/';
+                  if (isHome) label = 'Página inicial';
+                  const display = label.length > 40 ? label.slice(0, 37) + '...' : label;
+                  return (
+                    <li key={pagina + idx} style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '5px' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 16, height: 16, borderRadius: '3px', background: C.neutralBg, fontSize: '10px', color: C.textSoft, border: `1px solid ${C.neutralBorder}`, flexShrink: 0, fontWeight: 600 }}>{idx + 1}</span>
+                      <span title={label} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>{display}</span>
+                      {isHome && <Badge color={C.brand} bg={C.brandLight} border={C.brandLight}>Home</Badge>}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </div>
+        )}
+
+        {/* Funil */}
+        <div className="stat-card" style={{ gridRow: 'span 2' }}>
+          <div className="stat-info" style={{ width: '100%' }}>
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px', marginBottom: '14px', margin: '0 0 14px' }}>Funil de vendas</h3>
+            <div>
+              {[
+                { label: '1. Visitas únicas', val: funilVisitas, pct: 100, cor: C.neutralLight, bench: null as number | null, botao: null as string | null },
+                { label: '2. Carrinho', val: funilCarrinho, pct: taxaV2C, cor: funilCarrinho === 0 ? C.danger : '#60A5FA', bench: 10, botao: funilCarrinho === 0 ? 'Criar campanha' : null },
+                { label: '3. Checkout', val: funilCheckout, pct: taxaC2O, cor: funilCheckout === 0 ? C.danger : C.success, bench: mediaConv, botao: funilCarrinho > 0 && funilCheckout === 0 ? 'Recuperar carrinhos' : null },
+              ].map((etapa, i) => (
+                <div key={i} style={{ marginBottom: '14px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                    <span style={{ fontSize: '12px', color: C.textMid }}>{etapa.label}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      {etapa.botao && (
+                        <button onClick={onNavigateCampanhas} style={{ background: 'none', border: 'none', color: C.brand, fontSize: '11px', fontWeight: 600, cursor: 'pointer', padding: 0, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                          {Icon.lightning} {etapa.botao}
+                        </button>
+                      )}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <strong style={{ color: C.text, fontSize: '13px' }}>{etapa.val}</strong>
+                        {etapa.bench !== null && (
+                          <span style={{ fontSize: '10px', color: etapa.pct >= etapa.bench ? C.success : C.danger, fontWeight: 600 }}>
+                            {etapa.pct.toFixed(1)}%{etapa.pct >= etapa.bench ? ' ↑' : ' ↓'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ background: C.neutralBorder, borderRadius: '999px', height: '5px', overflow: 'hidden' }}>
+                    <div style={{ width: `${Math.min(etapa.pct, 100)}%`, background: etapa.cor, height: '100%', borderRadius: '999px', transition: 'width 0.4s ease' }} />
+                  </div>
+                </div>
+              ))}
+              <div style={{ padding: '10px 12px', background: C.neutralBg, borderRadius: '6px', border: `1px solid ${C.neutralBorder}` }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '12px' }}>
+                  <span style={{ color: C.textSoft }}>Sua conversão</span>
+                  <strong style={{ color: taxaConvApp >= mediaConv ? C.success : C.danger }}>{taxaConvApp}%</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                  <span style={{ color: C.textSoft }}>Média do mercado</span>
+                  <strong style={{ color: C.textSoft }}>{mediaConv}%</strong>
+                </div>
+                <div style={{ marginTop: '6px', fontSize: '11px', fontWeight: 600, color: taxaConvApp >= mediaConv ? C.success : C.danger }}>
+                  {taxaConvApp >= mediaConv
+                    ? `${(taxaConvApp - mediaConv).toFixed(1)}pp acima da média`
+                    : `${(mediaConv - taxaConvApp).toFixed(1)}pp abaixo da média`}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Carrinhos Abandonados */}
+        <div className="stat-card" style={{ borderLeft: `3px solid ${C.danger}` }}>
+          <div className="stat-icon red" style={{ color: C.danger }}>{Icon.cart}</div>
+          <div className="stat-info">
+            <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px' }}>Carrinhos abandonados</h3>
+            <Num>{brl(carrinhosValor)}</Num>
+            <div style={{ fontSize: '12px', color: C.textSoft, marginTop: '4px' }}>
+              {temOsData && carrinhoOS > 0 ? (
+                <><strong style={{ color: C.danger }}>{carrinhoOS}</strong> com carrinho ativo agora <span style={{ color: C.neutralLight }}>(OneSignal)</span></>
+              ) : (
+                <>{carrinhosQtd} abandono{carrinhosQtd !== 1 ? 's' : ''} registrado{carrinhosQtd !== 1 ? 's' : ''}</>
+              )}
+            </div>
+            <button onClick={onNavigateCampanhas} style={{ marginTop: '8px', display: 'inline-flex', alignItems: 'center', gap: '6px', background: C.dark, color: C.white, border: 'none', borderRadius: '5px', padding: '6px 12px', fontSize: '11px', cursor: 'pointer', fontWeight: 600 }}>
+              {Icon.lightning} Recuperar agora
+            </button>
+          </div>
+        </div>
+
+        {/* Taxa de Conversão */}
+        <div className="stat-card">
+          <div className="stat-info" style={{ width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textSoft, fontWeight: 500, fontSize: '12px', margin: 0 }}>Taxa de conversão</h3>
+              <span style={{ color: C.brand, display: 'flex' }}>{Icon.conversion}</span>
+            </div>
+            <div style={{ marginBottom: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '12px' }}>
+                <span style={{ color: C.textMid }}>App</span>
+                <strong style={{ color: taxaConvApp >= mediaConv ? C.success : C.danger }}>{taxaConvApp}%</strong>
+              </div>
+              <div style={{ background: C.neutralBorder, borderRadius: '999px', height: '5px', overflow: 'hidden' }}>
+                <div style={{ width: `${Math.min(taxaConvApp, 100)}%`, background: taxaConvApp >= mediaConv ? C.success : C.danger, height: '100%', borderRadius: '999px' }} />
+              </div>
+            </div>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '12px' }}>
+                <span style={{ color: C.textSoft }}>Mercado</span>
+                <strong style={{ color: C.neutralMid }}>{mediaConv}%</strong>
+              </div>
+              <div style={{ background: C.neutralBorder, borderRadius: '999px', height: '5px', overflow: 'hidden' }}>
+                <div style={{ width: `${mediaConv}%`, background: '#D1D5DB', height: '100%', borderRadius: '999px' }} />
+              </div>
+            </div>
+            <div style={{ marginTop: '10px' }}>
+              <Badge
+                color={taxaConvApp >= mediaConv ? C.success : C.danger}
+                bg={taxaConvApp >= mediaConv ? C.successBg : C.dangerBg}
+                border={taxaConvApp >= mediaConv ? C.successBorder : C.dangerBorder}
+              >
+                {taxaConvApp >= mediaConv ? Icon.check : Icon.alert}
+                {taxaConvApp >= mediaConv ? `${(taxaConvApp - mediaConv).toFixed(1)}pp acima` : `${(mediaConv - taxaConvApp).toFixed(1)}pp abaixo`}
+              </Badge>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  );
 }
