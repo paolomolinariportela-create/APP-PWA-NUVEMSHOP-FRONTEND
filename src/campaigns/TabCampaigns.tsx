@@ -1,28 +1,28 @@
 import React, { useState } from 'react';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
-import { TabCampaignsProps, ObjetivoCampanha, OneSignalNotif, ABTestForm } from './campaigns/types';
+import { TabCampaignsProps, ObjetivoCampanha, OneSignalNotif, ABTestForm } from './types';
 
 // ─── Design ───────────────────────────────────────────────────────────────────
-import { C, Icon } from './campaigns/design';
-import { Badge, SectionHeader } from './campaigns/ui/index';
+import { C, Icon } from './design';
+import { Badge, SectionHeader } from './ui/index';
 
 // ─── Constantes ───────────────────────────────────────────────────────────────
-import { OBJETIVOS, FLAG, PAIS_NOME, DISP_COLORS, TEMPLATES_DEFAULT, AB_FORM_DEFAULT } from './campaigns/constants';
+import { OBJETIVOS, FLAG, PAIS_NOME, DISP_COLORS, TEMPLATES_DEFAULT, AB_FORM_DEFAULT } from './constants';
 
 // ─── Hook de dados ────────────────────────────────────────────────────────────
-import { useCampaignData } from './campaigns/hooks/useCampaignData';
+import { useCampaignData } from './hooks/useCampaignData';
 
 // ─── Componentes ──────────────────────────────────────────────────────────────
-import { ABTestModal }      from './campaigns/components/ABTestModal';
-import { ABResultCard }     from './campaigns/components/ABResultCard';
-import { IAGerarModal }     from './campaigns/components/IAGerarModal';
-import { JornadaTab }       from './campaigns/components/JornadaTab';
-import { ScoreTab }         from './campaigns/components/ScoreTab';
-import { CoachInsights }    from './campaigns/components/CoachInsights';
-import { SeletorObjetivo, inferirFunil } from './campaigns/components/SeletorObjetivo';
-import { CampanhaDetalhe }  from './campaigns/components/CampanhaDetalhe';
-import { AutomacaoTab }     from './campaigns/components/AutomacaoTab';
+import { ABTestModal }      from './components/ABTestModal';
+import { ABResultCard }     from './components/ABResultCard';
+import { IAGerarModal }     from './components/IAGerarModal';
+import { JornadaTab }       from './components/JornadaTab';
+import { ScoreTab }         from './components/ScoreTab';
+import { CoachInsights }    from './components/CoachInsights';
+import { SeletorObjetivo, inferirFunil } from './components/SeletorObjetivo';
+import { CampanhaDetalhe }  from './components/CampanhaDetalhe';
+import { AutomacaoTab }     from './components/AutomacaoTab';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const brl = (v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
