@@ -96,9 +96,9 @@ export function CoachInsights(props: Props) {
                     <span style={{ fontSize: '18px', flexShrink: 0, marginTop: '1px' }}>{ins.icon}</span>
                     <div style={{ flex: 1 }}>
                         <div style={{ fontWeight: 600, fontSize: '13px', color: ins.cor, marginBottom: '2px' }}>{ins.titulo}</div>
-                        <div style={{ fontSize: '12px', color: C.textMid, lineHeight: 1.5 }}>{ins.detalhe}</div>
+                        <div style={{ fontSize: '13px', color: C.textMid, lineHeight: 1.5 }}>{ins.detalhe}</div>
                         {ins.acao && (
-                            <button onClick={() => props.onAcao(ins.acao!.key)} style={{ marginTop: '8px', padding: '4px 12px', borderRadius: '6px', border: `1px solid ${ins.cor}`, background: C.white, color: ins.cor, fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}>
+                            <button onClick={() => props.onAcao(ins.acao!.key)} style={{ marginTop: '8px', padding: '4px 12px', borderRadius: '6px', border: `1px solid ${ins.cor}`, background: C.white, color: ins.cor, fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
                                 → {ins.acao.label}
                             </button>
                         )}
