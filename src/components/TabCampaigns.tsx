@@ -1,5 +1,82 @@
 import React, { useEffect, useState } from 'react';
 
+// ─── DESIGN TOKENS ─────────────────────────────────────────────────────────────
+const C = {
+    brand:        '#4F46E5',
+    brandLight:   '#EEF2FF',
+    brandMuted:   '#818CF8',
+    success:      '#059669',
+    successBg:    '#F0FDF4',
+    successBorder:'#A7F3D0',
+    warning:      '#B45309',
+    warningBg:    '#FFFBEB',
+    warningBorder:'#FDE68A',
+    danger:       '#B91C1C',
+    dangerBg:     '#FFF5F5',
+    dangerBorder: '#FECACA',
+    neutralBorder:'#E5E7EB',
+    neutralBg:    '#F9FAFB',
+    neutralMid:   '#6B7280',
+    neutralLight: '#9CA3AF',
+    text:         '#111827',
+    textMid:      '#374151',
+    textSoft:     '#6B7280',
+    white:        '#FFFFFF',
+    dark:         '#111827',
+};
+
+// ─── SVG ICONS ─────────────────────────────────────────────────────────────────
+const Icon = {
+    bell: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>,
+    send: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>,
+    users: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+    check: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
+    alert: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+    info: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>,
+    eye: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
+    target: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
+    lightning: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+    dollar: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
+    chart: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
+    filter: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>,
+    clock: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+    link: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>,
+    image: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>,
+    map: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21 3 6"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>,
+    flask: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M9 3h6m-6 0v6L5.5 15M9 3H6.5M15 3v6l3.5 6M15 3h2.5M5.5 15h13M5.5 15a2 2 0 0 0 1.5 3h10a2 2 0 0 0 1.5-3"/></svg>,
+    brain: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-1.96-3 2.5 2.5 0 0 1-1.32-4.24A2.5 2.5 0 0 1 5.5 7.5a2.5 2.5 0 0 1 4-2z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 1.96-3 2.5 2.5 0 0 0 1.32-4.24A2.5 2.5 0 0 0 18.5 7.5a2.5 2.5 0 0 0-4-2z"/></svg>,
+    robot: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M12 11V5"/><circle cx="12" cy="4" r="1"/><line x1="8" y1="15" x2="8.01" y2="15"/><line x1="16" y1="15" x2="16.01" y2="15"/><path d="M8 19h8"/></svg>,
+    globe: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
+    smartphone: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>,
+    trending: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>,
+    arrow: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
+    x: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+    refresh: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>,
+    history: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.97"/></svg>,
+    zap: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+    score: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
+};
+
+// ─── REUSABLE UI PRIMITIVES ────────────────────────────────────────────────────
+const Badge = ({ color, bg, border, children }: { color: string; bg: string; border: string; children: React.ReactNode }) => (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: bg, color, border: `1px solid ${border}`, fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '4px', letterSpacing: '0.02em' }}>
+        {children}
+    </span>
+);
+
+const SectionHeader = ({ icon, title, subtitle, action }: { icon?: React.ReactNode; title: string; subtitle?: string; action?: React.ReactNode }) => (
+    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {icon && <span style={{ color: C.neutralMid, display: 'flex', flexShrink: 0 }}>{icon}</span>}
+            <div>
+                <div style={{ fontSize: '14px', fontWeight: 600, color: C.text }}>{title}</div>
+                {subtitle && <div style={{ fontSize: '12px', color: C.textSoft, marginTop: '2px' }}>{subtitle}</div>}
+            </div>
+        </div>
+        {action}
+    </div>
+);
+
 interface PushCampaign {
     title: string;
     message: string;
@@ -1930,101 +2007,103 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
             {/* ── 3 CARDS DE METRICAS ── */}
             <div className="stats-grid" style={{ marginBottom: '2rem' }}>
                 <div className="stat-card">
-                    <div className="stat-icon">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                    </div>
+                    <div className="stat-icon" style={{ color: C.brand }}>{Icon.users}</div>
                     <div className="stat-info">
-                        <h3>Subscribers Ativos</h3>
-                        <p>{loadingStats ? '...' : activeSubscribers.toLocaleString('pt-BR')}</p>
-                        <span className="stat-growth">🔔 Push habilitado</span>
+                        <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, fontSize: '14px' }}>Subscribers ativos</h3>
+                        <p style={{ letterSpacing: '-0.02em' }}>{loadingStats ? '—' : activeSubscribers.toLocaleString('pt-BR')}</p>
+                        <span className="stat-growth" style={{ color: C.brand, fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px' }}>{Icon.bell} Push habilitado</span>
                         <div style={{ marginTop: '8px' }}>
-                            <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '8px', overflow: 'hidden' }}>
-                                <div style={{ width: `${Math.min(activeSubscribers, 100)}%`, background: '#4F46E5', height: '100%', borderRadius: '999px', transition: 'width 0.5s' }} />
+                            <div style={{ background: C.neutralBorder, borderRadius: '999px', height: '5px', overflow: 'hidden' }}>
+                                <div style={{ width: `${Math.min(activeSubscribers, 100)}%`, background: C.brand, height: '100%', borderRadius: '999px', transition: 'width 0.5s' }} />
                             </div>
-                            <span style={{ fontSize: '0.85rem', color: '#6B7280', marginTop: '4px', display: 'block' }}>Meta: {activeSubscribers} / 100</span>
+                            <span style={{ fontSize: '11px', color: C.neutralLight, marginTop: '4px', display: 'block' }}>Meta: {activeSubscribers} / 100</span>
                         </div>
                     </div>
                 </div>
                 <div className="stat-card">
-                    <div className="stat-icon">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
-                    </div>
+                    <div className="stat-icon" style={{ color: C.brand }}>{Icon.check}</div>
                     <div className="stat-info">
-                        <h3>Taxa de Opt-in</h3>
-                        <p>{loadingStats ? '...' : `${taxaOptin}%`}</p>
-                        <span className="stat-growth" style={{ color: taxaOptin >= 50 ? '#16a34a' : '#f59e0b' }}>{taxaOptin >= 50 ? '✅ Excelente' : '⚠️ Pode melhorar'}</span>
-                        <span style={{ marginTop: '4px', display: 'block', fontSize: '0.85rem', color: '#6B7280' }}>{osStats?.instalacoes ?? 0} instalacoes → {activeSubscribers} inscritos</span>
+                        <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, fontSize: '14px' }}>Taxa de opt-in</h3>
+                        <p style={{ letterSpacing: '-0.02em' }}>{loadingStats ? '—' : `${taxaOptin}%`}</p>
+                        <Badge color={taxaOptin >= 50 ? C.success : C.warning} bg={taxaOptin >= 50 ? C.successBg : C.warningBg} border={taxaOptin >= 50 ? C.successBorder : C.warningBorder}>
+                            {taxaOptin >= 50 ? Icon.check : Icon.alert}
+                            {taxaOptin >= 50 ? 'Excelente' : 'Pode melhorar'}
+                        </Badge>
+                        <span style={{ marginTop: '6px', display: 'block', fontSize: '11px', color: C.neutralLight }}>{osStats?.instalacoes ?? 0} instalações → {activeSubscribers} inscritos</span>
                     </div>
                 </div>
                 <div className="stat-card">
-                    <div className="stat-icon">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
-                    </div>
+                    <div className="stat-icon" style={{ color: C.brand }}>{Icon.chart}</div>
                     <div className="stat-info">
-                        <h3>Taxa de Abertura Media</h3>
-                        <p>{loadingStats ? '...' : `${mediaAbertura}%`}</p>
-                        {mediaAbertura > 0 && (() => { const b = getBenchmarkBadge(mediaAbertura); return <span style={{ display: 'inline-block', marginTop: '4px', background: b.bg, color: b.color, padding: '2px 8px', borderRadius: '999px', fontSize: '11px', fontWeight: 600 }}>{b.icon} {b.label}</span>; })()}
-                        <span style={{ marginTop: '4px', display: 'block', fontSize: '0.85rem', color: '#6B7280' }}>Media do setor: ~5-10%</span>
+                        <h3 style={{ textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, fontSize: '14px' }}>Taxa de abertura média</h3>
+                        <p style={{ letterSpacing: '-0.02em' }}>{loadingStats ? '—' : `${mediaAbertura}%`}</p>
+                        {mediaAbertura > 0 && (() => { const b = getBenchmarkBadge(mediaAbertura); return <Badge color={b.color} bg={b.bg} border={b.bg}>{b.icon} {b.label}</Badge>; })()}
+                        <span style={{ marginTop: '6px', display: 'block', fontSize: '11px', color: C.neutralLight }}>Média do setor: 5–10%</span>
                     </div>
                 </div>
             </div>
 
             {/* ── SAUDE DA BASE ── */}
             {loadingStats ? (
-                <div className="config-card" style={{ marginBottom: '1.5rem', textAlign: 'center', padding: '30px', color: '#888' }}>Carregando dados do OneSignal...</div>
+                <div className="config-card" style={{ marginBottom: '1.5rem', textAlign: 'center', padding: '30px', color: C.neutralMid }}>Carregando dados do OneSignal...</div>
             ) : (
                 <div className="config-card" style={{ marginBottom: '1.5rem' }}>
-                    <CardSection title="❤️ Saude da Base de Push" subtitle="Ativos vs Inativos (bloquearam ou desinstalaram)" />
+                    <SectionHeader icon={Icon.users} title="Saúde da base de push" subtitle="Ativos vs. inativos (bloquearam ou desinstalaram)" />
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'flex-start' }}>
                         <div>
                             {totalSubscribers > 0 ? (
                                 <>
                                     <div style={{ marginBottom: '14px' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '13px', fontWeight: 500 }}>
-                                            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />Ativos</span>
-                                            <span style={{ fontWeight: 700 }}>{activeSubscribers.toLocaleString('pt-BR')} <span style={{ color: '#10B981' }}>({pctAtivos}%)</span></span>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '13px', color: C.textMid, fontWeight: 500 }}>
+                                            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '50%', background: C.success, display: 'inline-block' }} />Ativos</span>
+                                            <span>{activeSubscribers.toLocaleString('pt-BR')} <span style={{ color: C.success, fontWeight: 600 }}>({pctAtivos}%)</span></span>
                                         </div>
-                                        <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '10px', overflow: 'hidden' }}>
-                                            <div style={{ width: `${pctAtivos}%`, background: '#10B981', height: '100%', borderRadius: '999px', transition: 'width 0.6s' }} />
+                                        <div style={{ background: C.neutralBorder, borderRadius: '999px', height: '5px', overflow: 'hidden' }}>
+                                            <div style={{ width: `${pctAtivos}%`, background: C.success, height: '100%', borderRadius: '999px', transition: 'width 0.6s' }} />
                                         </div>
                                     </div>
                                     <div style={{ marginBottom: '14px' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '13px', fontWeight: 500 }}>
-                                            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#EF4444', display: 'inline-block' }} />Inativos</span>
-                                            <span style={{ fontWeight: 700 }}>{inativos.toLocaleString('pt-BR')} <span style={{ color: '#EF4444' }}>({pctInativos}%)</span></span>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '13px', color: C.textMid, fontWeight: 500 }}>
+                                            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '8px', height: '8px', borderRadius: '50%', background: C.danger, display: 'inline-block' }} />Inativos</span>
+                                            <span>{inativos.toLocaleString('pt-BR')} <span style={{ color: C.danger, fontWeight: 600 }}>({pctInativos}%)</span></span>
                                         </div>
-                                        <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '10px', overflow: 'hidden' }}>
-                                            <div style={{ width: `${pctInativos}%`, background: '#EF4444', height: '100%', borderRadius: '999px', transition: 'width 0.6s' }} />
+                                        <div style={{ background: C.neutralBorder, borderRadius: '999px', height: '5px', overflow: 'hidden' }}>
+                                            <div style={{ width: `${pctInativos}%`, background: C.danger, height: '100%', borderRadius: '999px', transition: 'width 0.6s' }} />
                                         </div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
-                                        <span style={{ background: churnRate > 30 ? '#fee2e2' : '#f0fdf4', color: churnRate > 30 ? '#991b1b' : '#166534', padding: '4px 10px', borderRadius: '999px', fontSize: '12px', fontWeight: 600 }}>📉 Churn: {churnRate}%</span>
-                                        <span style={{ background: '#F3F4F6', color: '#374151', padding: '4px 10px', borderRadius: '999px', fontSize: '12px', fontWeight: 600 }}>📈 Retencao: {pctAtivos}%</span>
+                                    <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
+                                        <Badge color={churnRate > 30 ? C.danger : C.success} bg={churnRate > 30 ? C.dangerBg : C.successBg} border={churnRate > 30 ? C.dangerBorder : C.successBorder}>
+                                            {churnRate > 30 ? Icon.alert : Icon.check} Churn {churnRate}%
+                                        </Badge>
+                                        <Badge color={C.neutralMid} bg={C.neutralBg} border={C.neutralBorder}>
+                                            {Icon.trending} Retenção {pctAtivos}%
+                                        </Badge>
                                     </div>
-                                    <div style={{ padding: '10px 14px', background: pctAtivos >= 70 ? '#f0fdf4' : '#fef3c7', border: `1px solid ${pctAtivos >= 70 ? '#86efac' : '#fde68a'}`, borderRadius: '8px', fontSize: '12px', color: pctAtivos >= 70 ? '#166534' : '#92400e' }}>
-                                        {pctAtivos >= 70 ? '✅ Base saudavel — mais de 70% ativos' : pctAtivos >= 40 ? '⚠️ Base razoavel — considere reativar inativos' : 'Base comprometida — muitos usuarios bloquearam'}
+                                    <div style={{ padding: '9px 12px', background: pctAtivos >= 70 ? C.successBg : C.warningBg, border: `1px solid ${pctAtivos >= 70 ? C.successBorder : C.warningBorder}`, borderRadius: '6px', fontSize: '12px', color: pctAtivos >= 70 ? C.success : C.warning, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        {pctAtivos >= 70 ? Icon.check : Icon.alert}
+                                        {pctAtivos >= 70 ? 'Base saudável — mais de 70% ativos' : pctAtivos >= 40 ? 'Base razoável — considere reativar inativos' : 'Base comprometida — muitos usuários bloquearam'}
                                     </div>
                                 </>
                             ) : (
-                                <div style={{ padding: '20px', background: '#F9FAFB', borderRadius: '8px', textAlign: 'center', color: '#6B7280', fontSize: '13px' }}>
+                                <div style={{ padding: '20px', background: C.neutralBg, borderRadius: '8px', textAlign: 'center', color: C.neutralMid, fontSize: '13px' }}>
                                     Aguardando dados do OneSignal...
-                                    <div style={{ fontSize: '11px', marginTop: '6px' }}>Configure o OneSignal na aba Configuracoes</div>
+                                    <div style={{ fontSize: '11px', marginTop: '6px', color: C.neutralLight }}>Configure o OneSignal na aba Configurações</div>
                                 </div>
                             )}
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                             <div className="stat-card" style={{ margin: 0, padding: '14px 16px' }}>
                                 <div className="stat-info">
-                                    <h3 style={{ fontSize: '0.8rem' }}>Total Cadastrado</h3>
-                                    <p style={{ fontSize: '1.5rem', margin: '4px 0' }}>{totalSubscribers > 0 ? totalSubscribers.toLocaleString('pt-BR') : '—'}</p>
-                                    <span style={{ fontSize: '11px', color: '#6B7280' }}>Todos que ja deram permissao</span>
+                                    <h3 style={{ fontSize: '12px', textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600 }}>Total cadastrado</h3>
+                                    <p style={{ fontSize: '1.5rem', margin: '4px 0', letterSpacing: '-0.02em' }}>{totalSubscribers > 0 ? totalSubscribers.toLocaleString('pt-BR') : '—'}</p>
+                                    <span style={{ fontSize: '11px', color: C.neutralLight }}>Todos que já deram permissão</span>
                                 </div>
                             </div>
                             <div className="stat-card" style={{ margin: 0, padding: '14px 16px' }}>
                                 <div className="stat-info">
-                                    <h3 style={{ fontSize: '0.8rem' }}>⏰ Melhor Horario</h3>
-                                    <p style={{ fontSize: '1.5rem', margin: '4px 0' }}>{melhorHorario ?? '—'}</p>
-                                    <span style={{ fontSize: '11px', color: '#6B7280' }}>{melhorHorario ? 'Baseado nas aberturas' : 'Disponivel apos campanhas'}</span>
+                                    <h3 style={{ fontSize: '12px', textTransform: 'none', letterSpacing: 'normal', color: C.textMid, fontWeight: 600, display: 'flex', alignItems: 'center', gap: '5px' }}>{Icon.clock} Melhor horário</h3>
+                                    <p style={{ fontSize: '1.5rem', margin: '4px 0', letterSpacing: '-0.02em' }}>{melhorHorario ?? '—'}</p>
+                                    <span style={{ fontSize: '11px', color: C.neutralLight }}>{melhorHorario ? 'Baseado nas aberturas' : 'Disponível após campanhas'}</span>
                                 </div>
                             </div>
                         </div>
@@ -2034,22 +2113,22 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
 
             {/* ── FUNIL DE NOTIFICACOES ── */}
             <div className="config-card" style={{ marginBottom: '1.5rem' }}>
-                <CardSection title="🔔 Funil de Notificacoes" subtitle={notifs.length > 0 ? `Performance agregada de todas as ${notifs.length} campanhas` : 'Disponivel apos enviar campanhas'} />
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+                <SectionHeader icon={Icon.bell} title="Funil de notificações" subtitle={notifs.length > 0 ? `Performance agregada de ${notifs.length} campanhas` : 'Disponível após enviar campanhas'} />
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
                     {[
-                        { label: 'Enviados', value: totalEnviados, pct: 100, color: '#4F46E5', icon: '📤', desc: 'Total disparado' },
-                        { label: 'Entregues', value: totalConfirmados, pct: pctEntrega, color: '#3b82f6', icon: '📬', desc: totalEnviados > 0 ? `${pctEntrega}% do total` : 'Aguardando dados' },
-                        { label: 'Clicados', value: totalClicados, pct: pctClique, color: '#10B981', icon: '👆', desc: totalEnviados > 0 ? `CTR: ${pctClique}%` : 'Aguardando dados' },
-                        { label: 'Convertidos', value: totalConvertidos, pct: pctConversao, color: '#f59e0b', icon: '💰', desc: totalClicados > 0 ? `${pctConversao}% dos cliques` : 'Aguardando dados' },
+                        { label: 'Enviados', value: totalEnviados, pct: 100, color: C.brand, icon: Icon.send, desc: 'Total disparado' },
+                        { label: 'Entregues', value: totalConfirmados, pct: pctEntrega, color: '#3b82f6', icon: Icon.check, desc: totalEnviados > 0 ? `${pctEntrega}% do total` : 'Aguardando dados' },
+                        { label: 'Clicados', value: totalClicados, pct: pctClique, color: C.success, icon: Icon.eye, desc: totalEnviados > 0 ? `CTR: ${pctClique}%` : 'Aguardando dados' },
+                        { label: 'Convertidos', value: totalConvertidos, pct: pctConversao, color: C.warning, icon: Icon.dollar, desc: totalClicados > 0 ? `${pctConversao}% dos cliques` : 'Aguardando dados' },
                     ].map((step, i) => (
                         <div key={i} style={{ textAlign: 'center', position: 'relative' }}>
-                            {i > 0 && <div style={{ position: 'absolute', left: '-8px', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: '18px' }}>›</div>}
-                            <div style={{ background: '#F9FAFB', border: `2px solid ${step.color}30`, borderRadius: '12px', padding: '16px 12px' }}>
-                                <div style={{ fontSize: '22px', marginBottom: '6px' }}>{step.icon}</div>
-                                <div style={{ fontSize: '22px', fontWeight: 700, color: step.value > 0 ? step.color : '#9CA3AF', marginBottom: '2px' }}>{step.value > 0 ? step.value.toLocaleString('pt-BR') : '—'}</div>
-                                <div style={{ fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '4px' }}>{step.label}</div>
-                                <div style={{ fontSize: '11px', color: '#6B7280' }}>{step.desc}</div>
-                                <div style={{ marginTop: '8px', background: '#E5E7EB', borderRadius: '999px', height: '4px', overflow: 'hidden' }}>
+                            {i > 0 && <div style={{ position: 'absolute', left: '-6px', top: '50%', transform: 'translateY(-50%)', color: C.neutralLight, fontSize: '16px' }}>›</div>}
+                            <div style={{ background: C.neutralBg, border: `1px solid ${step.color}25`, borderRadius: '10px', padding: '14px 10px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '6px', color: step.value > 0 ? step.color : C.neutralLight }}>{step.icon}</div>
+                                <div style={{ fontSize: '20px', fontWeight: 700, color: step.value > 0 ? step.color : C.neutralLight, marginBottom: '2px', letterSpacing: '-0.02em' }}>{step.value > 0 ? step.value.toLocaleString('pt-BR') : '—'}</div>
+                                <div style={{ fontSize: '11px', fontWeight: 600, color: C.textMid, marginBottom: '3px' }}>{step.label}</div>
+                                <div style={{ fontSize: '10px', color: C.neutralLight }}>{step.desc}</div>
+                                <div style={{ marginTop: '8px', background: C.neutralBorder, borderRadius: '999px', height: '3px', overflow: 'hidden' }}>
                                     <div style={{ width: `${step.pct}%`, background: step.color, height: '100%', borderRadius: '999px', transition: 'width 0.6s' }} />
                                 </div>
                             </div>
@@ -2060,7 +2139,7 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
 
             {/* ── COACH AUTOMÁTICO ── */}
             <div className="config-card" style={{ marginBottom: '1.5rem' }}>
-                <CardSection title="🧠 Coach Automático" subtitle="Diagnóstico em tempo real baseado nos seus dados" />
+                <SectionHeader icon={Icon.brain} title="Coach automático" subtitle="Diagnóstico em tempo real baseado nos seus dados" />
                 <CoachInsights
                     notifs={notifs}
                     totalSubscribers={totalSubscribers}
@@ -2085,35 +2164,36 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
             {(porDisp.length > 0 || porPais.length > 0) && (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
                     <div className="config-card" style={{ marginBottom: 0 }}>
-                        <CardSection title="📱 Plataformas — Cliques Reais" subtitle="Distribuicao de cliques por dispositivo" />
+                        <SectionHeader icon={Icon.smartphone} title="Plataformas" subtitle="Distribuição por dispositivo" />
                         {porDisp.map(d => {
                             const cliques = Math.round(totalClicados * (d.pct / 100));
+                            const cor = dispColors[d.dispositivo] ?? C.brand;
                             return (
-                                <div key={d.dispositivo} style={{ marginBottom: '14px' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px', fontWeight: 500 }}>
-                                        <span>{dispIcons[d.dispositivo] ?? '📟'} {d.dispositivo}</span>
-                                        <span style={{ color: '#6B7280' }}>{d.count} ({d.pct}%){cliques > 0 && <span style={{ marginLeft: '6px', color: '#059669', fontWeight: 600 }}>· {cliques} cliques</span>}</span>
+                                <div key={d.dispositivo} style={{ marginBottom: '12px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px', color: C.textMid, fontWeight: 500 }}>
+                                        <span>{d.dispositivo}</span>
+                                        <span style={{ color: C.textSoft }}>{d.count} ({d.pct}%){cliques > 0 && <span style={{ marginLeft: '6px', color: C.success, fontWeight: 600 }}>· {cliques} cliques</span>}</span>
                                     </div>
-                                    <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '8px', overflow: 'hidden' }}>
-                                        <div style={{ width: `${d.pct}%`, background: dispColors[d.dispositivo] ?? '#4F46E5', height: '100%', borderRadius: '999px', transition: 'width 0.5s' }} />
+                                    <div style={{ background: C.neutralBorder, borderRadius: '999px', height: '5px', overflow: 'hidden' }}>
+                                        <div style={{ width: `${d.pct}%`, background: cor, height: '100%', borderRadius: '999px', transition: 'width 0.5s' }} />
                                     </div>
                                 </div>
                             );
                         })}
-                        {porDisp.length === 0 && <p style={{ fontSize: '13px', color: '#9CA3AF' }}>Aguardando dados...</p>}
+                        {porDisp.length === 0 && <p style={{ fontSize: '13px', color: C.neutralLight }}>Aguardando dados...</p>}
                     </div>
                     <div className="config-card" style={{ marginBottom: 0 }}>
-                        <CardSection title="🌍 Por Pais" />
+                        <SectionHeader icon={Icon.globe} title="Por país" />
                         {porPais.length === 0
-                            ? <p style={{ color: '#6B7280', fontSize: '14px' }}>Dados insuficientes</p>
+                            ? <p style={{ color: C.neutralMid, fontSize: '13px' }}>Dados insuficientes</p>
                             : porPais.map(p => (
                                 <div key={p.pais} style={{ marginBottom: '12px' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '14px', fontWeight: 500 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '13px', color: C.textMid, fontWeight: 500 }}>
                                         <span>{FLAG[p.pais] ?? '🏳️'} {PAIS_NOME[p.pais] ?? p.pais}</span>
-                                        <span style={{ color: '#6B7280' }}>{p.count} ({p.pct}%)</span>
+                                        <span style={{ color: C.textSoft }}>{p.count} ({p.pct}%)</span>
                                     </div>
-                                    <div style={{ background: '#E5E7EB', borderRadius: '999px', height: '8px', overflow: 'hidden' }}>
-                                        <div style={{ width: `${p.pct}%`, background: '#4F46E5', height: '100%', borderRadius: '999px', transition: 'width 0.5s' }} />
+                                    <div style={{ background: C.neutralBorder, borderRadius: '999px', height: '5px', overflow: 'hidden' }}>
+                                        <div style={{ width: `${p.pct}%`, background: C.brand, height: '100%', borderRadius: '999px', transition: 'width 0.5s' }} />
                                     </div>
                                 </div>
                             ))}
@@ -2122,10 +2202,10 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
             )}
 
             {/* ── TABS ── */}
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', gap: '4px', marginBottom: '20px', background: C.neutralBg, borderRadius: '8px', padding: '3px' }}>
                 {(['campanhas', 'automacoes'] as const).map(tab => (
-                    <button key={tab} onClick={() => setActiveTab(tab)} style={{ padding: '8px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: 600, background: activeTab === tab ? '#111827' : '#F3F4F6', color: activeTab === tab ? '#fff' : '#6B7280', transition: 'all 0.2s' }}>
-                        {tab === 'campanhas' ? '📢 Campanhas' : '🤖 Automacoes'}
+                    <button key={tab} onClick={() => setActiveTab(tab)} style={{ flex: 1, padding: '7px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 600, background: activeTab === tab ? C.white : 'transparent', color: activeTab === tab ? C.text : C.neutralMid, boxShadow: activeTab === tab ? '0 1px 3px rgba(0,0,0,0.08)' : 'none', transition: 'all 0.15s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                        {tab === 'campanhas' ? <>{Icon.send} Campanhas</> : <>{Icon.robot} Automações</>}
                     </button>
                 ))}
             </div>
@@ -2135,8 +2215,8 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                 <>
                     <div className="config-card">
                         <div className="card-header" style={{ borderBottom: 'none', paddingBottom: 0 }}>
-                            <h2 style={{ margin: 0 }}>📢 Criar Nova Campanha</h2>
-                            <p style={{ color: '#666' }}>Envie notificacoes push para seus clientes.</p>
+                            <h2 style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: C.text, display: 'flex', alignItems: 'center', gap: '8px' }}>{Icon.send} Criar nova campanha</h2>
+                            <p style={{ color: C.textSoft, fontSize: '13px', marginTop: '3px' }}>Envie notificações push para seus clientes.</p>
                         </div>
 
                         {/* ── NOVO: SELETOR DE OBJETIVO ── */}
@@ -2147,17 +2227,17 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                         {/* Divisor visual */}
                         <div style={{ borderTop: '1px solid #E5E7EB', margin: '4px 0 20px' }} />
 
-                        <div style={{ background: '#F3F4F6', padding: '15px', borderRadius: '8px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <span style={{ fontSize: '20px' }}>👥</span>
-                                <div>
-                                    <strong>Alcance estimado:</strong>{' '}
-                                    <span style={{ color: '#4F46E5', fontWeight: 'bold' }}>{alcanceEstimado().toLocaleString('pt-BR')} dispositivos</span>
-                                    {(pushForm.filter_device || pushForm.filter_country || pushForm.filter_behavior) && <span style={{ fontSize: '12px', color: '#6B7280', marginLeft: '8px' }}>(filtro ativo)</span>}
+                        <div style={{ background: C.neutralBg, padding: '12px 14px', borderRadius: '8px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: `1px solid ${C.neutralBorder}` }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span style={{ color: C.neutralMid, display: 'flex' }}>{Icon.users}</span>
+                                <div style={{ fontSize: '13px', color: C.textMid }}>
+                                    Alcance estimado:{' '}
+                                    <span style={{ color: C.brand, fontWeight: 700 }}>{alcanceEstimado().toLocaleString('pt-BR')} dispositivos</span>
+                                    {(pushForm.filter_device || pushForm.filter_country || pushForm.filter_behavior) && <Badge color={C.brand} bg={C.brandLight} border={C.brandLight} children={<>filtro ativo</>} />}
                                 </div>
                             </div>
-                            <button onClick={() => setShowSegmentation(!showSegmentation)} style={{ background: showSegmentation ? '#EEF2FF' : '#fff', border: '1px solid #d1d5db', borderRadius: '8px', padding: '6px 14px', cursor: 'pointer', fontSize: '13px', fontWeight: 500, color: showSegmentation ? '#4F46E5' : '#374151' }}>
-                                🎯 {showSegmentation ? 'Ocultar' : 'Segmentar'}
+                            <button onClick={() => setShowSegmentation(!showSegmentation)} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: showSegmentation ? C.brandLight : C.white, border: `1px solid ${showSegmentation ? C.brand : C.neutralBorder}`, borderRadius: '6px', padding: '5px 12px', cursor: 'pointer', fontSize: '12px', fontWeight: 600, color: showSegmentation ? C.brand : C.textMid }}>
+                                {Icon.filter} {showSegmentation ? 'Ocultar' : 'Segmentar'}
                             </button>
                         </div>
                         {showSegmentation && (
@@ -2224,16 +2304,16 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                         )}
                         <div className="form-group">
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                                <label style={{ margin: 0 }}>Titulo</label>
+                                <label style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: C.textMid }}>Título</label>
                                 <button
                                     onClick={() => setShowIAModal(true)}
-                                    style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '4px 12px', borderRadius: '999px', border: 'none', background: 'linear-gradient(135deg, #4F46E5, #7C3AED)', color: '#fff', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
+                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '6px', border: 'none', background: C.brand, color: C.white, fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
                                 >
-                                    🧠 Gerar com IA
+                                    {Icon.brain} Gerar com IA
                                 </button>
                             </div>
-                            <input type="text" value={pushForm.title} onChange={e => setPushForm({ ...pushForm, title: e.target.value })} maxLength={50} placeholder="Ex: Oferta Relampago!" />
-                            <small>{pushForm.title.length}/50 — use <code style={{ background: '#F3F4F6', padding: '1px 4px', borderRadius: '3px' }}>{'{{first_name}}'}</code> para personalizar</small>
+                            <input type="text" value={pushForm.title} onChange={e => setPushForm({ ...pushForm, title: e.target.value })} maxLength={50} placeholder="Ex: Oferta Relâmpago!" />
+                            <small style={{ color: C.neutralLight }}>{pushForm.title.length}/50 — use <code style={{ background: C.neutralBg, padding: '1px 4px', borderRadius: '3px' }}>{'{{first_name}}'}</code> para personalizar</small>
                         </div>
 
                         {/* ── TEMPLATES (dinâmicos pelo objetivo) ── */}
@@ -2412,46 +2492,50 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                         </div>
 
                         {/* ── BOTÃO DE ENVIO + A/B ── */}
-                        <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
                             <button
                                 className="save-button"
                                 onClick={handleSendPush}
                                 disabled={sendingPush || !pushForm.title || !pushForm.message}
-                                style={{ background: sendingPush ? '#ccc' : objetivo ? OBJETIVOS.find(o => o.id === objetivo)?.cor ?? '#4F46E5' : '#4F46E5', flex: 1, transition: 'background 0.3s' }}
+                                style={{
+                                    background: sendingPush ? C.neutralBorder : objetivo ? OBJETIVOS.find(o => o.id === objetivo)?.cor ?? C.brand : C.dark,
+                                    flex: 1, transition: 'background 0.3s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '13px', fontWeight: 600,
+                                }}
                             >
+                                {Icon.send}
                                 {sendingPush ? 'Enviando...' : pushForm.send_after
-                                    ? `⏰ Agendar para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`
+                                    ? `Agendar para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`
                                     : objetivo
-                                        ? `${OBJETIVOS.find(o => o.id === objetivo)?.icon} Enviar campanha de ${OBJETIVOS.find(o => o.id === objetivo)?.label} para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`
-                                        : `🚀 Enviar para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`}
+                                        ? `Enviar campanha de ${OBJETIVOS.find(o => o.id === objetivo)?.label} — ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`
+                                        : `Enviar para ${alcanceEstimado().toLocaleString('pt-BR')} dispositivos`}
                             </button>
                             <button
                                 onClick={() => setShowABModal(true)}
-                                style={{ padding: '12px 16px', borderRadius: '8px', border: '2px solid #E5E7EB', background: '#fff', cursor: 'pointer', fontSize: '13px', fontWeight: 700, color: '#374151', whiteSpace: 'nowrap', transition: 'all 0.2s' }}
-                                onMouseOver={e => { e.currentTarget.style.borderColor = '#3b82f6'; e.currentTarget.style.color = '#3b82f6'; }}
-                                onMouseOut={e => { e.currentTarget.style.borderColor = '#E5E7EB'; e.currentTarget.style.color = '#374151'; }}
+                                style={{ padding: '10px 14px', borderRadius: '8px', border: `1px solid ${C.neutralBorder}`, background: C.white, cursor: 'pointer', fontSize: '12px', fontWeight: 700, color: C.textMid, whiteSpace: 'nowrap', transition: 'all 0.2s', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                                onMouseOver={e => { e.currentTarget.style.borderColor = C.brand; e.currentTarget.style.color = C.brand; }}
+                                onMouseOut={e => { e.currentTarget.style.borderColor = C.neutralBorder; e.currentTarget.style.color = C.textMid; }}
                             >
-                                🧪 A/B
+                                {Icon.flask} A/B
                             </button>
                         </div>
                     </div>
 
                     {/* ── HISTORICO COM ROI ── */}
                     <div className="config-card" style={{ marginTop: '24px' }}>
-                        <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                             <div>
-                                <h3 style={{ margin: 0 }}>📜 Historico de Campanhas</h3>
-                                <p style={{ margin: '4px 0 0', fontSize: '0.9rem', color: '#6B7280' }}>Metricas reais do OneSignal{ticketMedio > 0 ? ' + ROI estimado' : ''}</p>
+                                <div style={{ fontSize: '14px', fontWeight: 600, color: C.text, display: 'flex', alignItems: 'center', gap: '7px' }}>{Icon.history} Histórico de campanhas</div>
+                                <div style={{ fontSize: '12px', color: C.textSoft, marginTop: '2px' }}>Métricas reais do OneSignal{ticketMedio > 0 ? ' + ROI estimado' : ''}</div>
                             </div>
-                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                <div style={{ display: 'flex', background: '#F3F4F6', borderRadius: '8px', padding: '3px', gap: '2px' }}>
+                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                <div style={{ display: 'flex', background: C.neutralBg, borderRadius: '7px', padding: '3px', gap: '2px', border: `1px solid ${C.neutralBorder}` }}>
                                     {(['onesignal', 'ab', 'jornada', 'score', 'local'] as const).map(tab => (
-                                        <button key={tab} onClick={() => setActiveHistorySubTab(tab)} style={{ padding: '5px 12px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: 500, background: activeHistorySubTab === tab ? '#fff' : 'transparent', color: activeHistorySubTab === tab ? '#111827' : '#6B7280', boxShadow: activeHistorySubTab === tab ? '0 1px 3px rgba(0,0,0,0.1)' : 'none', whiteSpace: 'nowrap' }}>
-                                            {tab === 'onesignal' ? 'OneSignal' : tab === 'ab' ? '🧪 A/B' : tab === 'jornada' ? '🗺️ Jornada' : tab === 'score' ? '🎯 Score' : 'Local'}
+                                        <button key={tab} onClick={() => setActiveHistorySubTab(tab)} style={{ padding: '4px 10px', borderRadius: '5px', border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: 600, background: activeHistorySubTab === tab ? C.white : 'transparent', color: activeHistorySubTab === tab ? C.text : C.neutralMid, boxShadow: activeHistorySubTab === tab ? '0 1px 2px rgba(0,0,0,0.08)' : 'none', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                            {tab === 'onesignal' ? <>{Icon.bell} OneSignal</> : tab === 'ab' ? <>{Icon.flask} A/B</> : tab === 'jornada' ? <>{Icon.map} Jornada</> : tab === 'score' ? <>{Icon.score} Score</> : <>{Icon.history} Local</>}
                                         </button>
                                     ))}
                                 </div>
-                                <button onClick={() => { fetchHistory(); fetchOsStats(); fetchABTests(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px' }}>🔄</button>
+                                <button onClick={() => { fetchHistory(); fetchOsStats(); fetchABTests(); }} style={{ background: 'none', border: `1px solid ${C.neutralBorder}`, borderRadius: '6px', padding: '4px 8px', cursor: 'pointer', color: C.neutralMid, display: 'flex', alignItems: 'center' }}>{Icon.refresh}</button>
                             </div>
                         </div>
                         {activeHistorySubTab === 'onesignal' && (
@@ -2562,12 +2646,12 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
             {activeTab === 'automacoes' && (
                 <div className="config-card">
                     <div className="card-header">
-                        <h2 style={{ margin: 0 }}>🤖 Recuperacao de Carrinho Abandonado</h2>
-                        <p style={{ color: '#6B7280', margin: '6px 0 0' }}>Configure as mensagens automaticas enviadas quando um cliente abandona o carrinho.</p>
+                        <h2 style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: C.text, display: 'flex', alignItems: 'center', gap: '8px' }}>{Icon.robot} Recuperação de carrinho abandonado</h2>
+                        <p style={{ color: C.textSoft, margin: '4px 0 0', fontSize: '13px' }}>Configure as mensagens automáticas enviadas quando um cliente abandona o carrinho.</p>
                     </div>
-                    <div style={{ background: '#EEF2FF', border: '1px solid #C7D2FE', borderRadius: '10px', padding: '14px 16px', marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                        <span style={{ fontSize: '20px' }}>💡</span>
-                        <div style={{ fontSize: '13px', color: '#3730A3', lineHeight: '1.5' }}><strong>Como funciona:</strong> Quando um cliente adiciona itens ao carrinho e sai sem comprar, o sistema aguarda o tempo configurado e envia a notificacao automaticamente.</div>
+                    <div style={{ background: C.brandLight, border: `1px solid ${C.brandMuted}30`, borderRadius: '8px', padding: '12px 14px', marginBottom: '24px', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                        <span style={{ color: C.brand, display: 'flex', flexShrink: 0, marginTop: '1px' }}>{Icon.info}</span>
+                        <div style={{ fontSize: '13px', color: C.brand, lineHeight: '1.5' }}><strong>Como funciona:</strong> Quando um cliente adiciona itens ao carrinho e sai sem comprar, o sistema aguarda o tempo configurado e envia a notificação automaticamente.</div>
                     </div>
                     {loadingAutomacao ? <p style={{ textAlign: 'center', padding: '20px', color: '#888' }}>Carregando...</p> : (
                         <>
@@ -2575,10 +2659,10 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                             {renderPassoCard(2, automacao.passo2_ativo, automacao.passo2_horas, automacao.passo2_titulo, automacao.passo2_mensagem)}
                             {renderPassoCard(3, automacao.passo3_ativo, automacao.passo3_horas, automacao.passo3_titulo, automacao.passo3_mensagem, automacao.passo3_cupom)}
 
-                            <div style={{ borderTop: '1px solid #E5E7EB', paddingTop: '20px', marginTop: '4px', marginBottom: '16px' }}>
-                                <div style={{ fontSize: '13px', fontWeight: 700, color: '#374151', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <span>🛍️</span> Produto Visitado
-                                    <span style={{ fontSize: '11px', fontWeight: 400, color: '#6B7280' }}>— lembrete automático após visitar produto</span>
+                            <div style={{ borderTop: `1px solid ${C.neutralBorder}`, paddingTop: '20px', marginTop: '4px', marginBottom: '16px' }}>
+                                <div style={{ fontSize: '13px', fontWeight: 600, color: C.textMid, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    {Icon.eye} Produto Visitado
+                                    <span style={{ fontSize: '11px', fontWeight: 400, color: C.neutralLight }}>— lembrete automático após visitar produto</span>
                                 </div>
                             </div>
                             <div style={{ border: `2px solid ${automacao.produto_visitado_ativo ? '#8b5cf6' : '#E5E7EB'}`, borderRadius: '12px', padding: '20px', marginBottom: '16px', background: automacao.produto_visitado_ativo ? '#fafafa' : '#f9fafb', transition: 'all 0.2s' }}>
@@ -2616,10 +2700,10 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                 )}
                             </div>
 
-                            <div style={{ borderTop: '1px solid #E5E7EB', paddingTop: '20px', marginTop: '4px', marginBottom: '16px' }}>
-                                <div style={{ fontSize: '13px', fontWeight: 700, color: '#374151', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <span>😴</span> Cliente Inativo
-                                    <span style={{ fontSize: '11px', fontWeight: 400, color: '#6B7280' }}>— reativacao automatica de clientes sumidos</span>
+                            <div style={{ borderTop: `1px solid ${C.neutralBorder}`, paddingTop: '20px', marginTop: '4px', marginBottom: '16px' }}>
+                                <div style={{ fontSize: '13px', fontWeight: 600, color: C.textMid, marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    {Icon.clock} Cliente Inativo
+                                    <span style={{ fontSize: '11px', fontWeight: 400, color: C.neutralLight }}>— reativação automática de clientes sumidos</span>
                                 </div>
                             </div>
                             <div style={{ border: `2px solid ${automacao.inativo_ativo ? '#f59e0b' : '#E5E7EB'}`, borderRadius: '12px', padding: '20px', marginBottom: '16px', background: automacao.inativo_ativo ? '#fafafa' : '#f9fafb', transition: 'all 0.2s' }}>
@@ -2661,8 +2745,8 @@ export default function TabCampaigns({ stats, pushForm, setPushForm, handleSendP
                                     </div>
                                 )}
                             </div>
-                            <button className="save-button" onClick={saveAutomacao} disabled={savingAutomacao} style={{ width: '100%', marginTop: '8px', background: savingAutomacao ? '#ccc' : '#111827' }}>
-                                {savingAutomacao ? 'Salvando...' : '💾 Salvar Automacoes'}
+                            <button className="save-button" onClick={saveAutomacao} disabled={savingAutomacao} style={{ width: '100%', marginTop: '8px', background: savingAutomacao ? C.neutralBorder : C.dark, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '13px', fontWeight: 600 }}>
+                                {Icon.check} {savingAutomacao ? 'Salvando...' : 'Salvar automações'}
                             </button>
                         </>
                     )}
