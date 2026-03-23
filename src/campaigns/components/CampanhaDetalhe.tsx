@@ -1,5 +1,6 @@
 import { OneSignalNotif } from '../types';
-import { C, Icon } from '../design';
+import { C } from '../design';
+import { Icon } from '../icons';
 import { inferirFunil } from './SeletorObjetivo';
 
 interface Props {
@@ -108,7 +109,7 @@ export function CampanhaDetalhe({ notif, mediaAbertura, ticketMedio, taxaConvGlo
                                 ].map((m, i) => (
                                     <div key={i}>
                                         <div style={{ fontSize: '13px', color: C.textSoft, marginBottom: '3px' }}>{m.label}</div>
-                                        <div style={{ fontSize: '17px', fontWeight: 700, color: m.color, letterSpacing: '-0.01em' }}>{typeof m.value === 'number' ? m.value : m.value}</div>
+                                        <div style={{ fontSize: '17px', fontWeight: 700, color: m.color, letterSpacing: '-0.01em' }}>{m.value}</div>
                                     </div>
                                 ))}
                             </div>
